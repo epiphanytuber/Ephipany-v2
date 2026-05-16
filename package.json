@@ -1,0 +1,9 @@
+{
+  "name": "epiphany",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@duckdb/node-api": "1.5.2-r.1",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

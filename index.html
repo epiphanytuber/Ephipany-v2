@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Epiphany — Premier Tutoring Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --black:#080808;--black2:#111;--black3:#1a1a1a;--black4:#222;
+  --gold:#C9A84C;--gold-l:#E8C96A;--gold-d:rgba(201,168,76,.18);
+  --gold-p:#F5E9C8;--white:#FAF9F6;--muted:rgba(250,249,246,.45);
+  --border:rgba(201,168,76,.15);--green:#4caf7d;--red:#e05c5c;--amber:#e0a84c
+}
+html{scroll-behavior:smooth;background:var(--black)}
+body{background:var(--black);color:var(--white);font-family:'Nunito Sans',sans-serif;overflow-x:hidden}
+.page{animation:fadeUp .45s ease forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.eyebrow{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:'';display:block;width:30px;height:1px;background:var(--gold)}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;line-height:1.1;margin-bottom:10px}
+.section-title em{font-style:italic;color:var(--gold)}
+.gold-rule{width:56px;height:1px;background:var(--gold);margin:18px 0 28px}
+.btn-gold{padding:13px 34px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .25s}
+.btn-gold:hover{background:var(--gold-l);transform:translateY(-1px)}
+.btn-ghost{padding:13px 34px;background:transparent;color:var(--white);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;border:1px solid rgba(250,249,246,.2);cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .25s}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.badge{display:inline-block;padding:3px 11px;background:var(--gold);font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--black);font-weight:700}
+.badge.expert{background:transparent;border:1px solid var(--gold);color:var(--gold)}
+.stars-gold{color:var(--gold);font-size:11px}
+.rating-num{font-size:11px;color:var(--muted)}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:72px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:999;background:rgba(8,8,8,.96);backdrop-filter:blur(16px)}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;letter-spacing:8px;color:var(--gold);text-transform:uppercase;cursor:pointer;user-select:none}
+.nav-logo span{color:var(--white)}
+.nav-links{display:flex;gap:8px;align-items:center}
+.nav-link{padding:8px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .2s;background:none;border:none;font-family:'Nunito Sans',sans-serif}
+.nav-link:hover,.nav-link.active{color:var(--gold)}
+.nav-cta{margin-left:8px;padding:9px 22px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .25s;font-family:'Nunito Sans',sans-serif}
+.nav-cta:hover{background:var(--gold);color:var(--black)}
+.nav-cta.filled{background:var(--gold);color:var(--black)}
+.nav-cta.filled:hover{background:var(--gold-l);border-color:var(--gold-l)}
+
+/* DASHBOARD NAV */
+.dash-nav{display:none;align-items:center;justify-content:space-between;padding:0 48px;height:72px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:999;background:rgba(8,8,8,.97);backdrop-filter:blur(16px)}
+.dash-nav-right{display:flex;align-items:center;gap:16px}
+.dash-back-btn{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);background:none;border:1px solid rgba(250,249,246,.12);padding:8px 18px;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
+.dash-back-btn:hover{border-color:var(--gold);color:var(--gold)}
+.dash-user{display:flex;align-items:center;gap:9px}
+.dash-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid var(--gold)}
+.dash-uname{font-size:13px;color:var(--white)}
+
+/* HOME */
+.hero{min-height:88vh;display:flex;align-items:center;padding:80px 56px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 70% at 80% 50%,rgba(201,168,76,.06) 0%,transparent 70%)}
+.hero-bg-text{position:absolute;right:-40px;top:50%;transform:translateY(-50%);font-family:'Cormorant Garamond',serif;font-size:240px;font-weight:300;letter-spacing:24px;color:rgba(201,168,76,.035);white-space:nowrap;pointer-events:none;user-select:none;line-height:1}
+.hero-content{position:relative;z-index:2;max-width:680px}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:80px;font-weight:300;line-height:1.05;margin-bottom:28px}
+.hero-title em{font-style:italic;color:var(--gold)}
+.hero-sub{font-size:14px;color:var(--muted);line-height:1.9;max-width:460px;letter-spacing:.3px;margin-bottom:44px}
+.hero-actions{display:flex;gap:14px;margin-bottom:72px}
+.hero-stats{display:flex;gap:56px;padding-top:40px;border-top:1px solid var(--border)}
+.stat-n{font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:300;color:var(--gold)}
+.stat-l{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.featured-strip{padding:72px 56px;border-top:1px solid var(--border)}
+.strip-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px}
+.strip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
+.strip-card{cursor:pointer;position:relative;overflow:hidden;aspect-ratio:3/4;background:var(--black3);transition:transform .35s}
+.strip-card:hover{transform:translateY(-6px);z-index:2}
+.strip-card img{width:100%;height:100%;object-fit:cover;transition:transform .5s,filter .35s;filter:brightness(.75)}
+.strip-card:hover img{transform:scale(1.06);filter:brightness(.55)}
+.strip-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,.92) 0%,rgba(8,8,8,.2) 50%,transparent 100%)}
+.strip-card-body{position:absolute;bottom:0;left:0;right:0;padding:20px}
+.strip-card-badge{margin-bottom:8px}
+.strip-card-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:4px;line-height:1.2}
+.strip-card-sub{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold)}
+.how-section{padding:80px 56px;border-top:1px solid var(--border);background:var(--black2)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin-top:48px}
+.step-num{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;color:var(--gold-d);line-height:1;margin-bottom:16px}
+.step-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:400;margin-bottom:10px}
+.step-body{font-size:13px;color:var(--muted);line-height:1.9}
+
+/* CATALOGUE */
+.cat-hero{padding:72px 56px 48px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(201,168,76,.04) 0%,transparent 100%)}
+.cat-hero-inner{display:flex;justify-content:space-between;align-items:flex-end}
+.cat-count{font-size:12px;color:var(--muted);margin-top:8px;letter-spacing:1px}
+.filters-bar{padding:24px 56px;border-bottom:1px solid var(--border);display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;background:var(--black2);position:sticky;top:72px;z-index:90}
+.filter-group{display:flex;flex-direction:column;gap:5px}
+.filter-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.filter-select{background:rgba(255,255,255,.05);border:1px solid rgba(250,249,246,.12);color:var(--white);padding:8px 32px 8px 12px;font-size:11px;font-family:'Nunito Sans',sans-serif;cursor:pointer;outline:none;transition:border .2s;min-width:160px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C9A84C'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.filter-select option{background:#1a1a1a}
+.filter-select:focus{border-color:var(--gold)}
+.search-wrap{position:relative}
+.search-wrap::before{content:'⌕';position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:16px;pointer-events:none}
+.filter-search{min-width:240px;background:rgba(255,255,255,.05);border:1px solid rgba(250,249,246,.12);color:var(--white);padding:8px 14px 8px 36px;font-size:12px;font-family:'Nunito Sans',sans-serif;outline:none;transition:border .2s}
+.filter-search:focus{border-color:var(--gold)}
+.filter-search::placeholder{color:var(--muted)}
+.catalogue-body{padding:48px 56px}
+.tutor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.no-results{grid-column:1/-1;text-align:center;padding:80px;font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;color:var(--muted)}
+.t-card{background:var(--black3);cursor:pointer;position:relative;overflow:hidden;transition:transform .3s;display:flex;flex-direction:column}
+.t-card:hover{transform:translateY(-5px);z-index:2;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.t-card-img-wrap{position:relative;height:260px;overflow:hidden;flex-shrink:0}
+.t-card-img{width:100%;height:100%;object-fit:cover;transition:transform .5s,filter .3s;filter:brightness(.82)}
+.t-card:hover .t-card-img{transform:scale(1.05);filter:brightness(.65)}
+.t-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,.85) 0%,transparent 55%)}
+.t-card-badges{position:absolute;top:14px;left:14px;display:flex;gap:6px;flex-wrap:wrap}
+.t-card-mode{padding:3px 9px;background:rgba(8,8,8,.75);backdrop-filter:blur(4px);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border:1px solid rgba(250,249,246,.15)}
+.t-card-body{padding:20px 22px 24px;flex:1;display:flex;flex-direction:column}
+.t-card-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;margin-bottom:3px}
+.t-card-location{font-size:10px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.t-card-subjects{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.t-card-subj{padding:3px 9px;border:1px solid rgba(201,168,76,.25);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-p)}
+.t-card-bio{font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:16px;flex:1}
+.t-card-footer{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid rgba(250,249,246,.07)}
+.t-card-rate{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold)}
+.t-card-rating{display:flex;align-items:center;gap:5px}
+
+/* PROFILE */
+.profile-hero{display:grid;grid-template-columns:420px 1fr;min-height:520px}
+.profile-hero-img{position:relative;overflow:hidden}
+.profile-hero-img img{width:100%;height:100%;object-fit:cover;filter:brightness(.88)}
+.profile-hero-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 60%,var(--black) 100%)}
+.profile-hero-content{padding:60px 56px 60px 48px;background:var(--black);display:flex;flex-direction:column;justify-content:center}
+.profile-back{font-size:10px;letter-spacing:2px;text-transform:uppercase;background:none;border:none;color:var(--muted);cursor:pointer;font-family:'Nunito Sans',sans-serif;margin-bottom:28px;padding:0;display:flex;align-items:center;gap:8px;transition:color .2s}
+.profile-back:hover{color:var(--gold)}
+.profile-badges{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.profile-name{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;line-height:1.05;margin-bottom:8px}
+.profile-location{font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.profile-tagline{font-size:14px;color:var(--muted);line-height:1.85;max-width:480px;margin-bottom:28px}
+.profile-quick{display:flex;gap:36px;margin-bottom:36px;flex-wrap:wrap}
+.pq-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.pq-val{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--gold)}
+.profile-tags{display:flex;gap:8px;flex-wrap:wrap}
+.profile-tag{padding:5px 14px;border:1px solid rgba(201,168,76,.3);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-p)}
+.profile-body{display:grid;grid-template-columns:1fr 380px}
+.profile-main{padding:56px;border-right:1px solid var(--border)}
+.profile-sidebar{padding:48px 40px;background:var(--black2)}
+.profile-section{margin-bottom:48px}
+.profile-section-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.profile-bio{font-size:13.5px;color:rgba(250,249,246,.65);line-height:2}
+.qual-list{list-style:none}
+.qual-item{padding:12px 0;border-bottom:1px solid rgba(250,249,246,.06);font-size:13px;color:rgba(250,249,246,.7);display:flex;align-items:center;gap:12px}
+.qual-item::before{content:'✦';font-size:9px;color:var(--gold);flex-shrink:0}
+.avail-grid{display:flex;gap:8px;flex-wrap:wrap}
+.avail-day{width:52px;height:52px;display:flex;align-items:center;justify-content:center;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid rgba(250,249,246,.12);color:var(--muted)}
+.avail-day.on{border-color:var(--gold);color:var(--gold-p);background:rgba(201,168,76,.08)}
+.lang-list{display:flex;gap:10px;flex-wrap:wrap}
+.lang-tag{padding:6px 16px;border:1px solid rgba(201,168,76,.25);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(250,249,246,.65)}
+.testimonial{padding:24px;border:1px solid var(--border);margin-bottom:14px;background:rgba(255,255,255,.02)}
+.testimonial-stars{color:var(--gold);font-size:12px;margin-bottom:10px}
+.testimonial-text{font-size:13px;color:rgba(250,249,246,.65);line-height:1.85;font-style:italic;margin-bottom:12px}
+.testimonial-author{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.booking-card{position:sticky;top:100px}
+.booking-card-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;margin-bottom:4px}
+.booking-card-sub{font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:24px}
+.bc-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.bc-days{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.bc-day{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:1px;border:1px solid rgba(250,249,246,.12);color:var(--muted);cursor:default;transition:all .2s;font-family:'Nunito Sans',sans-serif}
+.bc-day.avail{border-color:rgba(201,168,76,.35);color:var(--gold-p);cursor:pointer}
+.bc-day.avail:hover{background:rgba(201,168,76,.12)}
+.bc-day.sel{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:700}
+.bc-times{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.bc-time{padding:7px 13px;border:1px solid rgba(250,249,246,.1);font-size:11px;color:var(--muted);cursor:pointer;transition:all .2s;background:none;font-family:'Nunito Sans',sans-serif}
+.bc-time:hover{border-color:rgba(201,168,76,.35);color:var(--gold-p)}
+.bc-time.sel{border-color:var(--gold);background:rgba(201,168,76,.12);color:var(--gold)}
+.bc-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:11px 14px;color:var(--white);font-size:12px;font-family:'Nunito Sans',sans-serif;margin-bottom:10px;outline:none;transition:border .2s}
+.bc-input:focus{border-color:var(--gold)}
+.bc-input::placeholder{color:var(--muted)}
+.bc-summary{padding:14px 0 6px;border-top:1px solid rgba(201,168,76,.1);margin-top:8px}
+.bc-summary-row{display:flex;justify-content:space-between;font-size:12px;color:rgba(250,249,246,.5);margin-bottom:6px}
+.bc-summary-total{display:flex;justify-content:space-between;font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold)}
+.bc-confirm{width:100%;padding:14px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s;margin-top:6px}
+.bc-confirm:hover{background:var(--gold-l)}
+.bc-confirm:disabled{opacity:.35;cursor:not-allowed}
+.booking-success-card{padding:28px;border:1px solid rgba(201,168,76,.25);text-align:center}
+.bsc-icon{font-size:32px;margin-bottom:10px}
+.bsc-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold);margin-bottom:8px}
+.bsc-text{font-size:12px;color:var(--muted);line-height:1.9}
+
+/* REGISTER */
+.register-page{padding:80px 56px;max-width:800px;margin:0 auto}
+.reg-intro{font-size:13px;color:var(--muted);margin-bottom:32px;line-height:1.9;max-width:520px}
+.reg-tabs{display:flex;gap:2px;margin-bottom:28px}
+.reg-tab{padding:11px 28px;background:var(--black3);border:1px solid rgba(250,249,246,.08);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
+.reg-tab.active{background:rgba(201,168,76,.1);border-color:var(--gold);color:var(--gold)}
+.photo-drop{border:1px dashed rgba(201,168,76,.3);padding:40px 20px;text-align:center;cursor:pointer;transition:all .25s;background:rgba(201,168,76,.02);margin-bottom:24px}
+.photo-drop:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
+.photo-drop-icon{font-size:32px;margin-bottom:10px}
+.photo-drop-text{font-size:12px;color:var(--muted);line-height:1.7}
+.photo-drop-text span{color:var(--gold)}
+.reg-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.reg-group{display:flex;flex-direction:column;gap:7px}
+.reg-group-full{grid-column:1/-1}
+.reg-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.reg-input{background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:13px 16px;color:var(--white);font-size:13px;font-family:'Nunito Sans',sans-serif;outline:none;transition:border .2s}
+.reg-input:focus{border-color:var(--gold)}
+.reg-input::placeholder{color:var(--muted)}
+.reg-select{background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:13px 16px;color:var(--white);font-size:13px;font-family:'Nunito Sans',sans-serif;outline:none;transition:border .2s;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C9A84C'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.reg-select option{background:#1a1a1a}
+.reg-select:focus{border-color:var(--gold)}
+.day-checks{display:flex;gap:12px;flex-wrap:wrap;padding:4px 0}
+.day-check{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(250,249,246,.6);cursor:pointer;user-select:none}
+.day-check input{accent-color:var(--gold)}
+.reg-submit{width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .25s;margin-top:20px}
+.reg-submit:hover{background:var(--gold-l)}
+.reg-success{text-align:center;padding:60px 0}
+.reg-success-icon{font-size:48px;margin-bottom:20px}
+.reg-success-title{font-family:'Cormorant Garamond',serif;font-size:42px;color:var(--gold);margin-bottom:12px}
+.reg-success-sub{font-size:14px;color:var(--muted);line-height:1.9;max-width:400px;margin:0 auto}
+
+/* DASHBOARD */
+.dashboard-wrap{display:flex;min-height:calc(100vh - 72px)}
+.dash-sidebar{width:240px;flex-shrink:0;padding:32px 0;border-right:1px solid var(--border);background:var(--black2);position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto}
+.dash-sb-profile{padding:0 28px 20px;border-bottom:1px solid rgba(201,168,76,.08);margin-bottom:12px}
+.dash-sb-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.dash-sb-user{display:flex;align-items:center;gap:10px}
+.dash-sb-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--gold)}
+.dash-sb-uname{font-size:13px;font-weight:600;line-height:1.2}
+.dash-sb-role{font-size:10px;color:var(--muted)}
+.dash-nav-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:0 28px;margin-bottom:10px;margin-top:8px}
+.dash-nav-item{display:flex;align-items:center;gap:12px;padding:11px 28px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s;background:none;border:none;width:100%;text-align:left;font-family:'Nunito Sans',sans-serif}
+.dash-nav-item:hover{color:var(--white);background:rgba(201,168,76,.05)}
+.dash-nav-item.active{color:var(--gold);background:rgba(201,168,76,.08);border-right:2px solid var(--gold)}
+.dash-nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.dash-nav-badge{margin-left:auto;background:var(--gold);color:var(--black);font-size:9px;font-weight:700;padding:2px 7px}
+.dash-main{flex:1;overflow-y:auto}
+.dash-section{padding:40px 48px;animation:fadeUp .4s ease}
+.dash-eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.dash-eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--gold)}
+.dash-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;line-height:1.1;margin-bottom:16px}
+.dash-title em{font-style:italic;color:var(--gold)}
+.ov-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:40px}
+.ov-card{background:var(--black3);padding:24px 26px;position:relative;overflow:hidden}
+.ov-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:rgba(201,168,76,.15)}
+.ov-card.ov-hl::before{background:var(--gold)}
+.ov-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.ov-value{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:300;color:var(--white);line-height:1}
+.ov-value.gld{color:var(--gold)}
+.ov-value.amb{color:var(--amber)}
+.ov-sub{font-size:11px;color:var(--muted);margin-top:6px}
+.ov-sub.clk{color:var(--amber);cursor:pointer}
+.ov-sub.clk:hover{text-decoration:underline}
+.sub-hdg{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.sub-hdg-link{font-family:'Nunito Sans',sans-serif;font-size:11px;color:var(--gold);cursor:pointer;font-weight:400}
+.sub-hdg-link:hover{text-decoration:underline}
+.sub-hdg-count{font-family:'Nunito Sans',sans-serif;font-size:11px;color:var(--muted);font-weight:400}
+.lesson-list{display:flex;flex-direction:column;gap:2px;margin-bottom:40px}
+.lc{background:var(--black3);display:flex;align-items:center;gap:20px;padding:18px 24px;transition:background .2s}
+.lc:hover{background:var(--black4)}
+.lc.lc-up{border-left:2px solid var(--gold)}
+.lc.lc-pend{border-left:2px solid var(--amber)}
+.lc.lc-can{border-left:2px solid rgba(224,92,92,.4);opacity:.55}
+.lc-img{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.lc-info{flex:1;min-width:0}
+.lc-tutor{font-size:14px;font-weight:600;margin-bottom:2px}
+.lc-subj{font-size:11px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.lc-meta{display:flex;gap:14px;align-items:center}
+.lc-date{font-size:12px;color:var(--muted)}
+.lc-mode{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(250,249,246,.12);color:var(--muted)}
+.lc-right{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.lc-rate-lbl{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold)}
+.lc-pill{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 12px}
+.pill-confirmed{background:rgba(76,175,125,.12);color:var(--green);border:1px solid rgba(76,175,125,.25)}
+.pill-pending{background:rgba(224,168,76,.1);color:var(--amber);border:1px solid rgba(224,168,76,.25)}
+.pill-completed{background:rgba(201,168,76,.08);color:var(--gold);border:1px solid var(--border)}
+.pill-cancelled{background:rgba(224,92,92,.08);color:var(--red);border:1px solid rgba(224,92,92,.2)}
+.lc-join{padding:7px 16px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
+.lc-join:hover{background:var(--gold-l)}
+.lc-cancel{padding:7px 14px;background:transparent;color:var(--muted);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid rgba(250,249,246,.1);cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
+.lc-cancel:hover{border-color:var(--red);color:var(--red)}
+.lc-stars{color:var(--gold);font-size:12px}
+.lc-rate-btn{padding:5px 12px;border:1px solid rgba(201,168,76,.35);background:transparent;color:var(--gold);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
+.lc-rate-btn:hover{background:rgba(201,168,76,.1)}
+.filter-tabs{display:flex;gap:8px;margin-bottom:24px}
+.ftab{padding:7px 18px;border:1px solid rgba(250,249,246,.1);background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
+.ftab.active{border-color:var(--gold);background:rgba(201,168,76,.1);color:var(--gold)}
+.pay-top{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:28px}
+.pay-card{background:var(--black3);padding:28px 30px}
+.pay-card-label{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.pay-card-value{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:300;color:var(--gold);line-height:1;margin-bottom:8px}
+.pay-card-value.amb{color:var(--amber)}
+.pay-card-value.grn{color:var(--green)}
+.pay-card-sub{font-size:11px;color:var(--muted)}
+.due-hdr{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--white);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.due-dot{width:7px;height:7px;background:var(--amber);border-radius:50%}
+.due-card{background:var(--black3);padding:18px 24px;display:flex;align-items:center;gap:16px;margin-bottom:2px;border-left:2px solid var(--amber)}
+.due-info{flex:1}
+.due-inv-id{font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:3px;font-family:monospace}
+.due-desc{font-size:14px;font-weight:600}
+.due-date{font-size:11px;color:var(--muted);margin-top:2px}
+.due-amount{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold);margin-right:16px}
+.pay-now-btn{padding:10px 22px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s;white-space:nowrap}
+.pay-now-btn:hover{background:var(--gold-l)}
+.inv-table{width:100%;border-collapse:collapse}
+.inv-table th{text-align:left;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 16px;border-bottom:1px solid var(--border);font-weight:400}
+.inv-table td{padding:14px 16px;font-size:13px;border-bottom:1px solid rgba(201,168,76,.06)}
+.inv-table tr:hover td{background:rgba(255,255,255,.02)}
+.inv-id{font-size:11px;color:var(--muted);font-family:monospace;letter-spacing:1px}
+.inv-paid{color:var(--green);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;background:rgba(76,175,125,.1);border:1px solid rgba(76,175,125,.2)}
+.inv-dl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);background:none;border:1px solid rgba(250,249,246,.1);padding:4px 12px;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
+.inv-dl:hover{color:var(--gold);border-color:var(--gold)}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.setting-group{display:flex;flex-direction:column;gap:7px}
+.setting-group.full{grid-column:1/-1}
+.setting-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.setting-input{background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:12px 15px;color:var(--white);font-size:13px;font-family:'Nunito Sans',sans-serif;outline:none;transition:border .2s}
+.setting-input:focus{border-color:var(--gold)}
+.setting-input::placeholder{color:var(--muted)}
+.settings-avatar-row{display:flex;align-items:center;gap:20px;margin-bottom:28px}
+.settings-big-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)}
+.settings-change-btn{padding:9px 20px;border:1px solid rgba(201,168,76,.35);background:transparent;color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
+.settings-change-btn:hover{background:rgba(201,168,76,.08)}
+.settings-save{padding:13px 36px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .25s;margin-top:20px}
+.settings-save:hover{background:var(--gold-l)}
+.save-toast{display:inline-flex;align-items:center;gap:8px;margin-left:14px;font-size:11px;color:var(--green)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:2000;background:rgba(5,5,5,.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:24px}
+.modal-box{background:var(--black2);max-width:480px;width:100%;border:1px solid rgba(201,168,76,.2);position:relative;padding:40px}
+.modal-close-btn{position:absolute;top:16px;right:16px;background:rgba(201,168,76,.1);border:1px solid var(--gold);color:var(--gold);width:32px;height:32px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Nunito Sans',sans-serif}
+.modal-eyebrow{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.modal-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;margin-bottom:24px}
+.modal-summary{background:var(--black3);padding:18px 20px;margin-bottom:24px}
+.modal-sum-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:8px}
+.modal-sum-row:last-child{margin:0;padding-top:8px;border-top:1px solid var(--border);font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold)}
+.modal-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;display:block}
+.modal-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:12px 14px;color:var(--white);font-size:13px;font-family:'Nunito Sans',sans-serif;outline:none;margin-bottom:12px;transition:border .2s}
+.modal-input:focus{border-color:var(--gold)}
+.modal-input::placeholder{color:var(--muted)}
+.modal-card-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.modal-submit{width:100%;padding:14px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s;margin-top:8px}
+.modal-submit:hover{background:var(--gold-l)}
+.modal-secure{font-size:11px;color:var(--muted);text-align:center;margin-top:12px}
+.modal-success{text-align:center;padding:24px 0}
+.modal-success-icon{font-size:36px;margin-bottom:12px}
+.modal-success-title{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold);margin-bottom:8px}
+.modal-success-text{font-size:13px;color:var(--muted);line-height:1.8}
+
+/* FOOTER */
+.footer{padding:48px 56px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;letter-spacing:6px;color:var(--gold);text-transform:uppercase}
+.footer-links{display:flex;gap:28px}
+.footer-link{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .2s}
+.footer-link:hover{color:var(--gold)}
+.footer-copy{font-size:10px;color:rgba(250,249,246,.2)}
+
+/* AUTH MODAL */
+.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-box{background:var(--black3);border:1px solid var(--border);padding:40px 44px;width:100%;max-width:460px;position:relative;animation:fadeUp .3s ease forwards;max-height:90vh;overflow-y:auto}
+.auth-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;transition:color .2s;line-height:1}
+.auth-close:hover{color:var(--white)}
+.auth-logo{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;letter-spacing:7px;color:var(--gold);text-transform:uppercase;text-align:center;margin-bottom:28px}
+.auth-logo span{color:var(--white)}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:28px}
+.auth-tab{flex:1;background:none;border:none;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Nunito Sans',sans-serif;padding:10px;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-1px}
+.auth-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.auth-label{display:block;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;margin-top:16px}
+.auth-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(250,249,246,.12);color:var(--white);padding:11px 14px;font-size:13px;font-family:'Nunito Sans',sans-serif;outline:none;transition:border .2s}
+.auth-input:focus{border-color:var(--gold)}
+.auth-input::placeholder{color:var(--muted)}
+.auth-submit{width:100%;margin-top:24px;padding:14px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .25s}
+.auth-submit:hover{background:var(--gold-l)}
+.auth-switch{text-align:center;font-size:12px;color:var(--muted);margin-top:18px}
+.auth-switch span{color:var(--gold);cursor:pointer;font-weight:600}
+.auth-switch span:hover{text-decoration:underline}
+.auth-error{background:rgba(224,92,92,.12);border:1px solid rgba(224,92,92,.3);color:#e05c5c;font-size:12px;padding:10px 14px;margin-bottom:4px}
+.reg-field-error{background:rgba(224,92,92,.12);border:1px solid rgba(224,92,92,.3);color:#e05c5c;font-size:12px;padding:10px 14px}
+
+@media(max-width:1024px){
+  .tutor-grid{grid-template-columns:repeat(2,1fr)}
+  .strip-grid{grid-template-columns:repeat(2,1fr)}
+  .ov-grid{grid-template-columns:repeat(2,1fr)}
+  .pay-top{grid-template-columns:1fr}
+  .settings-grid{grid-template-columns:1fr}
+  .modal-card-row{grid-template-columns:1fr}
+}
+@media(max-width:768px){
+  .nav,.dash-nav{padding:0 24px}
+  .hero,.featured-strip,.how-section,.cat-hero,.catalogue-body,.profile-main,.profile-sidebar,.register-page,.dash-section{padding-left:24px;padding-right:24px}
+  .filters-bar{padding-left:24px;padding-right:24px;top:64px}
+  .hero-title{font-size:52px}
+  .tutor-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .profile-hero{grid-template-columns:1fr}
+  .profile-hero-img{height:320px}
+  .profile-body{grid-template-columns:1fr}
+  .dash-sidebar{display:none}
+  .reg-grid{grid-template-columns:1fr}
+  .reg-group-full{grid-column:1}
+  .footer{padding:32px 24px;flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav" id="marketNav">
+  <div class="nav-logo" onclick="navigate('home')">Epi<span>phany</span></div>
+  <div class="nav-links">
+    <button class="nav-link active" id="nl-home"      onclick="navigate('home')">Home</button>
+    <button class="nav-link"        id="nl-catalogue" onclick="navigate('catalogue')">Find a Tutor</button>
+    <button class="nav-link"        id="nl-register"  onclick="navigate('register')">Become a Tutor</button>
+    <button class="nav-cta"                           onclick="navigate('register')">Register</button>
+    <button class="nav-cta filled"                    onclick="enterDashboard()">My Account</button>
+  </div>
+</nav>
+
+<nav class="dash-nav" id="dashNav">
+  <div class="nav-logo" onclick="exitDashboard()">Epi<span>phany</span></div>
+  <div class="dash-nav-right">
+    <button class="dash-back-btn" onclick="exitDashboard()">&#8592; Browse Tutors</button>
+    <div class="dash-user">
+      <img src="https://i.pravatar.cc/200?img=47" class="dash-avatar" id="dashAvatarImg" alt="user"/>
+      <span class="dash-uname" id="dashUnameEl"></span>
+    </div>
+  </div>
+</nav>
+
+<div id="authModalMount"></div>
+<div id="app"></div>
+
+<footer class="footer" id="siteFooter">
+  <div class="footer-logo">Epiphany</div>
+  <div class="footer-links">
+    <span class="footer-link" onclick="navigate('home')">Home</span>
+    <span class="footer-link" onclick="navigate('catalogue')">Tutors</span>
+    <span class="footer-link" onclick="navigate('register')">Register</span>
+    <span class="footer-link">About</span>
+    <span class="footer-link">Contact</span>
+  </div>
+  <div class="footer-copy">&#169; 2025 Epiphany Education. All rights reserved.</div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// AIRTABLE CONFIG
+// ── Replace BASE_ID with your base ID (starts with "app")
+// ── Replace TOKEN with your personal access token (starts with "pat")
+// ── Table name constants must match your Airtable tab names exactly
+// ═══════════════════════════════════════════════════════════════
+const API = '/api';
+
+// ── API helpers ──────────────────────────────────────────────────
+async function apiPost(endpoint, body) {
+  try {
+    const res = await fetch(`${API}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    return await res.json();
+  } catch(e) { console.error(`[API] ${endpoint}:`, e); return { error: 'Network error' }; }
+}
+async function apiGet(endpoint) {
+  try {
+    const res = await fetch(`${API}${endpoint}`);
+    return await res.json();
+  } catch(e) { console.error(`[API] ${endpoint}:`, e); return { error: 'Network error' }; }
+}
+async function atPush() { return null; }
+
+// ── SESSION HELPERS ──────────────────────────────────────────────
+function genToken() {
+  return 'tok_' + Math.random().toString(36).substr(2,9) + '_' + Date.now();
+}
+function setCookie(name, value, days) {
+  const exp = new Date(); exp.setDate(exp.getDate() + days);
+  document.cookie = `${name}=${value};expires=${exp.toUTCString()};path=/`;
+}
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? match[2] : null;
+}
+function clearCookie(name) {
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+}
+
+async function restoreSession() {
+  const token=getCookie('epiphany_token'), type=getCookie('epiphany_type');
+  if (!token||!type) return;
+  try {
+    const data=await apiPost('/session',{token});
+    if (data.error) { clearCookie('epiphany_token'); clearCookie('epiphany_type'); return; }
+    if (data.type==='learner'&&data.user) {
+      const u=data.user;
+      LEARNER.name=u.name||''; LEARNER.email=u.email||'';
+      LEARNER.phone=u.phone||''; LEARNER.since=u.since||'';
+      isLoggedIn=true; console.log('[Session] Learner restored:',LEARNER.name);
+    } else if (data.type==='tutor'&&data.tutor) {
+      const t=data.tutor;
+      TUTOR.name=t.name||''; TUTOR.email=t.email||''; TUTOR.phone=t.phone||'';
+      TUTOR.city=t.city||''; TUTOR.subject=t.subject||''; TUTOR.rate=t.rate||0;
+      TUTOR.bio=t.bio||''; TUTOR.since=t.since||''; TUTOR.airtableId=t.id||'';
+      tutorLoggedIn=true;
+      const sub=data.subscription||{};
+      TUTOR_SUB={status:sub.status||'none',trialStart:sub.trialStart||null,
+                 trialEnd:sub.trialEnd||null,subStart:null,nextBilling:sub.nextBilling||null};
+      saveSubState(); console.log('[Session] Tutor restored:',TUTOR.name);
+    }
+  } catch(e) { clearCookie('epiphany_token'); clearCookie('epiphany_type'); }
+}
+
+// ── DATA ─────────────────────────────────────────────────────────
+// TUTORS — fetched live from Airtable
+// When you set a tutor's Status to "Comfirmed" in Airtable,
+// they automatically appear in the catalogue on next page load.
+let TUTORS = [];
+let TUTORS_LOADED = false;
+
+function airtableToTutor(r, idx) {
+  const f = r.fields;
+  const modeRaw = f['Teaching Mode'] || 'Online';
+  const mode = modeRaw === 'Both' ? ['In-Person','Online'] : [modeRaw];
+  const avail = (f['Availability'] || '').split(',').map(d => d.trim()).filter(d => ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].includes(d));
+  return {
+    id:             idx + 1,
+    airtableId:     r.id,
+    name:           f['Full Name'] || '',
+    photo:          f['Photo URL'] || `https://i.pravatar.cc/400?img=${(idx % 70) + 1}`,
+    subjects:       (f['Primary Subject'] || 'General').split(',').map(s => s.trim()),
+    grade:          f['Grade Level'] || 'All grades',
+    bio:            f['Bio'] || 'Experienced educator passionate about student success.',
+    longBio:        f['Bio'] || 'Experienced educator passionate about student success.',
+    rate:           f['Hourly Rate'] || 0,
+    rating:         parseFloat(f['Rating'] || '4.8'),
+    reviews:        parseInt(f['Reviews'] || '0'),
+    sessions:       parseInt(f['Sessions'] || '0'),
+    availability:   avail.length ? avail : ['Mon','Wed','Fri'],
+    location:       f['City'] || 'South Africa',
+    mode:           mode,
+    badge:          f['Badge'] || null,
+    languages:      ['English'],
+    qualifications: (f['Qualification'] || '').split(',').map(q => q.trim()).filter(Boolean),
+    testimonials:   [],
+    email:          f['Email'] || '',
+  };
+}
+
+async function loadTutors() {
+  if (TUTORS_LOADED) return;
+  try {
+    const data = await apiGet('/tutors');
+    if (data.tutors && data.tutors.length > 0) {
+      TUTORS = data.tutors;
+      console.log(`[API] Loaded ${TUTORS.length} tutor(s)`);
+    }
+  } catch(e) { console.error('[API] Could not load tutors:', e); }
+  TUTORS_LOADED = true;
+}
+const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const TIMES=["08:00","09:00","10:00","11:00","14:00","15:00","16:00","17:00","18:00"];
+const SUBJECTS=["All Subjects","Mathematics","English","Sciences","Commerce","Languages","Computer Science","History"];
+const LOCATIONS=["All Locations","Johannesburg","Cape Town","Pretoria","Durban","Stellenbosch"];
+const MODES=["All Modes","In-Person","Online"];
+
+// Learner object — updated on registration
+let LEARNER = {
+  name: "", email: "", phone: "", avatar: "https://i.pravatar.cc/200?img=47", since: "", password: ""
+};
+
+let UPCOMING_L = [];
+let PAST_L = [];
+let INVOICES = [];
+let DUE_INV = [];
+
+// ── STATE ─────────────────────────────────────────────────────────
+let isLoggedIn = false;
+let authModal = null;
+let authError = '';
+let page = 'home', activeTutor = null;
+let catSearch = '', catSubject = 'All Subjects', catLocation = 'All Locations', catMode = 'All Modes';
+let selDay = null, selTime = null, bcName = '', bcEmail = '', bookingDone = false;
+let regRole = 'learner', regDone = false, regError = '';
+let dashTab = 'overview', histFilter = 'all';
+let cancelledIds = [], paidIds = [];
+let payInvoice = null, payStep = 1;
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function gv(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function today() { return new Date().toISOString().split('T')[0]; }
+function monthYear() { return new Date().toLocaleString('en-ZA', { month: 'long', year: 'numeric' }); }
+const S = n => `<span class="stars-gold">${'&#9733;'.repeat(Math.floor(n))}${'&#9734;'.repeat(5 - Math.floor(n))}</span>`;
+const PILL_MAP = { confirmed: 'pill-confirmed', pending: 'pill-pending', completed: 'pill-completed', cancelled: 'pill-cancelled' };
+function pill(s) { return `<span class="lc-pill ${PILL_MAP[s] || ''}">${s}</span>`; }
+
+// ── ROUTING ───────────────────────────────────────────────────────
+function navigate(p, tutor) {
+  page = p;
+  if (tutor) { activeTutor = tutor; selDay = null; selTime = null; bcName = ''; bcEmail = ''; bookingDone = false; }
+  ['home','catalogue','register'].forEach(id => {
+    const el = document.getElementById('nl-' + id);
+    if (el) el.classList.toggle('active', id === p);
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  render();
+}
+
+function goToDashboardAfterReg() {
+  // After registration isLoggedIn should already be true
+  // but force it just in case
+  if (!isLoggedIn) { isLoggedIn = true; }
+  enterDashboard();
+}
+
+function enterDashboard() {
+  if (!isLoggedIn) { openAuthModal('signin'); return; }
+  document.getElementById('marketNav').style.display = 'none';
+  document.getElementById('dashNav').style.display = 'flex';
+  document.getElementById('siteFooter').style.display = 'none';
+  const nameEl = document.getElementById('dashUnameEl');
+  if (nameEl) nameEl.textContent = LEARNER.name;
+  dashTab = 'overview';
+  renderDashboard();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function exitDashboard() {
+  // Clear session token from Airtable
+  if (isLoggedIn && LEARNER.email) {
+    fetch(`https://api.airtable.com/v0/${""}/${encodeURIComponent("Learners")}?filterByFormula={Email}="${LEARNER.email}"`, { headers: { 'Authorization': `Bearer ${""}` } })
+      .then(r => r.json()).then(d => { if (d.records && d.records[0]) atPush_update("Learners", d.records[0].id, { 'Session Token': '' }); });
+  }
+  if (tutorLoggedIn && TUTOR.airtableId) {
+    atPush_update("Tutors", TUTOR.airtableId, { 'Session Token': '' });
+  }
+  clearCookie('epiphany_token'); clearCookie('epiphany_type');
+  isLoggedIn = false; tutorLoggedIn = false;
+  LEARNER = { name:'', email:'', phone:'', avatar:'https://i.pravatar.cc/200?img=47', since:'', password:'' };
+  TUTOR   = { name:'', email:'', phone:'', city:'', subject:'', rate:0, bio:'', qual:'', avatar:'https://i.pravatar.cc/200?img=3', since:'', password:'', airtableId:'' };
+  document.getElementById('marketNav').style.display = 'flex';
+  document.getElementById('dashNav').style.display = 'none';
+  document.getElementById('siteFooter').style.display = 'flex';
+  navigate('home');
+}
+
+function switchTab(tab) { dashTab = tab; renderDashboard(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+// ── AUTH MODAL ────────────────────────────────────────────────────
+function openAuthModal(mode) { authModal = mode; authError = ''; renderAuthModal(); }
+
+function closeAuthModal() {
+  authModal = null; authError = '';
+  const m = document.getElementById('authModalMount');
+  if (m) m.innerHTML = '';
+}
+
+function renderAuthModal() {
+  const m = document.getElementById('authModalMount');
+  if (!m || !authModal) return;
+  const isSign = authModal === 'signin';
+  m.innerHTML = `
+<div class="auth-overlay" id="authOverlay" onclick="if(event.target.id==='authOverlay')closeAuthModal()">
+<div class="auth-box">
+  <button class="auth-close" onclick="closeAuthModal()">&#10005;</button>
+  <div class="auth-logo">Epi<span>phany</span></div>
+  <div class="auth-tabs">
+    <button class="auth-tab${isSign ? ' active' : ''}" onclick="openAuthModal('signin')">Sign In</button>
+    <button class="auth-tab${!isSign ? ' active' : ''}" onclick="goToRegisterFromModal()">Sign Up</button>
+  </div>
+  ${authError ? `<div class="auth-error">${authError}</div>` : ''}
+  ${isSign ? `
+  <p style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.7">Sign in with the email and password you used when registering as a learner.</p>
+  <label class="auth-label">Email Address</label>
+  <input class="auth-input" id="aiEmail" type="email" placeholder="your@email.com"/>
+  <label class="auth-label">Password</label>
+  <input class="auth-input" id="aiPass" type="password" placeholder="Enter your password"/>
+  <button class="auth-submit" onclick="doSignIn()">Sign In</button>
+  <div class="auth-switch">Not registered yet? <span onclick="goToRegisterFromModal()">Create a learner account</span></div>
+  ` : `
+  <p style="font-size:13px;color:var(--muted);text-align:center;line-height:1.8;margin-bottom:8px">Register as a learner first to create your account.</p>
+  <button class="auth-submit" onclick="goToRegisterFromModal()">Register as a Learner &rarr;</button>
+  <div class="auth-switch">Already registered? <span onclick="openAuthModal('signin')">Sign in</span></div>
+  `}
+</div>
+</div>`;
+}
+
+function goToRegisterFromModal() {
+  closeAuthModal();
+  regRole = 'learner';
+  regDone = false;
+  regError = '';
+  navigate('register');
+}
+
+async function doSignIn() {
+  const email = gv('aiEmail');
+  const pass  = document.getElementById('aiPass') ? document.getElementById('aiPass').value : '';
+  if (!email || !pass) { authError = 'Please fill in all fields.'; renderAuthModal(); return; }
+  const btn = document.querySelector('.auth-submit');
+  if (btn) { btn.textContent = 'Signing in...'; btn.disabled = true; }
+  try {
+    const data = await apiPost('/login', { email, password: pass });
+    if (data.error) { authError = data.error; renderAuthModal(); return; }
+    if (data.type === 'learner') {
+      const u = data.user;
+      LEARNER.name=u.name||''; LEARNER.email=u.email||'';
+      LEARNER.phone=u.phone||''; LEARNER.since=u.since||'';
+      isLoggedIn=true;
+      setCookie('epiphany_token', data.token, 30);
+      setCookie('epiphany_type', 'learner', 30);
+      closeAuthModal(); enterDashboard(); return;
+    }
+    if (data.type === 'tutor') {
+      const t=data.tutor;
+      TUTOR.name=t.name||''; TUTOR.email=t.email||''; TUTOR.phone=t.phone||'';
+      TUTOR.city=t.city||''; TUTOR.subject=t.subject||''; TUTOR.rate=t.rate||0;
+      TUTOR.bio=t.bio||''; TUTOR.since=t.since||''; TUTOR.airtableId=t.id||'';
+      tutorLoggedIn=true;
+      const sub=data.subscription||{};
+      TUTOR_SUB={status:sub.status||'none',trialStart:sub.trialStart||null,
+                 trialEnd:sub.trialEnd||null,subStart:null,nextBilling:sub.nextBilling||null};
+      saveSubState();
+      setCookie('epiphany_token', data.token, 30);
+      setCookie('epiphany_type', 'tutor', 30);
+      closeAuthModal(); enterTutorDashboard(); return;
+    }
+  } catch(e) { authError='Connection error. Please try again.'; renderAuthModal(); }
+}
+
+// ── MARKETPLACE RENDERS ───────────────────────────────────────────
+function render() {
+  const app = document.getElementById('app');
+  if (!app) return;
+  if (page === 'home')      app.innerHTML = renderHome();
+  if (page === 'catalogue') app.innerHTML = renderCatalogue();
+  if (page === 'profile')   app.innerHTML = renderProfile();
+  if (page === 'register')  app.innerHTML = renderRegister();
+}
+
+function renderHome() {
+  if (!TUTORS_LOADED) loadTutors().then(() => render());
+  const feat = TUTORS.slice(0, 4);
+  return `<div class="page">
+<section class="hero"><div class="hero-bg"></div><div class="hero-bg-text">EPIPHANY</div>
+<div class="hero-content">
+  <div class="eyebrow">Premier Tutoring Marketplace</div>
+  <h1 class="hero-title">Unlock your child's<br><em>true potential</em></h1>
+  <p class="hero-sub">Connect with South Africa's finest educators. Expert tutors, flexible scheduling, and transformative results &mdash; all in one place.</p>
+  <div class="hero-actions"><button class="btn-gold" onclick="navigate('catalogue')">Browse Tutors</button><button class="btn-ghost" onclick="navigate('register')">Become a Tutor</button></div>
+  <div class="hero-stats">
+    <div><div class="stat-n">240+</div><div class="stat-l">Expert Tutors</div></div>
+    <div><div class="stat-n">4,800+</div><div class="stat-l">Sessions Booked</div></div>
+    <div><div class="stat-n">98%</div><div class="stat-l">Satisfaction Rate</div></div>
+    <div><div class="stat-n">9+</div><div class="stat-l">Subjects</div></div>
+  </div>
+</div></section>
+<section class="featured-strip">
+  <div class="strip-header"><div><div class="eyebrow">Featured Educators</div><div class="section-title">Meet our <em>top rated</em> tutors</div></div><button class="btn-ghost" onclick="navigate('catalogue')">View All Tutors &rarr;</button></div>
+  <div class="strip-grid">${feat.map(t => `<div class="strip-card" onclick="navigate('profile',t)"><img src="${t.photo}" alt="${t.name}" loading="lazy"/><div class="strip-card-overlay"></div><div class="strip-card-body">${t.badge ? `<div class="strip-card-badge"><span class="badge">${t.badge}</span></div>` : ''}<div class="strip-card-name">${t.name}</div><div class="strip-card-sub">${t.subjects[0]}</div></div></div>`).join('')}</div>
+</section>
+<section class="how-section">
+  <div class="eyebrow">How It Works</div><div class="section-title">Simple. <em>Seamless.</em> Effective.</div>
+  <div class="steps">
+    <div><div class="step-num">01</div><div class="step-title">Browse the Catalogue</div><div class="step-body">Explore our curated directory of qualified tutors. Filter by subject, grade, location, and availability to find your perfect match.</div></div>
+    <div><div class="step-num">02</div><div class="step-title">View Tutor Profiles</div><div class="step-body">Read detailed profiles including qualifications, teaching philosophy, rates, and verified reviews from real parents and students.</div></div>
+    <div><div class="step-num">03</div><div class="step-title">Book Your Session</div><div class="step-body">Select a day and time that suits you and confirm your booking instantly. Receive a confirmation and reminder before your session.</div></div>
+  </div>
+</section></div>`;
+}
+
+function renderCatalogue() {
+  if (!TUTORS_LOADED) {
+    loadTutors().then(() => render());
+    return `<div class="page"><div class="cat-hero"><div class="cat-hero-inner"><div><div class="eyebrow">Our Educators</div><div class="section-title">Tutor <em>Catalogue</em></div></div></div></div><div style="padding:80px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--muted);font-style:italic">Loading tutors&hellip;</div></div>`;
+  }
+  const filtered = TUTORS.filter(t => {
+    const ms = !catSearch || t.name.toLowerCase().includes(catSearch.toLowerCase()) || t.subjects.some(s => s.toLowerCase().includes(catSearch.toLowerCase()));
+    const msu = catSubject === 'All Subjects' || t.subjects.some(s => s.toLowerCase().includes(catSubject.toLowerCase().replace(' studies','').replace('sciences','science')));
+    const ml = catLocation === 'All Locations' || t.location === catLocation;
+    const mm = catMode === 'All Modes' || t.mode.includes(catMode);
+    return ms && msu && ml && mm;
+  });
+  return `<div class="page">
+<div class="cat-hero"><div class="cat-hero-inner"><div><div class="eyebrow">Our Educators</div><div class="section-title">Tutor <em>Catalogue</em></div></div><div class="cat-count">${filtered.length} tutor${filtered.length !== 1 ? 's' : ''} found</div></div></div>
+<div class="filters-bar">
+  <div class="search-wrap"><input class="filter-search" placeholder="Search by name or subject&hellip;" value="${catSearch}" oninput="catSearch=this.value;render()"/></div>
+  <div class="filter-group"><div class="filter-label">Subject</div><select class="filter-select" onchange="catSubject=this.value;render()">${SUBJECTS.map(s => `<option${s === catSubject ? ' selected' : ''}>${s}</option>`).join('')}</select></div>
+  <div class="filter-group"><div class="filter-label">Location</div><select class="filter-select" onchange="catLocation=this.value;render()">${LOCATIONS.map(l => `<option${l === catLocation ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
+  <div class="filter-group"><div class="filter-label">Mode</div><select class="filter-select" onchange="catMode=this.value;render()">${MODES.map(m => `<option${m === catMode ? ' selected' : ''}>${m}</option>`).join('')}</select></div>
+</div>
+<div class="catalogue-body"><div class="tutor-grid">${filtered.length === 0 ? '<div class="no-results">No tutors match your search criteria.</div>' : filtered.map(t => `<div class="t-card" onclick="navigate('profile',t)"><div class="t-card-img-wrap"><img src="${t.photo}" alt="${t.name}" class="t-card-img" loading="lazy"/><div class="t-card-overlay"></div><div class="t-card-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="t-card-mode">${m}</span>`).join('')}</div></div><div class="t-card-body"><div class="t-card-name">${t.name}</div><div class="t-card-location">&#128205; ${t.location} &middot; ${t.grade}</div><div class="t-card-subjects">${t.subjects.slice(0,3).map(s => `<span class="t-card-subj">${s}</span>`).join('')}</div><div class="t-card-bio">${t.bio}</div><div class="t-card-footer"><div class="t-card-rate">R${t.rate}/hr</div><div class="t-card-rating">${S(t.rating)}<span class="rating-num">${t.rating} (${t.reviews})</span></div></div></div></div>`).join('')}</div></div>
+</div>`;
+}
+
+function renderProfile() {
+  const t = activeTutor; if (!t) return '';
+  const panel = bookingDone
+    ? `<div class="booking-success-card"><div class="bsc-icon">&#10022;</div><div class="bsc-title">Booking Confirmed</div><div class="bsc-text">Your session with <strong style="color:var(--gold)">${t.name}</strong> is set for <strong style="color:var(--gold)">${selDay}</strong> at <strong style="color:var(--gold)">${selTime}</strong>.<br/><br/>A confirmation has been sent to <strong style="color:var(--gold)">${bcEmail}</strong>.<br/><br/><button onclick="isLoggedIn?enterDashboard():openAuthModal('signin')" style="margin-top:12px;padding:10px 22px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif">View in Dashboard &rarr;</button></div></div>`
+    : `<div class="booking-card-title">Book a Session</div><div class="booking-card-sub">with ${t.name.split(' ')[0]}</div>
+<div class="bc-label">Select Day</div>
+<div class="bc-days">${DAYS.map(d => { const a = t.availability.includes(d); return `<div class="bc-day${!a ? '' : selDay === d ? ' sel' : ' avail'}"${a ? ` onclick="pickDay('${d}')"` : ''}>${d}</div>`; }).join('')}</div>
+${selDay ? `<div class="bc-label">Select Time</div><div class="bc-times">${TIMES.map(ti => `<button class="bc-time${selTime === ti ? ' sel' : ''}" onclick="pickTime('${ti}')">${ti}</button>`).join('')}</div>` : ''}
+<div class="bc-label" style="margin-top:8px">Your Details</div>
+<input class="bc-input" placeholder="Full name" value="${bcName}" oninput="bcName=this.value;updateBookBtn()"/>
+<input class="bc-input" placeholder="Email address" type="email" value="${bcEmail}" oninput="bcEmail=this.value;updateBookBtn()"/>
+<div class="bc-summary"><div class="bc-summary-row"><span>Session rate</span><span>R${t.rate}</span></div><div class="bc-summary-total"><span>Total</span><span>R${t.rate}</span></div></div>
+<button class="bc-confirm" id="bookBtn" ${selDay && selTime && bcName.trim() && bcEmail.trim() ? '' : 'disabled'} onclick="confirmBooking()">Confirm Booking</button>`;
+  return `<div class="page profile-page">
+<div class="profile-hero">
+  <div class="profile-hero-img"><img src="${t.photo}" alt="${t.name}"/></div>
+  <div class="profile-hero-content">
+    <button class="profile-back" onclick="navigate('catalogue')">&larr; Back to Catalogue</button>
+    <div class="profile-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="badge expert">${m}</span>`).join('')}</div>
+    <div class="profile-name">${t.name}</div>
+    <div class="profile-location">&#128205; ${t.location}</div>
+    <div class="profile-tagline">${t.bio}</div>
+    <div class="profile-quick">
+      <div><div class="pq-label">Rate</div><div class="pq-val">R${t.rate}/hr</div></div>
+      <div><div class="pq-label">Rating</div><div class="pq-val">${t.rating} &#9733;</div></div>
+      <div><div class="pq-label">Sessions</div><div class="pq-val">${t.sessions}</div></div>
+      <div><div class="pq-label">Reviews</div><div class="pq-val">${t.reviews}</div></div>
+    </div>
+    <div class="profile-tags">${t.subjects.map(s => `<span class="profile-tag">${s}</span>`).join('')}</div>
+  </div>
+</div>
+<div class="profile-body">
+  <div class="profile-main">
+    <div class="profile-section"><div class="profile-section-title">About</div><p class="profile-bio">${t.longBio}</p></div>
+    <div class="profile-section"><div class="profile-section-title">Qualifications</div><ul class="qual-list">${t.qualifications.map(q => `<li class="qual-item">${q}</li>`).join('')}</ul></div>
+    <div class="profile-section"><div class="profile-section-title">Availability</div><div class="avail-grid">${DAYS.map(d => `<div class="avail-day${t.availability.includes(d) ? ' on' : ''}">${d}</div>`).join('')}</div></div>
+    <div class="profile-section"><div class="profile-section-title">Languages</div><div class="lang-list">${t.languages.map(l => `<span class="lang-tag">${l}</span>`).join('')}</div></div>
+    <div class="profile-section"><div class="profile-section-title">Testimonials</div>${t.testimonials.map(tm => `<div class="testimonial"><div class="testimonial-stars">${'&#9733;'.repeat(tm.stars)}</div><div class="testimonial-text">&ldquo;${tm.text}&rdquo;</div><div class="testimonial-author">&mdash; ${tm.name}</div></div>`).join('')}</div>
+  </div>
+  <div class="profile-sidebar"><div class="booking-card">${panel}</div></div>
+</div></div>`;
+}
+
+function pickDay(d) { selDay = d; selTime = null; render(); }
+function pickTime(t) { selTime = t; const b = document.getElementById('bookBtn'); if (b) b.disabled = !(selDay && selTime && bcName.trim() && bcEmail.trim()); }
+function updateBookBtn() { const b = document.getElementById('bookBtn'); if (b) b.disabled = !(selDay && selTime && bcName.trim() && bcEmail.trim()); }
+
+function confirmBooking() {
+  if (!(selDay && selTime && bcName.trim() && bcEmail.trim())) return;
+  bookingDone = true;
+
+  const t = activeTutor;
+  const newId = 'BK-' + Date.now();
+  const invId = 'INV-' + Date.now();
+
+  // Add to live upcoming lessons so dashboard updates immediately
+  UPCOMING_L.unshift({
+    id:      newId,
+    tutor:   t.name,
+    img:     t.photo,
+    subject: t.subjects[0],
+    date:    selDay,
+    time:    selTime,
+    mode:    t.mode[0],
+    rate:    t.rate,
+    status:  'confirmed',
+  });
+
+  // Add a due invoice for the booked session
+  DUE_INV.unshift({
+    id:      invId,
+    dueDate: selDay,
+    tutor:   t.name,
+    subject: t.subjects[0],
+    amount:  t.rate,
+  });
+
+  // Push to Airtable
+  apiPost('/sessions',{learnerName:bcName.trim(),learnerEmail:bcEmail.trim(),tutorName:t.name,subject:t.subjects[0],day:selDay,time:selTime,rate:t.rate,mode:t.mode[0]});
+
+  render();
+}
+
+function renderRegister() {
+  const isTutor = regRole === 'tutor';
+  if (regDone) {
+    const msg = isTutor
+      ? 'Our team will review your profile and be in touch within 2&ndash;3 business days.'
+      : 'Your account is ready. <span style="color:var(--gold);cursor:pointer;font-weight:600" onclick="goToDashboardAfterReg()">Go to your dashboard &rarr;</span>';
+    return `<div class="page register-page"><div class="reg-success"><div class="reg-success-icon">&#10022;</div><div class="reg-success-title">${isTutor ? 'Application Received' : 'Welcome to Epiphany!'}</div><div class="gold-rule" style="margin:16px auto 24px"></div><div class="reg-success-sub">${msg}</div></div></div>`;
+  }
+  return `<div class="page register-page">
+<div class="eyebrow">Join Our Network</div>
+<div class="section-title">Become an <em>Epiphany</em> ${isTutor ? 'Tutor' : 'Learner'}</div>
+<div class="gold-rule"></div>
+<p class="reg-intro">${isTutor ? 'Share your expertise, inspire learners, and build a flexible career on your terms.' : "Connect with South Africa's finest educators and start your learning journey today."}</p>
+<div class="reg-tabs">
+  <button class="reg-tab${isTutor ? ' active' : ''}" onclick="regRole='tutor';render()">I&rsquo;m a Tutor</button>
+  <button class="reg-tab${!isTutor ? ' active' : ''}" onclick="regRole='learner';render()">I&rsquo;m a Learner</button>
+</div>
+${isTutor ? `<div class="photo-drop"><div class="photo-drop-icon">&#128247;</div><div class="photo-drop-text">Drop your profile photo here, or <span>browse to upload</span><br/>JPG or PNG &middot; Max 5MB</div></div>` : ''}
+<div class="reg-grid">
+  <div class="reg-group"><label class="reg-label">First Name</label><input class="reg-input" id="rFirst" placeholder="First name"/></div>
+  <div class="reg-group"><label class="reg-label">Last Name</label><input class="reg-input" id="rLast" placeholder="Last name"/></div>
+  <div class="reg-group"><label class="reg-label">Email Address</label><input class="reg-input" id="rEmail" placeholder="your@email.com" type="email"/></div>
+  <div class="reg-group"><label class="reg-label">Phone Number</label><input class="reg-input" id="rPhone" placeholder="+27 &hellip;"/></div>
+  ${isTutor ? `
+  <div class="reg-group"><label class="reg-label">City / Location</label><select class="reg-select" id="rTCity"><option value="">Select city</option>${LOCATIONS.slice(1).map(l => `<option>${l}</option>`).join('')}</select></div>
+  <div class="reg-group"><label class="reg-label">Teaching Mode</label><select class="reg-select" id="rTMode"><option value="">Select mode</option><option>In-Person</option><option>Online</option><option>Both</option></select></div>
+  <div class="reg-group"><label class="reg-label">Primary Subject</label><input class="reg-input" id="rSubject" placeholder="e.g. Mathematics"/></div>
+  <div class="reg-group"><label class="reg-label">Grade Level</label><input class="reg-input" id="rGradeLevel" placeholder="e.g. Grade 10&ndash;12"/></div>
+  <div class="reg-group"><label class="reg-label">Hourly Rate (ZAR)</label><input class="reg-input" id="rRate" placeholder="e.g. 400" type="number"/></div>
+  <div class="reg-group"><label class="reg-label">Highest Qualification</label><select class="reg-select" id="rQual"><option value="">Select&hellip;</option><option>Matric / Grade 12</option><option>Diploma</option><option>Bachelor&rsquo;s Degree</option><option>Honours Degree</option><option>Master&rsquo;s Degree</option><option>Doctorate (PhD)</option></select></div>
+  <div class="reg-group reg-group-full"><label class="reg-label">Availability</label><div class="day-checks">${DAYS.map(d => `<label class="day-check"><input type="checkbox" class="tAvailDay" value="${d}"/> ${d}</label>`).join('')}</div></div>
+  <div class="reg-group reg-group-full"><label class="reg-label">Bio / About You</label><textarea class="reg-input" id="rBio" rows="5" placeholder="Tell parents and learners about your background&hellip;" style="resize:vertical"></textarea></div>`
+  : `
+  <div class="reg-group"><label class="reg-label">Grade / Year</label><select class="reg-select" id="rGrade"><option value="">Select grade&hellip;</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option><option>University Year 1</option><option>University Year 2+</option><option>Adult learner</option></select></div>
+  <div class="reg-group"><label class="reg-label">Location</label><select class="reg-select" id="rLocation"><option value="">Select city</option>${LOCATIONS.slice(1).map(l => `<option>${l}</option>`).join('')}</select></div>
+  <div class="reg-group reg-group-full"><label class="reg-label">Subjects I need help with</label><input class="reg-input" id="rSubjects" placeholder="e.g. Mathematics, Physics, English"/></div>
+  <div class="reg-group reg-group-full"><label class="reg-label">Anything else?</label><textarea class="reg-input" id="rNotes" rows="4" placeholder="Learning goals, preferred learning style, etc." style="resize:vertical"></textarea></div>
+  <div class="reg-group"><label class="reg-label">Password</label><input class="reg-input" id="rPass" type="password" placeholder="Create a password (min. 6 characters)"/></div>
+  <div class="reg-group"><label class="reg-label">Confirm Password</label><input class="reg-input" id="rPass2" type="password" placeholder="Repeat your password"/></div>
+  ${regError ? `<div class="reg-group reg-group-full"><div class="reg-field-error">${regError}</div></div>` : ''}`}
+</div>
+<button class="reg-submit" onclick="submitRegistration()">${isTutor ? 'Submit Application' : 'Create My Account'}</button>
+${!isTutor ? `<p style="font-size:11px;color:var(--muted);margin-top:16px;text-align:center">Already have an account? <span style="color:var(--gold);cursor:pointer;font-weight:600" onclick="openAuthModal('signin')">Sign in here</span></p>` : ''}
+</div>`;
+}
+
+async function submitRegistration() {
+  regError = '';
+  if (regRole === 'learner') {
+    const first    = gv('rFirst');
+    const last     = gv('rLast');
+    const email    = gv('rEmail');
+    const phone    = gv('rPhone');
+    const grade    = gv('rGrade');
+    const location = gv('rLocation');
+    const subjects = gv('rSubjects');
+    const notes    = gv('rNotes');
+    const pass     = document.getElementById('rPass')  ? document.getElementById('rPass').value  : '';
+    const pass2    = document.getElementById('rPass2') ? document.getElementById('rPass2').value : '';
+
+    if (!first || !last || !email) { regError = 'Please fill in your name and email.'; render(); return; }
+    if (!pass) { regError = 'Please create a password.'; render(); return; }
+    if (pass.length < 6) { regError = 'Password must be at least 6 characters.'; render(); return; }
+    if (pass !== pass2) { regError = 'Passwords do not match.'; render(); return; }
+
+    // Update local LEARNER state
+    LEARNER.name     = (first + ' ' + last).trim();
+    LEARNER.email    = email;
+    LEARNER.phone    = phone || LEARNER.phone;
+    LEARNER.password = pass;
+    LEARNER.since    = monthYear();
+    isLoggedIn = true;
+    // Set session cookie for new learner too (token saved after Airtable record created)
+    LEARNER._pendingToken = genToken();
+    setCookie('epiphany_token', LEARNER._pendingToken, 30);
+    setCookie('epiphany_type',  'learner', 30);
+
+    const regData = await apiPost('/register',{type:'learner',first,last,email,phone,password:pass,grade,location,subjects});
+    if (regData.error) { regError=regData.error; render(); return; }
+    const loginData = await apiPost('/login',{email,password:pass});
+    if (loginData.token) { setCookie('epiphany_token',loginData.token,30); setCookie('epiphany_type','learner',30); }
+
+    // Go straight to dashboard after registration
+    regDone = true;
+    render();
+    // Auto-enter dashboard after short delay to allow render
+    setTimeout(() => enterDashboard(), 300);
+
+  } else {
+    // Tutor application
+    const first      = gv('rFirst');
+    const last       = gv('rLast');
+    const email      = gv('rEmail');
+    const phone      = gv('rPhone');
+    const city       = gv('rTCity');
+    const tMode      = gv('rTMode');
+    const subject    = gv('rSubject');
+    const gradeLevel = gv('rGradeLevel');
+    const rateEl     = document.getElementById('rRate');
+    const rate       = rateEl ? parseFloat(rateEl.value) || 0 : 0;
+    const qual       = gv('rQual');
+    const bio        = gv('rBio');
+    const availDays  = [...document.querySelectorAll('.tAvailDay:checked')].map(cb => cb.value).join(', ');
+
+    if (!first || !last || !email) { regError = 'Please fill in your name and email.'; render(); return; }
+
+    const tutorPass = gv('rTPass')||(first.toLowerCase()+'123');
+    const tReg = await apiPost('/register',{type:'tutor',first,last,email,phone,password:tutorPass,
+      city,teachingMode:tMode||'Online',subject,gradeLevel,rate,qual,availability:availDays,bio});
+    if (tReg.error) { regError=tReg.error; render(); return; }
+
+    regDone = true;
+    render();
+  }
+}
+
+// ── LESSON CARD ───────────────────────────────────────────────────
+function lessonCard(l) {
+  const cancelled = cancelledIds.includes(l.id);
+  const st = cancelled ? 'cancelled' : l.status;
+  const bcls = st === 'confirmed' ? 'lc-up' : st === 'pending' ? 'lc-pend' : st === 'cancelled' ? 'lc-can' : '';
+  let act = '';
+  if (st === 'confirmed') act += `<button class="lc-join" onclick="alert('Opening session link...')">Join &rarr;</button>`;
+  if (st === 'pending')   act += `<button class="lc-cancel" onclick="cancelLesson('${l.id}')">Cancel</button>`;
+  if (st === 'completed' && !l.rated) act += `<button class="lc-rate-btn">Rate &#9733;</button>`;
+  if (st === 'completed' && l.rated)  act += `<span class="lc-stars">${'&#9733;'.repeat(l.rating)}</span>`;
+  return `<div class="lc ${bcls}"><img src="${l.img}" class="lc-img" alt="${l.tutor}"/><div class="lc-info"><div class="lc-tutor">${l.tutor}</div><div class="lc-subj">${l.subject}</div><div class="lc-meta"><span class="lc-date">&#128197; ${l.date} &middot; ${l.time}</span><span class="lc-mode">${l.mode}</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R${l.rate}</span>${pill(st)}${act}</div></div>`;
+}
+
+function cancelLesson(id) { cancelledIds.push(id); renderDashboard(); }
+
+// ── DASHBOARD RENDER ──────────────────────────────────────────────
+function renderDashboard() {
+  const totalSpent  = INVOICES.reduce((s, i) => s + i.amount, 0);
+  const outstanding = DUE_INV.filter(i => !paidIds.includes(i.id));
+  const dueTotal    = outstanding.reduce((s, i) => s + i.amount, 0);
+  const completedCt = PAST_L.filter(l => l.status === 'completed').length;
+
+  const navItems = [
+    { id: 'overview', label: 'Overview',         icon: '&#9672;' },
+    { id: 'upcoming', label: 'Upcoming Lessons',  icon: '&#9719;', badge: UPCOMING_L.length },
+    { id: 'history',  label: 'Session History',   icon: '&#9681;' },
+    { id: 'payments', label: 'Payments',          icon: '&#9678;', badge: outstanding.length || null },
+    { id: 'profile',  label: 'Profile Settings',  icon: '&#9673;' },
+  ];
+
+  const sidebar = `<aside class="dash-sidebar">
+<div class="dash-sb-profile">
+  <div class="dash-sb-label">My Account</div>
+  <div class="dash-sb-user"><img src="${LEARNER.avatar}" class="dash-sb-avatar" alt=""/><div><div class="dash-sb-uname">${LEARNER.name}</div><div class="dash-sb-role">Learner</div></div></div>
+</div>
+<div class="dash-nav-label">Navigation</div>
+${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' : ''}" onclick="switchTab('${n.id}')"><span class="dash-nav-icon">${n.icon}</span>${n.label}${n.badge ? `<span class="dash-nav-badge">${n.badge}</span>` : ''}</button>`).join('')}
+</aside>`;
+
+  let main = '';
+
+  if (dashTab === 'overview') {
+    const nxt = UPCOMING_L[0];
+    main = `<div class="dash-section">
+<div class="dash-eyebrow">Dashboard</div>
+<div class="dash-title">Welcome back, <em>${LEARNER.name.split(' ')[0]}</em></div>
+<div class="ov-grid">
+  <div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">${UPCOMING_L.length}</div><div class="ov-sub">Next: ${nxt.date}</div></div>
+  <div class="ov-card"><div class="ov-label">Completed Sessions</div><div class="ov-value">${completedCt}</div><div class="ov-sub">Since ${LEARNER.since}</div></div>
+  <div class="ov-card"><div class="ov-label">Total Invested</div><div class="ov-value gld">R${totalSpent.toLocaleString()}</div><div class="ov-sub">${INVOICES.length} invoices paid</div></div>
+  <div class="ov-card"><div class="ov-label">Amount Due</div><div class="ov-value amb">R${dueTotal}</div><div class="ov-sub clk" onclick="switchTab('payments')">Pay now &rarr;</div></div>
+</div>
+<div class="sub-hdg">Next Session <span class="sub-hdg-link" onclick="switchTab('upcoming')">View all &rarr;</span></div>
+<div class="lesson-list">${lessonCard(nxt)}</div>
+<div class="sub-hdg">Recent Sessions <span class="sub-hdg-link" onclick="switchTab('history')">View all &rarr;</span></div>
+<div class="lesson-list">${PAST_L.slice(0, 3).map(lessonCard).join('')}</div>
+</div>`;
+  }
+
+  if (dashTab === 'upcoming') {
+    main = `<div class="dash-section">
+<div class="dash-eyebrow">My Lessons</div><div class="dash-title"><em>Upcoming</em> Sessions</div>
+<div class="sub-hdg">Confirmed &amp; Pending <span class="sub-hdg-count">${UPCOMING_L.length} sessions</span></div>
+<div class="lesson-list">${UPCOMING_L.map(lessonCard).join('')}</div>
+</div>`;
+  }
+
+  if (dashTab === 'history') {
+    const f = histFilter === 'all' ? PAST_L : PAST_L.filter(l => l.status === histFilter);
+    main = `<div class="dash-section">
+<div class="dash-eyebrow">My Lessons</div><div class="dash-title">Session <em>History</em></div>
+<div class="filter-tabs">
+  <button class="ftab${histFilter === 'all' ? ' active' : ''}" onclick="histFilter='all';renderDashboard()">All</button>
+  <button class="ftab${histFilter === 'completed' ? ' active' : ''}" onclick="histFilter='completed';renderDashboard()">Completed</button>
+  <button class="ftab${histFilter === 'cancelled' ? ' active' : ''}" onclick="histFilter='cancelled';renderDashboard()">Cancelled</button>
+</div>
+<div class="sub-hdg">Past Sessions <span class="sub-hdg-count">${f.length} sessions</span></div>
+<div class="lesson-list">${f.map(lessonCard).join('')}</div>
+</div>`;
+  }
+
+  if (dashTab === 'payments') {
+    const modal = payInvoice ? renderPayModal() : '';
+    main = `<div class="dash-section">
+<div class="dash-eyebrow">Finances</div><div class="dash-title">Payments &amp; <em>Invoices</em></div>
+<div class="pay-top">
+  <div class="pay-card"><div class="pay-card-label">Total Spent (All Time)</div><div class="pay-card-value">R${totalSpent.toLocaleString()}</div><div class="pay-card-sub">${INVOICES.length} sessions paid</div></div>
+  <div class="pay-card"><div class="pay-card-label">Currently Due</div><div class="pay-card-value ${dueTotal > 0 ? 'amb' : 'grn'}">R${dueTotal}</div><div class="pay-card-sub">${outstanding.length === 0 ? 'All paid &#10003;' : `${outstanding.length} invoice${outstanding.length !== 1 ? 's' : ''} outstanding`}</div></div>
+</div>
+${outstanding.length > 0 ? `<div style="margin-bottom:28px"><div class="due-hdr"><span class="due-dot"></span>Outstanding Invoices</div>${outstanding.map(inv => `<div class="due-card"><div class="due-info"><div class="due-inv-id">${inv.id}</div><div class="due-desc">${inv.tutor} &mdash; ${inv.subject}</div><div class="due-date">Due: ${inv.dueDate}</div></div><span class="due-amount">R${inv.amount}</span><button class="pay-now-btn" onclick="openPayModal('${inv.id}')">Pay Now</button></div>`).join('')}</div>` : ''}
+<div class="sub-hdg">Invoice History <span class="sub-hdg-count">${INVOICES.length} invoices</span></div>
+<table class="inv-table">
+<thead><tr><th>Invoice</th><th>Date</th><th>Tutor</th><th>Subject</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+<tbody>${INVOICES.map(inv => `<tr><td><span class="inv-id">${inv.id}</span></td><td style="color:var(--muted);font-size:12px">${inv.date}</td><td>${inv.tutor}</td><td style="color:var(--muted)">${inv.subject}</td><td style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold)">R${inv.amount}</td><td><span class="inv-paid">Paid</span></td><td><button class="inv-dl">&#8595; Receipt</button></td></tr>`).join('')}</tbody>
+</table>${modal}
+</div>`;
+  }
+
+  if (dashTab === 'profile') {
+    main = `<div class="dash-section">
+<div class="dash-eyebrow">Account</div><div class="dash-title">Profile <em>Settings</em></div>
+<div class="gold-rule"></div>
+<div class="settings-avatar-row">
+  <img src="${LEARNER.avatar}" class="settings-big-avatar" alt=""/>
+  <div>
+    <div style="font-size:16px;font-weight:600;margin-bottom:4px">${LEARNER.name}</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Member since ${LEARNER.since}</div>
+    <button class="settings-change-btn">Change Photo</button>
+  </div>
+</div>
+<div class="settings-grid">
+  <div class="setting-group"><label class="setting-label">Full Name</label><input class="setting-input" id="sName" value="${LEARNER.name}"/></div>
+  <div class="setting-group"><label class="setting-label">Email Address</label><input class="setting-input" id="sEmail" type="email" value="${LEARNER.email}"/></div>
+  <div class="setting-group"><label class="setting-label">Phone Number</label><input class="setting-input" id="sPhone" value="${LEARNER.phone}"/></div>
+  <div class="setting-group"><label class="setting-label">Location</label><input class="setting-input" id="sLocation" value="Johannesburg"/></div>
+  <div class="setting-group full"><label class="setting-label">New Password</label><input class="setting-input" id="sPass" type="password" placeholder="Leave blank to keep current"/></div>
+</div>
+<div style="display:flex;align-items:center">
+  <button class="settings-save" onclick="saveProfile()">Save Changes</button>
+  <span class="save-toast" id="saveToast" style="display:none">&#10003; Saved successfully</span>
+</div>
+</div>`;
+  }
+
+  document.getElementById('app').innerHTML = `<div class="dashboard-wrap">${sidebar}<main class="dash-main">${main}</main></div>`;
+}
+
+// ── PAYMENT MODAL ─────────────────────────────────────────────────
+function openPayModal(invId) { payInvoice = DUE_INV.find(i => i.id === invId); payStep = 1; renderDashboard(); }
+function closePayModal() { payInvoice = null; payStep = 1; renderDashboard(); }
+
+function renderPayModal() {
+  if (!payInvoice) return '';
+  const body = payStep === 1 ? `
+<div class="modal-eyebrow">Secure Payment</div>
+<div class="modal-title">Pay Invoice</div>
+<div class="modal-summary">
+  <div class="modal-sum-row"><span>Invoice</span><span>${payInvoice.id}</span></div>
+  <div class="modal-sum-row"><span>Tutor</span><span>${payInvoice.tutor}</span></div>
+  <div class="modal-sum-row"><span>Subject</span><span>${payInvoice.subject}</span></div>
+  <div class="modal-sum-row"><span>Session Date</span><span>${payInvoice.dueDate}</span></div>
+  <div class="modal-sum-row"><span>Total Due</span><span>R${payInvoice.amount}</span></div>
+</div>
+<label class="modal-label">Cardholder Name</label><input class="modal-input" id="mCardName" placeholder="Name on card"/>
+<label class="modal-label">Card Number</label><input class="modal-input" id="mCardNum" placeholder="1234 5678 9012 3456" maxlength="19"/>
+<div class="modal-card-row">
+  <div><label class="modal-label">Expiry</label><input class="modal-input" id="mExpiry" placeholder="MM / YY"/></div>
+  <div><label class="modal-label">CVV</label><input class="modal-input" id="mCvv" placeholder="&middot;&middot;&middot;" maxlength="3"/></div>
+</div>
+<button class="modal-submit" onclick="processPayment('${payInvoice.id}')">Pay R${payInvoice.amount}</button>
+<div class="modal-secure">&#128274; Secured by 256-bit SSL encryption</div>`
+  : `<div class="modal-success"><div class="modal-success-icon">&#10022;</div><div class="modal-success-title">Payment Successful</div><div class="modal-success-text">R${payInvoice.amount} has been charged for your session with<br/><strong style="color:var(--gold)">${payInvoice.tutor}</strong>.<br/><br/>A receipt has been sent to<br/><strong style="color:var(--gold)">${LEARNER.email}</strong>.</div></div>`;
+  return `<div class="modal-overlay" id="payModalOverlay" onclick="if(event.target.id==='payModalOverlay')closePayModal()"><div class="modal-box"><button class="modal-close-btn" onclick="closePayModal()">&#10005;</button>${body}</div></div>`;
+}
+
+function processPayment(invId) {
+  const inv = DUE_INV.find(i => i.id === invId);
+  if (!inv) return;
+  paidIds.push(invId);
+  payStep = 2;
+  // Push payment record to Airtable
+  apiPost('/payments',{invoiceId:inv.id,learnerName:LEARNER.name,learnerEmail:LEARNER.email,tutorName:inv.tutor,subject:inv.subject,amount:inv.amount});
+  renderDashboard();
+}
+
+// ── PROFILE SAVE ──────────────────────────────────────────────────
+function saveProfile() {
+  const name  = gv('sName');
+  const email = gv('sEmail');
+  const phone = gv('sPhone');
+  const pass  = document.getElementById('sPass') ? document.getElementById('sPass').value : '';
+  if (name)  LEARNER.name  = name;
+  if (email) LEARNER.email = email;
+  if (phone) LEARNER.phone = phone;
+  if (pass)  LEARNER.password = pass;
+  // Update nav display name
+  const nameEl = document.getElementById('dashUnameEl');
+  if (nameEl) nameEl.textContent = LEARNER.name;
+  showSaveToast();
+}
+
+function showSaveToast() {
+  const t = document.getElementById('saveToast');
+  if (t) { t.style.display = 'inline-flex'; setTimeout(() => { t.style.display = 'none'; }, 2500); }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+loadTutors();
+restoreSession().then(() => render());
+</script>
+</body>
+</html>
