@@ -598,10 +598,11 @@ function navigate(p, tutor) {
 }
 
 function goToDashboardAfterReg() {
-  // After registration isLoggedIn should already be true
-  // but force it just in case
-  if (!isLoggedIn) { isLoggedIn = true; }
-  enterDashboard();
+  restoreSession().then(() => {
+    if (isLoggedIn) enterDashboard();
+    else if (tutorLoggedIn) enterTutorDashboard();
+    else { isLoggedIn = true; enterDashboard(); }
+  });
 }
 
 function enterDashboard() {
@@ -617,14 +618,7 @@ function enterDashboard() {
 }
 
 function exitDashboard() {
-  // Clear session token from Airtable
-  if (isLoggedIn && LEARNER.email) {
-    fetch(`https://api.airtable.com/v0/${""}/${encodeURIComponent("Learners")}?filterByFormula={Email}="${LEARNER.email}"`, { headers: { 'Authorization': `Bearer ${""}` } })
-      .then(r => r.json()).then(d => { if (d.records && d.records[0]) atPush_update("Learners", d.records[0].id, { 'Session Token': '' }); });
-  }
-  if (tutorLoggedIn && TUTOR.airtableId) {
-    atPush_update("Tutors", TUTOR.airtableId, { 'Session Token': '' });
-  }
+  // Session cleanup handled via JWT expiry
   clearCookie('epiphany_token'); clearCookie('epiphany_type');
   isLoggedIn = false; tutorLoggedIn = false;
   LEARNER = { name:'', email:'', phone:'', avatar:'https://i.pravatar.cc/200?img=47', since:'', password:'' };
