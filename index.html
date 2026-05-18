@@ -412,7 +412,7 @@ body{background:var(--black);color:var(--white);font-family:'Nunito Sans',sans-s
   <div class="dash-nav-right">
     <button class="dash-back-btn" onclick="exitDashboard()">&#8592; Browse Tutors</button>
     <div class="dash-user">
-      <img src="https://i.pravatar.cc/200?img=47" class="dash-avatar" id="dashAvatarImg" alt="user"/>
+      <div id="dashAvatarEl" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--gold);overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:11px;background:#2D1B69;color:#C9A84C"></div>
       <span class="dash-uname" id="dashUnameEl"></span>
     </div>
   </div>
@@ -438,7 +438,6 @@ body{background:var(--black);color:var(--white);font-family:'Nunito Sans',sans-s
 // AIRTABLE CONFIG
 // ── Replace BASE_ID with your base ID (starts with "app")
 // ── Replace TOKEN with your personal access token (starts with "pat")
-// ── Table name constants must match your Airtable tab names exactly
 // ═══════════════════════════════════════════════════════════════
 const API = '/api';
 
@@ -503,8 +502,6 @@ async function restoreSession() {
 }
 
 // ── DATA ─────────────────────────────────────────────────────────
-// TUTORS — fetched live from Airtable
-// When you set a tutor's Status to "Comfirmed" in Airtable,
 // they automatically appear in the catalogue on next page load.
 let TUTORS = [];
 let TUTORS_LOADED = false;
@@ -566,7 +563,14 @@ let INVOICES = [];
 let DUE_INV = [];
 
 // ── STATE ─────────────────────────────────────────────────────────
-let isLoggedIn = false;
+let isLoggedIn    = false;
+let tutorLoggedIn = false;
+let TUTOR = { name:'', email:'', phone:'', city:'', subject:'', rate:0, bio:'', qual:'', avatar:'https://i.pravatar.cc/200?img=3', since:'', password:'', airtableId:'' };
+let TUTOR_SUB = { status:'none', trialStart:null, trialEnd:null, subStart:null, nextBilling:null };
+let tutorSessions = [], tutorPastSessions = [], tutorEarnings = [];
+const SUB_PRICE = 250;
+const TRIAL_DAYS = 30;
+const PAYFAST_SANDBOX = true;
 let authModal = null;
 let authError = '';
 let page = 'home', activeTutor = null;
@@ -599,35 +603,10 @@ function navigate(p, tutor) {
 
 function goToDashboardAfterReg() {
   restoreSession().then(() => {
-    if (isLoggedIn) { enterDashboard(); }
-    else if (tutorLoggedIn) { enterTutorDashboard(); }
+    if (isLoggedIn) enterDashboard();
+    else if (tutorLoggedIn) enterTutorDashboard();
     else { isLoggedIn = true; enterDashboard(); }
   });
-}
-
-async function loadLearnerData() {
-  if (!LEARNER.email) return;
-  try {
-    const sData = await apiGet(`/sessions?email=${encodeURIComponent(LEARNER.email)}&type=learner`);
-    if (sData.sessions) {
-      UPCOMING_L = sData.sessions
-        .filter(s => s.status === 'confirmed' || s.status === 'pending')
-        .map(s => ({ id: s.id, tutor: s.tutor_name||'', img: 'https://i.pravatar.cc/80?img=12',
-          subject: s.subject, date: s.day, time: s.time, mode: s.mode,
-          rate: parseFloat(s.rate)||0, status: s.status }));
-      PAST_L = sData.sessions
-        .filter(s => s.status === 'completed' || s.status === 'cancelled')
-        .map(s => ({ id: s.id, tutor: s.tutor_name||'', img: 'https://i.pravatar.cc/80?img=12',
-          subject: s.subject, date: s.day, time: s.time, mode: s.mode,
-          rate: parseFloat(s.rate)||0, status: s.status, rated: false, rating: null }));
-    }
-    const pData = await apiGet(`/payments?email=${encodeURIComponent(LEARNER.email)}&type=learner`);
-    if (pData.payments) {
-      INVOICES = pData.payments.filter(p => p.status === 'paid')
-        .map(p => ({ id: p.invoice_id||p.id, date: p.paid_on||'',
-          tutor: p.tutor_name||'', subject: p.subject, amount: parseFloat(p.amount)||0 }));
-    }
-  } catch(e) { console.error('[loadLearnerData]', e); }
 }
 
 function enterDashboard() {
@@ -638,13 +617,19 @@ function enterDashboard() {
   document.getElementById('siteFooter').style.display = 'none';
   const nameEl = document.getElementById('dashUnameEl');
   if (nameEl) nameEl.textContent = LEARNER.name;
+  const avatarEl = document.getElementById('dashAvatarEl');
+  if (avatarEl) {
+    const c = getAvatarColor(LEARNER.name);
+    avatarEl.style.background = c.bg;
+    avatarEl.style.color = c.fg;
+    avatarEl.textContent = getInitials(LEARNER.name);
+  }
   dashTab = 'overview';
-  renderDashboard();
+  loadLearnerData().then(() => renderDashboard());
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function exitDashboard() {
-  // Session cleanup handled via JWT expiry
   clearCookie('epiphany_token'); clearCookie('epiphany_type');
   isLoggedIn = false; tutorLoggedIn = false;
   LEARNER = { name:'', email:'', phone:'', avatar:'https://i.pravatar.cc/200?img=47', since:'', password:'' };
@@ -751,8 +736,14 @@ function render() {
 }
 
 function renderHome() {
-  if (!TUTORS_LOADED) loadTutors().then(() => render());
+  if (!TUTORS_LOADED) { loadTutors().then(() => render()); }
   const feat = TUTORS.slice(0, 4);
+  const tutorCount = TUTORS.length;
+  const featuredSection = tutorCount > 0 ? `
+<section class="featured-strip">
+  <div class="strip-header"><div><div class="eyebrow">Featured Educators</div><div class="section-title">Meet our <em>top rated</em> tutors</div></div><button class="btn-ghost" onclick="navigate('catalogue')">View All Tutors &rarr;</button></div>
+  <div class="strip-grid">${feat.map(t => `<div class="strip-card" onclick="selectTutor(${t.id})">${(!t.photo || t.photo === '') ? `<div style="width:100%;height:100%;background:${getAvatarColor(t.name).bg};display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:72px;color:${getAvatarColor(t.name).fg};letter-spacing:4px">${getInitials(t.name)}</div>` : `<img src="${t.photo}" alt="${t.name}" loading="lazy"/>`}<div class="strip-card-overlay"></div><div class="strip-card-body">${t.badge ? `<div class="strip-card-badge"><span class="badge">${t.badge}</span></div>` : ''}<div class="strip-card-name">${t.name}</div><div class="strip-card-sub">${t.subjects[0]}</div></div></div>`).join('')}</div>
+</section>` : '';
   return `<div class="page">
 <section class="hero"><div class="hero-bg"></div><div class="hero-bg-text">EPIPHANY</div>
 <div class="hero-content">
@@ -761,16 +752,13 @@ function renderHome() {
   <p class="hero-sub">Connect with South Africa's finest educators. Expert tutors, flexible scheduling, and transformative results &mdash; all in one place.</p>
   <div class="hero-actions"><button class="btn-gold" onclick="navigate('catalogue')">Browse Tutors</button><button class="btn-ghost" onclick="navigate('register')">Become a Tutor</button></div>
   <div class="hero-stats">
-    <div><div class="stat-n">240+</div><div class="stat-l">Expert Tutors</div></div>
-    <div><div class="stat-n">4,800+</div><div class="stat-l">Sessions Booked</div></div>
+    <div><div class="stat-n">${tutorCount || '0'}</div><div class="stat-l">Expert Tutors</div></div>
+    <div><div class="stat-n">${TUTORS.reduce((s,t) => s + (t.sessions||0), 0) || '0'}</div><div class="stat-l">Sessions Booked</div></div>
     <div><div class="stat-n">98%</div><div class="stat-l">Satisfaction Rate</div></div>
-    <div><div class="stat-n">9+</div><div class="stat-l">Subjects</div></div>
+    <div><div class="stat-n">${[...new Set(TUTORS.flatMap(t => t.subjects))].length || '0'}</div><div class="stat-l">Subjects</div></div>
   </div>
 </div></section>
-<section class="featured-strip">
-  <div class="strip-header"><div><div class="eyebrow">Featured Educators</div><div class="section-title">Meet our <em>top rated</em> tutors</div></div><button class="btn-ghost" onclick="navigate('catalogue')">View All Tutors &rarr;</button></div>
-  <div class="strip-grid">${feat.map(t => `<div class="strip-card" onclick="selectTutor(${t.id})"><img src="${t.photo}" alt="${t.name}" loading="lazy"/><div class="strip-card-overlay"></div><div class="strip-card-body">${t.badge ? `<div class="strip-card-badge"><span class="badge">${t.badge}</span></div>` : ''}<div class="strip-card-name">${t.name}</div><div class="strip-card-sub">${t.subjects[0]}</div></div></div>`).join('')}</div>
-</section>
+${featuredSection}
 <section class="how-section">
   <div class="eyebrow">How It Works</div><div class="section-title">Simple. <em>Seamless.</em> Effective.</div>
   <div class="steps">
@@ -801,7 +789,7 @@ function renderCatalogue() {
   <div class="filter-group"><div class="filter-label">Location</div><select class="filter-select" onchange="catLocation=this.value;render()">${LOCATIONS.map(l => `<option${l === catLocation ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
   <div class="filter-group"><div class="filter-label">Mode</div><select class="filter-select" onchange="catMode=this.value;render()">${MODES.map(m => `<option${m === catMode ? ' selected' : ''}>${m}</option>`).join('')}</select></div>
 </div>
-<div class="catalogue-body"><div class="tutor-grid">${filtered.length === 0 ? '<div class="no-results">No tutors match your search criteria.</div>' : filtered.map(t => `<div class="t-card" onclick="selectTutor(${t.id})"><div class="t-card-img-wrap"><img src="${t.photo}" alt="${t.name}" class="t-card-img" loading="lazy"/><div class="t-card-overlay"></div><div class="t-card-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="t-card-mode">${m}</span>`).join('')}</div></div><div class="t-card-body"><div class="t-card-name">${t.name}</div><div class="t-card-location">&#128205; ${t.location} &middot; ${t.grade}</div><div class="t-card-subjects">${t.subjects.slice(0,3).map(s => `<span class="t-card-subj">${s}</span>`).join('')}</div><div class="t-card-bio">${t.bio}</div><div class="t-card-footer"><div class="t-card-rate">R${t.rate}/hr</div><div class="t-card-rating">${S(t.rating)}<span class="rating-num">${t.rating} (${t.reviews})</span></div></div></div></div>`).join('')}</div></div>
+<div class="catalogue-body"><div class="tutor-grid">${filtered.length === 0 ? filtered.length === 0 && TUTORS.length === 0 ? '<div class="no-results">No approved tutors yet. Check back soon!</div>' : '<div class="no-results">No tutors match your search criteria.</div>' : filtered.map(t => `<div class="t-card" onclick="selectTutor(${t.id})"><div class="t-card-img-wrap">${(!t.photo || t.photo === '') ? `<div style="width:100%;height:100%;background:${getAvatarColor(t.name).bg};display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:72px;color:${getAvatarColor(t.name).fg};letter-spacing:4px">${getInitials(t.name)}</div>` : `<img src="${t.photo}" alt="${t.name}" class="t-card-img" loading="lazy"/>`}<div class="t-card-overlay"></div><div class="t-card-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="t-card-mode">${m}</span>`).join('')}</div></div><div class="t-card-body"><div class="t-card-name">${t.name}</div><div class="t-card-location">&#128205; ${t.location} &middot; ${t.grade}</div><div class="t-card-subjects">${t.subjects.slice(0,3).map(s => `<span class="t-card-subj">${s}</span>`).join('')}</div><div class="t-card-bio">${t.bio}</div><div class="t-card-footer"><div class="t-card-rate">R${t.rate}/hr</div><div class="t-card-rating">${S(t.rating)}<span class="rating-num">${t.rating} (${t.reviews})</span></div></div></div></div>`).join('')}</div></div>
 </div>`;
 }
 
@@ -820,7 +808,7 @@ ${selDay ? `<div class="bc-label">Select Time</div><div class="bc-times">${TIMES
 <button class="bc-confirm" id="bookBtn" ${selDay && selTime && bcName.trim() && bcEmail.trim() ? '' : 'disabled'} onclick="confirmBooking()">Confirm Booking</button>`;
   return `<div class="page profile-page">
 <div class="profile-hero">
-  <div class="profile-hero-img"><img src="${t.photo}" alt="${t.name}"/></div>
+  <div class="profile-hero-img">${(!t.photo || t.photo === '') ? `<div style="width:100%;height:100%;background:${getAvatarColor(t.name).bg};display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:140px;color:${getAvatarColor(t.name).fg};letter-spacing:8px">${getInitials(t.name)}</div>` : `<img src="${t.photo}" alt="${t.name}"/>`}</div>
   <div class="profile-hero-content">
     <button class="profile-back" onclick="navigate('catalogue')">&larr; Back to Catalogue</button>
     <div class="profile-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="badge expert">${m}</span>`).join('')}</div>
@@ -882,8 +870,7 @@ function confirmBooking() {
     amount:  t.rate,
   });
 
-  // Push to Airtable
-  apiPost('/sessions',{learnerName:bcName.trim(),learnerEmail:bcEmail.trim(),tutorName:t.name,subject:t.subjects[0],day:selDay,time:selTime,rate:t.rate,mode:t.mode[0]});
+    apiPost('/sessions',{learnerName:bcName.trim(),learnerEmail:bcEmail.trim(),tutorName:t.name,subject:t.subjects[0],day:selDay,time:selTime,rate:t.rate,mode:t.mode[0]});
 
   render();
 }
@@ -960,8 +947,7 @@ async function submitRegistration() {
     LEARNER.password = pass;
     LEARNER.since    = monthYear();
     isLoggedIn = true;
-    // Set session cookie for new learner too (token saved after Airtable record created)
-    LEARNER._pendingToken = genToken();
+        LEARNER._pendingToken = genToken();
     setCookie('epiphany_token', LEARNER._pendingToken, 30);
     setCookie('epiphany_type',  'learner', 30);
 
@@ -1014,7 +1000,7 @@ function lessonCard(l) {
   if (st === 'pending')   act += `<button class="lc-cancel" onclick="cancelLesson('${l.id}')">Cancel</button>`;
   if (st === 'completed' && !l.rated) act += `<button class="lc-rate-btn">Rate &#9733;</button>`;
   if (st === 'completed' && l.rated)  act += `<span class="lc-stars">${'&#9733;'.repeat(l.rating)}</span>`;
-  return `<div class="lc ${bcls}"><img src="${l.img}" class="lc-img" alt="${l.tutor}"/><div class="lc-info"><div class="lc-tutor">${l.tutor}</div><div class="lc-subj">${l.subject}</div><div class="lc-meta"><span class="lc-date">&#128197; ${l.date} &middot; ${l.time}</span><span class="lc-mode">${l.mode}</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R${l.rate}</span>${pill(st)}${act}</div></div>`;
+  return `<div class="lc ${bcls}">${avatarHTML(l.tutor, 44)}<div class="lc-info"><div class="lc-tutor">${l.tutor}</div><div class="lc-subj">${l.subject}</div><div class="lc-meta"><span class="lc-date">&#128197; ${l.date} &middot; ${l.time}</span><span class="lc-mode">${l.mode}</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R${l.rate}</span>${pill(st)}${act}</div></div>`;
 }
 
 function cancelLesson(id) { cancelledIds.push(id); renderDashboard(); }
@@ -1025,54 +1011,59 @@ function renderDashboard() {
   const outstanding = DUE_INV.filter(i => !paidIds.includes(i.id));
   const dueTotal    = outstanding.reduce((s, i) => s + i.amount, 0);
   const completedCt = PAST_L.filter(l => l.status === 'completed').length;
+  const firstName   = LEARNER.name ? LEARNER.name.split(' ')[0] : 'there';
 
   const navItems = [
-    { id: 'overview', label: 'Overview',         icon: '&#9672;' },
-    { id: 'upcoming', label: 'Upcoming Lessons',  icon: '&#9719;', badge: UPCOMING_L.length },
-    { id: 'history',  label: 'Session History',   icon: '&#9681;' },
-    { id: 'payments', label: 'Payments',          icon: '&#9678;', badge: outstanding.length || null },
-    { id: 'profile',  label: 'Profile Settings',  icon: '&#9673;' },
+    { id: 'overview', label: 'Overview',        icon: '&#9672;' },
+    { id: 'upcoming', label: 'Upcoming Lessons', icon: '&#9719;', badge: UPCOMING_L.length || null },
+    { id: 'history',  label: 'Session History',  icon: '&#9681;' },
+    { id: 'payments', label: 'Payments',         icon: '&#9678;', badge: outstanding.length || null },
+    { id: 'profile',  label: 'Profile Settings', icon: '&#9673;' },
   ];
 
   const sidebar = `<aside class="dash-sidebar">
 <div class="dash-sb-profile">
   <div class="dash-sb-label">My Account</div>
-  <div class="dash-sb-user"><img src="${LEARNER.avatar}" class="dash-sb-avatar" alt=""/><div><div class="dash-sb-uname">${LEARNER.name}</div><div class="dash-sb-role">Learner</div></div></div>
+  <div class="dash-sb-user">${avatarHTML(LEARNER.name, 40, "border:1px solid var(--gold)")}<div><div class="dash-sb-uname">${LEARNER.name}</div><div class="dash-sb-role">Learner</div></div></div>
 </div>
 <div class="dash-nav-label">Navigation</div>
-${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' : ''}" onclick="switchTab('${n.id}')"><span class="dash-nav-icon">${n.icon}</span>${n.label}${n.badge ? `<span class="dash-nav-badge">${n.badge}</span>` : ''}</button>`).join('')}
+${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' : ''}" onclick="switchTab('${n.id}')"><span class="dash-nav-icon">${n.icon}</span>${n.label}${n.badge ? '<span class="dash-nav-badge">'+n.badge+'</span>' : ''}</button>`).join('')}
 </aside>`;
 
   let main = '';
 
   if (dashTab === 'overview') {
-    const nxt = UPCOMING_L[0];
+    const nxt = UPCOMING_L.length > 0 ? UPCOMING_L[0] : null;
+    const nxtLine = nxt ? `<div class="lesson-list">${lessonCard(nxt)}</div>` : `<div style="padding:24px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions. <span style="color:var(--gold);cursor:pointer" onclick="navigate('catalogue')">Browse tutors &rarr;</span></div>`;
+    const histLine = PAST_L.length > 0 ? `<div class="lesson-list">${PAST_L.slice(0,3).map(lessonCard).join('')}</div>` : `<div style="padding:24px 0;color:var(--muted);font-size:13px;text-align:center">No session history yet.</div>`;
     main = `<div class="dash-section">
 <div class="dash-eyebrow">Dashboard</div>
-<div class="dash-title">Welcome back, <em>${LEARNER.name.split(' ')[0]}</em></div>
+<div class="dash-title">Welcome back, <em>${firstName}</em></div>
 <div class="ov-grid">
-  <div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">${UPCOMING_L.length}</div><div class="ov-sub">Next: ${nxt.date}</div></div>
-  <div class="ov-card"><div class="ov-label">Completed Sessions</div><div class="ov-value">${completedCt}</div><div class="ov-sub">Since ${LEARNER.since}</div></div>
+  <div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">${UPCOMING_L.length}</div><div class="ov-sub">${nxt ? 'Next: '+nxt.date : 'No sessions yet'}</div></div>
+  <div class="ov-card"><div class="ov-label">Completed Sessions</div><div class="ov-value">${completedCt}</div><div class="ov-sub">${LEARNER.since ? 'Since '+LEARNER.since : 'None yet'}</div></div>
   <div class="ov-card"><div class="ov-label">Total Invested</div><div class="ov-value gld">R${totalSpent.toLocaleString()}</div><div class="ov-sub">${INVOICES.length} invoices paid</div></div>
-  <div class="ov-card"><div class="ov-label">Amount Due</div><div class="ov-value amb">R${dueTotal}</div><div class="ov-sub clk" onclick="switchTab('payments')">Pay now &rarr;</div></div>
+  <div class="ov-card"><div class="ov-label">Amount Due</div><div class="ov-value${dueTotal > 0 ? ' amb' : ''}">R${dueTotal}</div><div class="ov-sub${dueTotal > 0 ? ' clk' : ''}" ${dueTotal > 0 ? "onclick=\"switchTab('payments')\""  : ''}>${dueTotal > 0 ? 'Pay now &rarr;' : 'All clear'}</div></div>
 </div>
 <div class="sub-hdg">Next Session <span class="sub-hdg-link" onclick="switchTab('upcoming')">View all &rarr;</span></div>
-<div class="lesson-list">${lessonCard(nxt)}</div>
+${nxtLine}
 <div class="sub-hdg">Recent Sessions <span class="sub-hdg-link" onclick="switchTab('history')">View all &rarr;</span></div>
-<div class="lesson-list">${PAST_L.slice(0, 3).map(lessonCard).join('')}</div>
+${histLine}
 </div>`;
   }
 
   if (dashTab === 'upcoming') {
+    const upLine = UPCOMING_L.length > 0 ? `<div class="lesson-list">${UPCOMING_L.map(lessonCard).join('')}</div>` : `<div style="padding:48px 0;text-align:center;color:var(--muted);font-size:13px">No upcoming sessions. <span style="color:var(--gold);cursor:pointer" onclick="navigate('catalogue')">Browse tutors &rarr;</span></div>`;
     main = `<div class="dash-section">
 <div class="dash-eyebrow">My Lessons</div><div class="dash-title"><em>Upcoming</em> Sessions</div>
 <div class="sub-hdg">Confirmed &amp; Pending <span class="sub-hdg-count">${UPCOMING_L.length} sessions</span></div>
-<div class="lesson-list">${UPCOMING_L.map(lessonCard).join('')}</div>
+${upLine}
 </div>`;
   }
 
   if (dashTab === 'history') {
     const f = histFilter === 'all' ? PAST_L : PAST_L.filter(l => l.status === histFilter);
+    const histLine = f.length > 0 ? `<div class="lesson-list">${f.map(lessonCard).join('')}</div>` : `<div style="padding:48px 0;text-align:center;color:var(--muted);font-size:13px">No sessions yet.</div>`;
     main = `<div class="dash-section">
 <div class="dash-eyebrow">My Lessons</div><div class="dash-title">Session <em>History</em></div>
 <div class="filter-tabs">
@@ -1081,7 +1072,7 @@ ${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' 
   <button class="ftab${histFilter === 'cancelled' ? ' active' : ''}" onclick="histFilter='cancelled';renderDashboard()">Cancelled</button>
 </div>
 <div class="sub-hdg">Past Sessions <span class="sub-hdg-count">${f.length} sessions</span></div>
-<div class="lesson-list">${f.map(lessonCard).join('')}</div>
+${histLine}
 </div>`;
   }
 
@@ -1091,9 +1082,9 @@ ${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' 
 <div class="dash-eyebrow">Finances</div><div class="dash-title">Payments &amp; <em>Invoices</em></div>
 <div class="pay-top">
   <div class="pay-card"><div class="pay-card-label">Total Spent (All Time)</div><div class="pay-card-value">R${totalSpent.toLocaleString()}</div><div class="pay-card-sub">${INVOICES.length} sessions paid</div></div>
-  <div class="pay-card"><div class="pay-card-label">Currently Due</div><div class="pay-card-value ${dueTotal > 0 ? 'amb' : 'grn'}">R${dueTotal}</div><div class="pay-card-sub">${outstanding.length === 0 ? 'All paid &#10003;' : `${outstanding.length} invoice${outstanding.length !== 1 ? 's' : ''} outstanding`}</div></div>
+  <div class="pay-card"><div class="pay-card-label">Currently Due</div><div class="pay-card-value ${dueTotal > 0 ? 'amb' : 'grn'}">R${dueTotal}</div><div class="pay-card-sub">${outstanding.length === 0 ? 'All paid &#10003;' : outstanding.length+' invoice'+(outstanding.length !== 1 ? 's' : '')+' outstanding'}</div></div>
 </div>
-${outstanding.length > 0 ? `<div style="margin-bottom:28px"><div class="due-hdr"><span class="due-dot"></span>Outstanding Invoices</div>${outstanding.map(inv => `<div class="due-card"><div class="due-info"><div class="due-inv-id">${inv.id}</div><div class="due-desc">${inv.tutor} &mdash; ${inv.subject}</div><div class="due-date">Due: ${inv.dueDate}</div></div><span class="due-amount">R${inv.amount}</span><button class="pay-now-btn" onclick="openPayModal('${inv.id}')">Pay Now</button></div>`).join('')}</div>` : ''}
+${outstanding.length > 0 ? '<div style="margin-bottom:28px"><div class="due-hdr"><span class="due-dot"></span>Outstanding Invoices</div>'+outstanding.map(inv => `<div class="due-card"><div class="due-info"><div class="due-inv-id">${inv.id}</div><div class="due-desc">${inv.tutor} &mdash; ${inv.subject}</div><div class="due-date">Due: ${inv.dueDate}</div></div><span class="due-amount">R${inv.amount}</span><button class="pay-now-btn" onclick="openPayModal('${inv.id}')">Pay Now</button></div>`).join('')+'</div>' : ''}
 <div class="sub-hdg">Invoice History <span class="sub-hdg-count">${INVOICES.length} invoices</span></div>
 <table class="inv-table">
 <thead><tr><th>Invoice</th><th>Date</th><th>Tutor</th><th>Subject</th><th>Amount</th><th>Status</th><th></th></tr></thead>
@@ -1107,7 +1098,7 @@ ${outstanding.length > 0 ? `<div style="margin-bottom:28px"><div class="due-hdr"
 <div class="dash-eyebrow">Account</div><div class="dash-title">Profile <em>Settings</em></div>
 <div class="gold-rule"></div>
 <div class="settings-avatar-row">
-  <img src="${LEARNER.avatar}" class="settings-big-avatar" alt=""/>
+  ${avatarHTML(LEARNER.name, 72, "border:2px solid var(--gold)")}
   <div>
     <div style="font-size:16px;font-weight:600;margin-bottom:4px">${LEARNER.name}</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Member since ${LEARNER.since}</div>
@@ -1164,8 +1155,7 @@ function processPayment(invId) {
   if (!inv) return;
   paidIds.push(invId);
   payStep = 2;
-  // Push payment record to Airtable
-  apiPost('/payments',{invoiceId:inv.id,learnerName:LEARNER.name,learnerEmail:LEARNER.email,tutorName:inv.tutor,subject:inv.subject,amount:inv.amount});
+    apiPost('/payments',{invoiceId:inv.id,learnerName:LEARNER.name,learnerEmail:LEARNER.email,tutorName:inv.tutor,subject:inv.subject,amount:inv.amount});
   renderDashboard();
 }
 
@@ -1190,14 +1180,126 @@ function showSaveToast() {
   if (t) { t.style.display = 'inline-flex'; setTimeout(() => { t.style.display = 'none'; }, 2500); }
 }
 
+function subKey() { return 'epiphany_sub_' + TUTOR.email; }
+function saveSubState() { try { localStorage.setItem(subKey(), JSON.stringify(TUTOR_SUB)); } catch(e){} }
+function loadSubState() { try { const s = localStorage.getItem(subKey()); if(s) TUTOR_SUB=JSON.parse(s); } catch(e){} }
+function isSubActive() {
+  if (TUTOR_SUB.status==='active') return true;
+  if (TUTOR_SUB.status==='trial') return new Date() < new Date(TUTOR_SUB.trialEnd);
+  return false;
+}
+function daysLeft() {
+  if (!TUTOR_SUB.trialEnd) return 0;
+  return Math.max(0, Math.ceil((new Date(TUTOR_SUB.trialEnd)-new Date())/86400000));
+}
+function startTrial() {
+  const s=new Date(), e=new Date(s); e.setDate(e.getDate()+TRIAL_DAYS);
+  TUTOR_SUB={status:'trial',trialStart:s.toISOString(),trialEnd:e.toISOString(),subStart:null,nextBilling:e.toISOString()};
+  saveSubState();
+  if(TUTOR.airtableId) apiPost('/subscription',{action:'start_trial',tutorId:TUTOR.airtableId});
+  renderTutorDashboard();
+}
+function cancelSubscription() {
+  TUTOR_SUB.status='cancelled'; saveSubState();
+  if(TUTOR.airtableId) apiPost('/subscription',{action:'cancel',tutorId:TUTOR.airtableId});
+  renderTutorDashboard();
+}
+function goToRequests() { dashTab='requests'; renderTutorDashboard(); }
+function launchPayFast() { alert('PayFast integration coming soon!'); }
+
 function selectTutor(id) {
   const t = TUTORS.find(t => t.id === id);
   if (t) navigate('profile', t);
 }
 
+async function loadLearnerData() {
+  if (!LEARNER.email) return;
+  try {
+    const sData = await apiGet(`/sessions?email=${encodeURIComponent(LEARNER.email)}&type=learner`);
+    if (sData.sessions) {
+      UPCOMING_L = sData.sessions.filter(s=>s.status==='confirmed'||s.status==='pending')
+        .map(s=>({id:s.id,tutor:s.tutor_name||'',img:'https://i.pravatar.cc/80?img=12',
+          subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status}));
+      PAST_L = sData.sessions.filter(s=>s.status==='completed'||s.status==='cancelled')
+        .map(s=>({id:s.id,tutor:s.tutor_name||'',img:'https://i.pravatar.cc/80?img=12',
+          subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status,rated:false,rating:null}));
+    }
+    const pData = await apiGet(`/payments?email=${encodeURIComponent(LEARNER.email)}&type=learner`);
+    if (pData.payments) {
+      INVOICES = pData.payments.filter(p=>p.status==='paid')
+        .map(p=>({id:p.invoice_id||p.id,date:p.paid_on||'',tutor:p.tutor_name||'',subject:p.subject,amount:parseFloat(p.amount)||0}));
+    }
+  } catch(e) { console.error('[loadLearnerData]',e); }
+}
+
+async function loadTutorData() {
+  if (!TUTOR.email) return;
+  try {
+    const r1 = await apiGet(`/sessions?email=${encodeURIComponent(TUTOR.email)}&type=tutor`);
+    tutorSessions=[]; tutorPastSessions=[];
+    if(r1.sessions) r1.sessions.forEach(s=>{
+      const obj={id:s.id,learner:s.learner_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status};
+      if(s.status==='confirmed'||s.status==='pending') tutorSessions.push(obj); else tutorPastSessions.push(obj);
+    });
+    const r2 = await apiGet(`/payments?email=${encodeURIComponent(TUTOR.email)}&type=tutor`);
+    tutorEarnings = r2.payments ? r2.payments.filter(p=>p.status==='paid')
+      .map(p=>({id:p.invoice_id||p.id,date:p.paid_on||'',learner:p.learner_name||'',subject:p.subject,amount:parseFloat(p.amount)||0})) : [];
+  } catch(e) { console.error('[loadTutorData]',e); }
+}
+
+function enterTutorDashboard() {
+  document.getElementById('marketNav').style.display='none';
+  document.getElementById('dashNav').style.display='flex';
+  document.getElementById('siteFooter').style.display='none';
+  const nameEl=document.getElementById('dashUnameEl');
+  if(nameEl) nameEl.textContent=TUTOR.name;
+  dashTab='overview';
+  loadTutorData().then(()=>renderTutorDashboard());
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderTutorDashboard() {
+  loadSubState();
+  if(TUTOR_SUB.status==='none'){renderSubGate();return;}
+  if(!isSubActive()&&TUTOR_SUB.status!=='active'){renderSubExpired();return;}
+  const totalEarned=tutorEarnings.reduce((s,e)=>s+e.amount,0);
+  const requests=tutorSessions.filter(s=>s.status==='pending');
+  const confirmed=tutorSessions.filter(s=>s.status==='confirmed');
+  const completedCt=tutorPastSessions.filter(s=>s.status==='completed').length;
+  const navItems=[{id:'overview',label:'Overview',icon:'&#9672;'},{id:'sessions',label:'My Sessions',icon:'&#9719;',badge:confirmed.length||null},{id:'requests',label:'Student Requests',icon:'&#9681;',badge:requests.length||null},{id:'earnings',label:'Earnings',icon:'&#9678;'},{id:'subscription',label:'Subscription',icon:'&#9670;'},{id:'tprofile',label:'Profile Settings',icon:'&#9673;'}];
+  const trialBanner=TUTOR_SUB.status==='trial'?`<div style="background:rgba(201,168,76,.12);border:1px solid var(--gold);padding:14px 20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;color:var(--gold)">&#9670; Free trial — <strong>${daysLeft()} day${daysLeft()!==1?'s':''} remaining</strong></span><button onclick="dashTab='subscription';renderTutorDashboard()" style="font-size:10px;letter-spacing:2px;text-transform:uppercase;background:var(--gold);color:var(--black);border:none;padding:7px 16px;cursor:pointer;font-family:'Nunito Sans',sans-serif">Manage &rarr;</button></div>`:'';
+  const sidebar=`<aside class="dash-sidebar"><div class="dash-sb-profile"><div class="dash-sb-label">Tutor Account</div><div class="dash-sb-user">${avatarHTML(TUTOR.name, 40, "border:1px solid var(--gold)")}<div><div class="dash-sb-uname">${TUTOR.name}</div><div class="dash-sb-role" style="color:var(--gold)">Tutor</div></div></div></div><div class="dash-nav-label">Navigation</div>${navItems.map(n=>`<button class="dash-nav-item${dashTab===n.id?' active':''}" onclick="dashTab='${n.id}';renderTutorDashboard()"><span class="dash-nav-icon">${n.icon}</span>${n.label}${n.badge?`<span class="dash-nav-badge">${n.badge}</span>`:''}</button>`).join('')}</aside>`;
+  const tCard=s=>`<div class="lc ${s.status==='confirmed'?'lc-up':s.status==='pending'?'lc-pend':'lc-can'}">${avatarHTML(s.learner||'Student', 44)}<div class="lc-info"><div class="lc-tutor">${s.learner||'Student'}</div><div class="lc-subj">${s.subject}</div><div class="lc-meta"><span class="lc-date">&#128197; ${s.date} &middot; ${s.time}</span><span class="lc-mode">${s.mode}</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R${s.rate}</span>${pill(s.status)}</div></div>`;
+  let main='';
+  if(dashTab==='overview'){const nxt=confirmed[0]||tutorSessions[0];main=`<div class="dash-section">${trialBanner}<div class="dash-eyebrow">Tutor Dashboard</div><div class="dash-title">Welcome back, <em>${TUTOR.name.split(' ')[0]||'Tutor'}</em></div><div class="ov-grid"><div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">${confirmed.length}</div><div class="ov-sub">${nxt?'Next: '+nxt.date:'None scheduled'}</div></div><div class="ov-card"><div class="ov-label">Completed Sessions</div><div class="ov-value">${completedCt}</div><div class="ov-sub">Since ${TUTOR.since||'registration'}</div></div><div class="ov-card"><div class="ov-label">Total Earned</div><div class="ov-value gld">R${totalEarned.toLocaleString()}</div><div class="ov-sub">${tutorEarnings.length} session${tutorEarnings.length!==1?'s':''} paid</div></div><div class="ov-card"><div class="ov-label">Pending Requests</div><div class="ov-value${requests.length?' amb':''}">${requests.length}</div><div class="ov-sub${requests.length?' clk':''}" ${requests.length?'onclick="goToRequests()"':''}>${requests.length?'Review now &rarr;':'None pending'}</div></div></div><div class="sub-hdg">Next Session</div>${nxt?`<div class="lesson-list">${tCard(nxt)}</div>`:`<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>`}</div>`;}
+  if(dashTab==='sessions'){main=`<div class="dash-section"><div class="dash-eyebrow">My Sessions</div><div class="dash-title"><em>Upcoming</em> Sessions</div>${confirmed.length>0?`<div class="lesson-list">${confirmed.map(tCard).join('')}</div>`:`<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>`}<div class="sub-hdg" style="margin-top:16px">Past Sessions</div>${tutorPastSessions.length>0?`<div class="lesson-list">${tutorPastSessions.map(tCard).join('')}</div>`:`<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No past sessions yet.</div>`}</div>`;}
+  if(dashTab==='requests'){main=`<div class="dash-section"><div class="dash-eyebrow">Student Requests</div><div class="dash-title"><em>Pending</em> Requests</div>${requests.length>0?`<div class="lesson-list">${requests.map(s=>`<div class="lc lc-pend"><img src="https://i.pravatar.cc/80?img=3" class="lc-img" alt=""/><div class="lc-info"><div class="lc-tutor">${s.learner||'Student'}</div><div class="lc-subj">${s.subject}</div><div class="lc-meta"><span class="lc-date">&#128197; ${s.date} &middot; ${s.time}</span><span class="lc-mode">${s.mode}</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R${s.rate}</span>${pill(s.status)}<button class="lc-join" onclick="alert('Accepted!')">Accept</button><button class="lc-cancel" onclick="alert('Declined.')">Decline</button></div></div>`).join('')}</div>`:`<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No pending requests.</div>`}</div>`;}
+  if(dashTab==='earnings'){main=`<div class="dash-section"><div class="dash-eyebrow">Finances</div><div class="dash-title">My <em>Earnings</em></div><div class="pay-top"><div class="pay-card"><div class="pay-card-label">Total Earned</div><div class="pay-card-value">R${totalEarned.toLocaleString()}</div></div><div class="pay-card"><div class="pay-card-label">Hourly Rate</div><div class="pay-card-value">R${TUTOR.rate||0}</div></div></div>${tutorEarnings.length>0?`<table class="inv-table"><thead><tr><th>Invoice</th><th>Date</th><th>Learner</th><th>Subject</th><th>Amount</th></tr></thead><tbody>${tutorEarnings.map(e=>`<tr><td><span class="inv-id">${e.id}</span></td><td style="color:var(--muted);font-size:12px">${e.date}</td><td>${e.learner}</td><td style="color:var(--muted)">${e.subject}</td><td style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold)">R${e.amount}</td></tr>`).join('')}</tbody></table>`:`<div style="padding:32px 0;color:var(--muted);font-size:13px;text-align:center">No earnings yet.</div>`}</div>`;}
+  if(dashTab==='subscription'){const fmt=d=>d?new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'}):'—';const sl=TUTOR_SUB.status==='trial'?`Free Trial — ${daysLeft()} day${daysLeft()!==1?'s':''} remaining`:TUTOR_SUB.status==='active'?'Active':'Inactive';main=`<div class="dash-section"><div class="dash-eyebrow">Billing</div><div class="dash-title">My <em>Subscription</em></div><div class="pay-top"><div class="pay-card"><div class="pay-card-label">Current Plan</div><div class="pay-card-value" style="font-size:32px">${TUTOR_SUB.status==='trial'?'Free Trial':TUTOR_SUB.status==='active'?'Active':'Inactive'}</div><div class="pay-card-sub">${sl}</div></div><div class="pay-card"><div class="pay-card-label">Monthly Fee</div><div class="pay-card-value">R${SUB_PRICE}</div></div></div>${TUTOR_SUB.status==='trial'?`<div style="background:var(--black3);padding:32px;margin-bottom:24px;border:1px solid var(--border)"><div style="font-family:'Cormorant Garamond',serif;font-size:26px;margin-bottom:8px">Trial ends <span style="color:var(--gold)">${fmt(TUTOR_SUB.trialEnd)}</span></div><div style="font-size:13px;color:var(--muted);margin-bottom:24px">Subscribe to keep your profile live. R${SUB_PRICE}/month. Cancel anytime.</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;margin-right:12px">Subscribe Now</button><button onclick="if(confirm('Cancel trial?'))cancelSubscription()" style="padding:14px 20px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.15);cursor:pointer;font-family:'Nunito Sans',sans-serif">Cancel Trial</button></div>`:''}${TUTOR_SUB.status==='active'?`<div style="background:var(--black3);padding:32px;margin-bottom:24px;border:1px solid rgba(76,175,125,.2)"><div style="font-family:'Cormorant Garamond',serif;font-size:26px;margin-bottom:8px;color:var(--green)">&#10003; Active</div><button onclick="if(confirm('Cancel?'))cancelSubscription()" style="padding:14px 20px;background:transparent;color:var(--red);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid var(--red);cursor:pointer;font-family:'Nunito Sans',sans-serif">Cancel Subscription</button></div>`:''}${(TUTOR_SUB.status==='cancelled'||TUTOR_SUB.status==='expired')?`<div style="background:var(--black3);padding:32px;border:1px solid rgba(224,92,92,.2)"><div style="font-family:'Cormorant Garamond',serif;font-size:26px;margin-bottom:8px;color:var(--red)">Subscription ${TUTOR_SUB.status==='cancelled'?'Cancelled':'Expired'}</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif">Reactivate</button></div>`:''}</div>`;}
+  if(dashTab==='tprofile'){main=`<div class="dash-section"><div class="dash-eyebrow">Account</div><div class="dash-title">Tutor <em>Profile</em></div><div class="gold-rule"></div><div class="settings-avatar-row">${avatarHTML(TUTOR.name, 72, "border:2px solid var(--gold)")}<div><div style="font-size:16px;font-weight:600;margin-bottom:4px">${TUTOR.name}</div><div style="font-size:12px;color:var(--gold);margin-bottom:4px">${TUTOR.subject||''}</div></div></div><div class="settings-grid"><div class="setting-group"><label class="setting-label">Full Name</label><input class="setting-input" id="tpName" value="${TUTOR.name}"/></div><div class="setting-group"><label class="setting-label">Email</label><input class="setting-input" id="tpEmail" value="${TUTOR.email}"/></div><div class="setting-group"><label class="setting-label">Phone</label><input class="setting-input" id="tpPhone" value="${TUTOR.phone||''}"/></div><div class="setting-group"><label class="setting-label">City</label><input class="setting-input" id="tpCity" value="${TUTOR.city||''}"/></div><div class="setting-group"><label class="setting-label">New Password</label><input class="setting-input" id="tpPass" type="password" placeholder="Leave blank to keep current"/></div></div><div style="display:flex;align-items:center"><button class="settings-save" onclick="saveTutorProfile()">Save Changes</button><span class="save-toast" id="saveToast" style="display:none">&#10003; Saved</span></div></div>`;}
+  document.getElementById('app').innerHTML=`<div class="dashboard-wrap">${sidebar}<main class="dash-main">${main}</main></div>`;
+}
+
+function renderSubGate() {
+  document.getElementById('app').innerHTML=`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px"><div style="max-width:560px;width:100%;text-align:center"><div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;line-height:1.1;margin-bottom:12px">Start your <em style="color:var(--gold)">free trial</em></div><div style="width:56px;height:1px;background:var(--gold);margin:20px auto 28px"></div><div style="font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:40px">Get <strong style="color:var(--white)">30 days free</strong> then just <strong style="color:var(--gold)">R${SUB_PRICE}/month</strong>. Cancel anytime.</div><button onclick="startTrial()" style="width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;margin-bottom:12px">Start Free 30-Day Trial</button><div style="font-size:11px;color:var(--muted)">No payment required during trial</div></div></div>`;
+}
+
+function renderSubExpired() {
+  document.getElementById('app').innerHTML=`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px"><div style="max-width:480px;width:100%;text-align:center"><div style="font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:300;margin-bottom:12px">Subscription <em style="color:var(--red)">Expired</em></div><div style="width:56px;height:1px;background:var(--gold);margin:20px auto 28px"></div><button onclick="launchPayFast()" style="width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;margin-bottom:12px">Resubscribe — R${SUB_PRICE}/month</button><button onclick="exitDashboard()" style="width:100%;padding:14px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.12);cursor:pointer;font-family:'Nunito Sans',sans-serif">Back to Website</button></div></div>`;
+}
+
+function saveTutorProfile() {
+  const name=gv('tpName'),email=gv('tpEmail'),phone=gv('tpPhone'),city=gv('tpCity');
+  const pass=document.getElementById('tpPass')?document.getElementById('tpPass').value:'';
+  if(name)TUTOR.name=name; if(email)TUTOR.email=email; if(phone)TUTOR.phone=phone; if(city)TUTOR.city=city;
+  if(pass)TUTOR.password=pass;
+  const nameEl=document.getElementById('dashUnameEl'); if(nameEl) nameEl.textContent=TUTOR.name;
+  showSaveToast();
+}
+
 // ── INIT ──────────────────────────────────────────────────────────
 loadTutors();
-restoreSession().then(() => render());
+window._sessionRestoring = restoreSession().then(() => { window._sessionRestoring = null; render(); });
 </script>
 </body>
 </html>
