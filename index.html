@@ -599,14 +599,40 @@ function navigate(p, tutor) {
 
 function goToDashboardAfterReg() {
   restoreSession().then(() => {
-    if (isLoggedIn) enterDashboard();
-    else if (tutorLoggedIn) enterTutorDashboard();
+    if (isLoggedIn) { enterDashboard(); }
+    else if (tutorLoggedIn) { enterTutorDashboard(); }
     else { isLoggedIn = true; enterDashboard(); }
   });
 }
 
+async function loadLearnerData() {
+  if (!LEARNER.email) return;
+  try {
+    const sData = await apiGet(`/sessions?email=${encodeURIComponent(LEARNER.email)}&type=learner`);
+    if (sData.sessions) {
+      UPCOMING_L = sData.sessions
+        .filter(s => s.status === 'confirmed' || s.status === 'pending')
+        .map(s => ({ id: s.id, tutor: s.tutor_name||'', img: 'https://i.pravatar.cc/80?img=12',
+          subject: s.subject, date: s.day, time: s.time, mode: s.mode,
+          rate: parseFloat(s.rate)||0, status: s.status }));
+      PAST_L = sData.sessions
+        .filter(s => s.status === 'completed' || s.status === 'cancelled')
+        .map(s => ({ id: s.id, tutor: s.tutor_name||'', img: 'https://i.pravatar.cc/80?img=12',
+          subject: s.subject, date: s.day, time: s.time, mode: s.mode,
+          rate: parseFloat(s.rate)||0, status: s.status, rated: false, rating: null }));
+    }
+    const pData = await apiGet(`/payments?email=${encodeURIComponent(LEARNER.email)}&type=learner`);
+    if (pData.payments) {
+      INVOICES = pData.payments.filter(p => p.status === 'paid')
+        .map(p => ({ id: p.invoice_id||p.id, date: p.paid_on||'',
+          tutor: p.tutor_name||'', subject: p.subject, amount: parseFloat(p.amount)||0 }));
+    }
+  } catch(e) { console.error('[loadLearnerData]', e); }
+}
+
 function enterDashboard() {
-  if (!isLoggedIn) { openAuthModal('signin'); return; }
+  if (!isLoggedIn && !tutorLoggedIn) { openAuthModal('signin'); return; }
+  if (tutorLoggedIn && !isLoggedIn) { enterTutorDashboard(); return; }
   document.getElementById('marketNav').style.display = 'none';
   document.getElementById('dashNav').style.display = 'flex';
   document.getElementById('siteFooter').style.display = 'none';
@@ -743,7 +769,7 @@ function renderHome() {
 </div></section>
 <section class="featured-strip">
   <div class="strip-header"><div><div class="eyebrow">Featured Educators</div><div class="section-title">Meet our <em>top rated</em> tutors</div></div><button class="btn-ghost" onclick="navigate('catalogue')">View All Tutors &rarr;</button></div>
-  <div class="strip-grid">${feat.map(t => `<div class="strip-card" onclick="navigate('profile',t)"><img src="${t.photo}" alt="${t.name}" loading="lazy"/><div class="strip-card-overlay"></div><div class="strip-card-body">${t.badge ? `<div class="strip-card-badge"><span class="badge">${t.badge}</span></div>` : ''}<div class="strip-card-name">${t.name}</div><div class="strip-card-sub">${t.subjects[0]}</div></div></div>`).join('')}</div>
+  <div class="strip-grid">${feat.map(t => `<div class="strip-card" onclick="selectTutor(${t.id})"><img src="${t.photo}" alt="${t.name}" loading="lazy"/><div class="strip-card-overlay"></div><div class="strip-card-body">${t.badge ? `<div class="strip-card-badge"><span class="badge">${t.badge}</span></div>` : ''}<div class="strip-card-name">${t.name}</div><div class="strip-card-sub">${t.subjects[0]}</div></div></div>`).join('')}</div>
 </section>
 <section class="how-section">
   <div class="eyebrow">How It Works</div><div class="section-title">Simple. <em>Seamless.</em> Effective.</div>
@@ -775,7 +801,7 @@ function renderCatalogue() {
   <div class="filter-group"><div class="filter-label">Location</div><select class="filter-select" onchange="catLocation=this.value;render()">${LOCATIONS.map(l => `<option${l === catLocation ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
   <div class="filter-group"><div class="filter-label">Mode</div><select class="filter-select" onchange="catMode=this.value;render()">${MODES.map(m => `<option${m === catMode ? ' selected' : ''}>${m}</option>`).join('')}</select></div>
 </div>
-<div class="catalogue-body"><div class="tutor-grid">${filtered.length === 0 ? '<div class="no-results">No tutors match your search criteria.</div>' : filtered.map(t => `<div class="t-card" onclick="navigate('profile',t)"><div class="t-card-img-wrap"><img src="${t.photo}" alt="${t.name}" class="t-card-img" loading="lazy"/><div class="t-card-overlay"></div><div class="t-card-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="t-card-mode">${m}</span>`).join('')}</div></div><div class="t-card-body"><div class="t-card-name">${t.name}</div><div class="t-card-location">&#128205; ${t.location} &middot; ${t.grade}</div><div class="t-card-subjects">${t.subjects.slice(0,3).map(s => `<span class="t-card-subj">${s}</span>`).join('')}</div><div class="t-card-bio">${t.bio}</div><div class="t-card-footer"><div class="t-card-rate">R${t.rate}/hr</div><div class="t-card-rating">${S(t.rating)}<span class="rating-num">${t.rating} (${t.reviews})</span></div></div></div></div>`).join('')}</div></div>
+<div class="catalogue-body"><div class="tutor-grid">${filtered.length === 0 ? '<div class="no-results">No tutors match your search criteria.</div>' : filtered.map(t => `<div class="t-card" onclick="selectTutor(${t.id})"><div class="t-card-img-wrap"><img src="${t.photo}" alt="${t.name}" class="t-card-img" loading="lazy"/><div class="t-card-overlay"></div><div class="t-card-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="t-card-mode">${m}</span>`).join('')}</div></div><div class="t-card-body"><div class="t-card-name">${t.name}</div><div class="t-card-location">&#128205; ${t.location} &middot; ${t.grade}</div><div class="t-card-subjects">${t.subjects.slice(0,3).map(s => `<span class="t-card-subj">${s}</span>`).join('')}</div><div class="t-card-bio">${t.bio}</div><div class="t-card-footer"><div class="t-card-rate">R${t.rate}/hr</div><div class="t-card-rating">${S(t.rating)}<span class="rating-num">${t.rating} (${t.reviews})</span></div></div></div></div>`).join('')}</div></div>
 </div>`;
 }
 
@@ -1162,6 +1188,11 @@ function saveProfile() {
 function showSaveToast() {
   const t = document.getElementById('saveToast');
   if (t) { t.style.display = 'inline-flex'; setTimeout(() => { t.style.display = 'none'; }, 2500); }
+}
+
+function selectTutor(id) {
+  const t = TUTORS.find(t => t.id === id);
+  if (t) navigate('profile', t);
 }
 
 // ── INIT ──────────────────────────────────────────────────────────
