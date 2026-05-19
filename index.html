@@ -625,12 +625,13 @@ function enterDashboard() {
     avatarEl.textContent = getInitials(LEARNER.name);
   }
   dashTab = 'overview';
+  setCookie('epiphany_dash', 'learner', 30);
   loadLearnerData().then(() => renderDashboard());
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function exitDashboard() {
-  clearCookie('epiphany_token'); clearCookie('epiphany_type');
+  clearCookie('epiphany_token'); clearCookie('epiphany_type'); clearCookie('epiphany_dash');
   isLoggedIn = false; tutorLoggedIn = false;
   LEARNER = { name:'', email:'', phone:'', avatar:'https://i.pravatar.cc/200?img=47', since:'', password:'' };
   TUTOR   = { name:'', email:'', phone:'', city:'', subject:'', rate:0, bio:'', qual:'', avatar:'https://i.pravatar.cc/200?img=3', since:'', password:'', airtableId:'' };
@@ -1039,6 +1040,7 @@ ${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' 
     main = `<div class="dash-section">
 <div class="dash-eyebrow">Dashboard</div>
 <div class="dash-title">Welcome back, <em>${firstName}</em></div>
+${emptyBanner}
 <div class="ov-grid">
   <div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">${UPCOMING_L.length}</div><div class="ov-sub">${nxt ? 'Next: '+nxt.date : 'No sessions yet'}</div></div>
   <div class="ov-card"><div class="ov-label">Completed Sessions</div><div class="ov-value">${completedCt}</div><div class="ov-sub">${LEARNER.since ? 'Since '+LEARNER.since : 'None yet'}</div></div>
@@ -1254,6 +1256,7 @@ function enterTutorDashboard() {
   const nameEl=document.getElementById('dashUnameEl');
   if(nameEl) nameEl.textContent=TUTOR.name;
   dashTab='overview';
+  setCookie('epiphany_dash', 'tutor', 30);
   loadTutorData().then(()=>renderTutorDashboard());
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1299,7 +1302,18 @@ function saveTutorProfile() {
 
 // ── INIT ──────────────────────────────────────────────────────────
 loadTutors();
-window._sessionRestoring = restoreSession().then(() => { window._sessionRestoring = null; render(); });
+window._sessionRestoring = restoreSession().then(() => {
+  window._sessionRestoring = null;
+  // If session restored and user was in dashboard, go back to dashboard
+  const wasInDash = getCookie('epiphany_dash');
+  if (wasInDash === 'learner' && isLoggedIn) {
+    enterDashboard();
+  } else if (wasInDash === 'tutor' && tutorLoggedIn) {
+    enterTutorDashboard();
+  } else {
+    render();
+  }
+});
 </script>
 </body>
 </html>
