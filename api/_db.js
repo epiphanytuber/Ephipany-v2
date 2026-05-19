@@ -4,7 +4,9 @@ process.env.HOME = '/tmp';
 import { DuckDBInstance } from '@duckdb/node-api';
 import crypto from 'crypto';
 
+let _instance = null;
 let _conn = null;
+let _columns = {}; // cache column names per query
 
 export async function getDB() {
   if (_conn) return _conn;
@@ -13,12 +15,13 @@ export async function getDB() {
   const instance = await DuckDBInstance.create(
     `md:epiphany?motherduck_token=${token}&home_directory=/tmp`
   );
+  _instance = instance;
   _conn = await instance.connect();
   return _conn;
 }
 
-export function sanitize(rows) {
-  return JSON.parse(JSON.stringify(rows, (_, v) =>
+export function sanitize(val) {
+  return JSON.parse(JSON.stringify(val, (_, v) =>
     typeof v === 'bigint' ? v.toString() : v
   ));
 }
@@ -26,7 +29,17 @@ export function sanitize(rows) {
 export async function query(sql) {
   const db = await getDB();
   const reader = await db.runAndReadAll(sql);
-  return sanitize(reader.getRows());
+  const columnNames = reader.columnNames();
+  const rows = sanitize(reader.getRows());
+  // Convert array rows to objects using column names
+  return rows.map(row => {
+    if (Array.isArray(row)) {
+      const obj = {};
+      columnNames.forEach((name, i) => { obj[name] = row[i]; });
+      return obj;
+    }
+    return row;
+  });
 }
 
 export function col(row, name) {
