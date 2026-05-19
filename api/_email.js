@@ -13,7 +13,7 @@ export async function sendEmail({ to, subject, html }) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: `Epiphany Education <from: 'noreply@epiphanytutors.co.za'>`,
+        from: `Epiphany Education <noreply@epiphanytutors.co.za>`,
         to: Array.isArray(to) ? to : [to],
         subject,
         html,
