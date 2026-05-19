@@ -630,6 +630,15 @@ function goToDashboardAfterReg() {
 }
 
 function enterDashboard() {
+  // If session still restoring, wait for it
+  if (window._sessionRestoring) {
+    window._sessionRestoring.then(() => {
+      if (isLoggedIn) enterDashboard();
+      else if (tutorLoggedIn) enterTutorDashboard();
+      else openAuthModal('signin');
+    });
+    return;
+  }
   if (!isLoggedIn && !tutorLoggedIn) { openAuthModal('signin'); return; }
   if (tutorLoggedIn && !isLoggedIn) { enterTutorDashboard(); return; }
   document.getElementById('marketNav').style.display = 'none';
@@ -1038,8 +1047,10 @@ async function submitRegistration() {
     // Go straight to dashboard after registration
     regDone = true;
     render();
-    // Auto-enter dashboard after short delay to allow render
-    setTimeout(() => enterDashboard(), 300);
+    // Auto-enter dashboard after short delay
+    setTimeout(() => {
+      if (isLoggedIn) enterDashboard();
+    }, 500);
 
   } else {
     // Tutor application
