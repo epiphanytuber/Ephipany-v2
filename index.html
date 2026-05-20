@@ -14,7 +14,7 @@
   --border:rgba(201,168,76,.15);--green:#4caf7d;--red:#e05c5c;--amber:#e0a84c
 }
 html{scroll-behavior:smooth;background:var(--black)}
-body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-x:hidden}
+body{background:var(--black);color:var(--white);font-family:'Nunito Sans',sans-serif;overflow-x:hidden}
 .page{animation:fadeUp .45s ease forwards}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .eyebrow{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:10px}
@@ -22,9 +22,9 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .section-title{font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;line-height:1.1;margin-bottom:10px}
 .section-title em{font-style:italic;color:var(--gold)}
 .gold-rule{width:56px;height:1px;background:var(--gold);margin:18px 0 28px}
-.btn-gold{padding:13px 34px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:sans-serif;transition:all .25s}
+.btn-gold{padding:13px 34px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .25s}
 .btn-gold:hover{background:var(--gold-l);transform:translateY(-1px)}
-.btn-ghost{padding:13px 34px;background:transparent;color:var(--white);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;border:1px solid rgba(250,249,246,.2);cursor:pointer;font-family:sans-serif;transition:all .25s}
+.btn-ghost{padding:13px 34px;background:transparent;color:var(--white);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;border:1px solid rgba(250,249,246,.2);cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .25s}
 .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
 .badge{display:inline-block;padding:3px 11px;background:var(--gold);font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--black);font-weight:700}
 .badge.expert{background:transparent;border:1px solid var(--gold);color:var(--gold)}
@@ -36,9 +36,9 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .nav-logo{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;letter-spacing:8px;color:var(--gold);text-transform:uppercase;cursor:pointer;user-select:none}
 .nav-logo span{color:var(--white)}
 .nav-links{display:flex;gap:8px;align-items:center}
-.nav-link{padding:8px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .2s;background:none;border:none;font-family:sans-serif}
+.nav-link{padding:8px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .2s;background:none;border:none;font-family:'Nunito Sans',sans-serif}
 .nav-link:hover,.nav-link.active{color:var(--gold)}
-.nav-cta{margin-left:8px;padding:9px 22px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .25s;font-family:sans-serif}
+.nav-cta{margin-left:8px;padding:9px 22px;border:1px solid var(--gold);background:transparent;color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .25s;font-family:'Nunito Sans',sans-serif}
 .nav-cta:hover{background:var(--gold);color:var(--black)}
 .nav-cta.filled{background:var(--gold);color:var(--black)}
 .nav-cta.filled:hover{background:var(--gold-l);border-color:var(--gold-l)}
@@ -46,7 +46,7 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 /* DASHBOARD NAV */
 .dash-nav{display:none;align-items:center;justify-content:space-between;padding:0 48px;height:72px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:999;background:rgba(8,8,8,.97);backdrop-filter:blur(16px)}
 .dash-nav-right{display:flex;align-items:center;gap:16px}
-.dash-back-btn{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);background:none;border:1px solid rgba(250,249,246,.12);padding:8px 18px;cursor:pointer;font-family:sans-serif;transition:all .2s}
+.dash-back-btn{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);background:none;border:1px solid rgba(250,249,246,.12);padding:8px 18px;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
 .dash-back-btn:hover{border-color:var(--gold);color:var(--gold)}
 .dash-user{display:flex;align-items:center;gap:9px}
 .dash-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid var(--gold)}
@@ -89,17 +89,17 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .filters-bar{padding:24px 56px;border-bottom:1px solid var(--border);display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;background:var(--black2);position:sticky;top:72px;z-index:90}
 .filter-group{display:flex;flex-direction:column;gap:5px}
 .filter-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-.filter-select{background:rgba(255,255,255,.05);border:1px solid rgba(250,249,246,.12);color:var(--white);padding:8px 32px 8px 12px;font-size:11px;font-family:sans-serif;cursor:pointer;outline:none;transition:border .2s;min-width:160px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C9A84C'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.filter-select{background:rgba(255,255,255,.05);border:1px solid rgba(250,249,246,.12);color:var(--white);padding:8px 32px 8px 12px;font-size:11px;font-family:'Nunito Sans',sans-serif;cursor:pointer;outline:none;transition:border .2s;min-width:160px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C9A84C'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
 .filter-select option{background:#1a1a1a}
 .filter-select:focus{border-color:var(--gold)}
 .search-wrap{position:relative}
 .search-wrap::before{content:'⌕';position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:16px;pointer-events:none}
-.filter-search{min-width:240px;background:rgba(255,255,255,.05);border:1px solid rgba(250,249,246,.12);color:var(--white);padding:8px 14px 8px 36px;font-size:12px;font-family:sans-serif;outline:none;transition:border .2s}
+.filter-search{min-width:240px;background:rgba(255,255,255,.05);border:1px solid rgba(250,249,246,.12);color:var(--white);padding:8px 14px 8px 36px;font-size:12px;font-family:'Nunito Sans',sans-serif;outline:none;transition:border .2s}
 .filter-search:focus{border-color:var(--gold)}
 .filter-search::placeholder{color:var(--muted)}
 .catalogue-body{padding:48px 56px}
 .tutor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
-.no-results{grid-column:1/-1;text-align:center;padding:80px;font-family:Georgia,serif;font-size:28px;font-style:italic;color:var(--muted)}
+.no-results{grid-column:1/-1;text-align:center;padding:80px;font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;color:var(--muted)}
 .t-card{background:var(--black3);cursor:pointer;position:relative;overflow:hidden;transition:transform .3s;display:flex;flex-direction:column}
 .t-card:hover{transform:translateY(-5px);z-index:2;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 .t-card-img-wrap{position:relative;height:260px;overflow:hidden;flex-shrink:0}
@@ -124,7 +124,7 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .profile-hero-img img{width:100%;height:100%;object-fit:cover;filter:brightness(.88)}
 .profile-hero-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 60%,var(--black) 100%)}
 .profile-hero-content{padding:60px 56px 60px 48px;background:var(--black);display:flex;flex-direction:column;justify-content:center}
-.profile-back{font-size:10px;letter-spacing:2px;text-transform:uppercase;background:none;border:none;color:var(--muted);cursor:pointer;font-family:sans-serif;margin-bottom:28px;padding:0;display:flex;align-items:center;gap:8px;transition:color .2s}
+.profile-back{font-size:10px;letter-spacing:2px;text-transform:uppercase;background:none;border:none;color:var(--muted);cursor:pointer;font-family:'Nunito Sans',sans-serif;margin-bottom:28px;padding:0;display:flex;align-items:center;gap:8px;transition:color .2s}
 .profile-back:hover{color:var(--gold)}
 .profile-badges{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .profile-name{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;line-height:1.05;margin-bottom:8px}
@@ -139,7 +139,7 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .profile-main{padding:56px;border-right:1px solid var(--border)}
 .profile-sidebar{padding:48px 40px;background:var(--black2)}
 .profile-section{margin-bottom:48px}
-.profile-section-title{font-family:Georgia,serif;font-size:28px;font-weight:300;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.profile-section-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
 .profile-bio{font-size:13.5px;color:rgba(250,249,246,.65);line-height:2}
 .qual-list{list-style:none}
 .qual-item{padding:12px 0;border-bottom:1px solid rgba(250,249,246,.06);font-size:13px;color:rgba(250,249,246,.7);display:flex;align-items:center;gap:12px}
@@ -158,21 +158,21 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .booking-card-sub{font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:24px}
 .bc-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
 .bc-days{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
-.bc-day{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:1px;border:1px solid rgba(250,249,246,.12);color:var(--muted);cursor:default;transition:all .2s;font-family:sans-serif}
+.bc-day{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:9px;letter-spacing:1px;border:1px solid rgba(250,249,246,.12);color:var(--muted);cursor:default;transition:all .2s;font-family:'Nunito Sans',sans-serif}
 .bc-day.avail{border-color:rgba(201,168,76,.35);color:var(--gold-p);cursor:pointer}
 .bc-day.avail:hover{background:rgba(201,168,76,.12)}
 .bc-day.sel{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:700}
 .bc-times{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
-.bc-time{padding:7px 13px;border:1px solid rgba(250,249,246,.1);font-size:11px;color:var(--muted);cursor:pointer;transition:all .2s;background:none;font-family:sans-serif}
+.bc-time{padding:7px 13px;border:1px solid rgba(250,249,246,.1);font-size:11px;color:var(--muted);cursor:pointer;transition:all .2s;background:none;font-family:'Nunito Sans',sans-serif}
 .bc-time:hover{border-color:rgba(201,168,76,.35);color:var(--gold-p)}
 .bc-time.sel{border-color:var(--gold);background:rgba(201,168,76,.12);color:var(--gold)}
-.bc-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:11px 14px;color:var(--white);font-size:12px;font-family:sans-serif;margin-bottom:10px;outline:none;transition:border .2s}
+.bc-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:11px 14px;color:var(--white);font-size:12px;font-family:'Nunito Sans',sans-serif;margin-bottom:10px;outline:none;transition:border .2s}
 .bc-input:focus{border-color:var(--gold)}
 .bc-input::placeholder{color:var(--muted)}
 .bc-summary{padding:14px 0 6px;border-top:1px solid rgba(201,168,76,.1);margin-top:8px}
 .bc-summary-row{display:flex;justify-content:space-between;font-size:12px;color:rgba(250,249,246,.5);margin-bottom:6px}
 .bc-summary-total{display:flex;justify-content:space-between;font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold)}
-.bc-confirm{width:100%;padding:14px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:sans-serif;transition:all .2s;margin-top:6px}
+.bc-confirm{width:100%;padding:14px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s;margin-top:6px}
 .bc-confirm:hover{background:var(--gold-l)}
 .bc-confirm:disabled{opacity:.35;cursor:not-allowed}
 .booking-success-card{padding:28px;border:1px solid rgba(201,168,76,.25);text-align:center}
@@ -184,7 +184,7 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .register-page{padding:80px 56px;max-width:800px;margin:0 auto}
 .reg-intro{font-size:13px;color:var(--muted);margin-bottom:32px;line-height:1.9;max-width:520px}
 .reg-tabs{display:flex;gap:2px;margin-bottom:28px}
-.reg-tab{padding:11px 28px;background:var(--black3);border:1px solid rgba(250,249,246,.08);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:sans-serif;transition:all .2s}
+.reg-tab{padding:11px 28px;background:var(--black3);border:1px solid rgba(250,249,246,.08);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
 .reg-tab.active{background:rgba(201,168,76,.1);border-color:var(--gold);color:var(--gold)}
 .photo-drop{border:1px dashed rgba(201,168,76,.3);padding:40px 20px;text-align:center;cursor:pointer;transition:all .25s;background:rgba(201,168,76,.02);margin-bottom:24px}
 .photo-drop:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
@@ -195,16 +195,16 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .reg-group{display:flex;flex-direction:column;gap:7px}
 .reg-group-full{grid-column:1/-1}
 .reg-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-.reg-input{background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:13px 16px;color:var(--white);font-size:13px;font-family:sans-serif;outline:none;transition:border .2s}
+.reg-input{background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:13px 16px;color:var(--white);font-size:13px;font-family:'Nunito Sans',sans-serif;outline:none;transition:border .2s}
 .reg-input:focus{border-color:var(--gold)}
 .reg-input::placeholder{color:var(--muted)}
-.reg-select{background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:13px 16px;color:var(--white);font-size:13px;font-family:sans-serif;outline:none;transition:border .2s;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C9A84C'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.reg-select{background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:13px 16px;color:var(--white);font-size:13px;font-family:'Nunito Sans',sans-serif;outline:none;transition:border .2s;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23C9A84C'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
 .reg-select option{background:#1a1a1a}
 .reg-select:focus{border-color:var(--gold)}
 .day-checks{display:flex;gap:12px;flex-wrap:wrap;padding:4px 0}
 .day-check{display:flex;align-items:center;gap:7px;font-size:11px;color:rgba(250,249,246,.6);cursor:pointer;user-select:none}
 .day-check input{accent-color:var(--gold)}
-.reg-submit{width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:sans-serif;transition:all .25s;margin-top:20px}
+.reg-submit{width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .25s;margin-top:20px}
 .reg-submit:hover{background:var(--gold-l)}
 .reg-success{text-align:center;padding:60px 0}
 .reg-success-icon{font-size:48px;margin-bottom:20px}
@@ -221,7 +221,7 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .dash-sb-uname{font-size:13px;font-weight:600;line-height:1.2}
 .dash-sb-role{font-size:10px;color:var(--muted)}
 .dash-nav-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);padding:0 28px;margin-bottom:10px;margin-top:8px}
-.dash-nav-item{display:flex;align-items:center;gap:12px;padding:11px 28px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s;background:none;border:none;width:100%;text-align:left;font-family:sans-serif}
+.dash-nav-item{display:flex;align-items:center;gap:12px;padding:11px 28px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s;background:none;border:none;width:100%;text-align:left;font-family:'Nunito Sans',sans-serif}
 .dash-nav-item:hover{color:var(--white);background:rgba(201,168,76,.05)}
 .dash-nav-item.active{color:var(--gold);background:rgba(201,168,76,.08);border-right:2px solid var(--gold)}
 .dash-nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
@@ -244,9 +244,9 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .ov-sub.clk{color:var(--amber);cursor:pointer}
 .ov-sub.clk:hover{text-decoration:underline}
 .sub-hdg{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.sub-hdg-link{font-family:sans-serif;font-size:11px;color:var(--gold);cursor:pointer;font-weight:400}
+.sub-hdg-link{font-family:'Nunito Sans',sans-serif;font-size:11px;color:var(--gold);cursor:pointer;font-weight:400}
 .sub-hdg-link:hover{text-decoration:underline}
-.sub-hdg-count{font-family:sans-serif;font-size:11px;color:var(--muted);font-weight:400}
+.sub-hdg-count{font-family:'Nunito Sans',sans-serif;font-size:11px;color:var(--muted);font-weight:400}
 .lesson-list{display:flex;flex-direction:column;gap:2px;margin-bottom:40px}
 .lc{background:var(--black3);display:flex;align-items:center;gap:20px;padding:18px 24px;transition:background .2s}
 .lc:hover{background:var(--black4)}
@@ -267,15 +267,15 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .pill-pending{background:rgba(224,168,76,.1);color:var(--amber);border:1px solid rgba(224,168,76,.25)}
 .pill-completed{background:rgba(201,168,76,.08);color:var(--gold);border:1px solid var(--border)}
 .pill-cancelled{background:rgba(224,92,92,.08);color:var(--red);border:1px solid rgba(224,92,92,.2)}
-.lc-join{padding:7px 16px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:sans-serif;transition:all .2s}
+.lc-join{padding:7px 16px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
 .lc-join:hover{background:var(--gold-l)}
-.lc-cancel{padding:7px 14px;background:transparent;color:var(--muted);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid rgba(250,249,246,.1);cursor:pointer;font-family:sans-serif;transition:all .2s}
+.lc-cancel{padding:7px 14px;background:transparent;color:var(--muted);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid rgba(250,249,246,.1);cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
 .lc-cancel:hover{border-color:var(--red);color:var(--red)}
 .lc-stars{color:var(--gold);font-size:12px}
-.lc-rate-btn{padding:5px 12px;border:1px solid rgba(201,168,76,.35);background:transparent;color:var(--gold);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:sans-serif;transition:all .2s}
+.lc-rate-btn{padding:5px 12px;border:1px solid rgba(201,168,76,.35);background:transparent;color:var(--gold);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
 .lc-rate-btn:hover{background:rgba(201,168,76,.1)}
 .filter-tabs{display:flex;gap:8px;margin-bottom:24px}
-.ftab{padding:7px 18px;border:1px solid rgba(250,249,246,.1);background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:sans-serif;transition:all .2s}
+.ftab{padding:7px 18px;border:1px solid rgba(250,249,246,.1);background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
 .ftab.active{border-color:var(--gold);background:rgba(201,168,76,.1);color:var(--gold)}
 .pay-top{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:28px}
 .pay-card{background:var(--black3);padding:28px 30px}
@@ -292,7 +292,7 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .due-desc{font-size:14px;font-weight:600}
 .due-date{font-size:11px;color:var(--muted);margin-top:2px}
 .due-amount{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold);margin-right:16px}
-.pay-now-btn{padding:10px 22px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:sans-serif;transition:all .2s;white-space:nowrap}
+.pay-now-btn{padding:10px 22px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s;white-space:nowrap}
 .pay-now-btn:hover{background:var(--gold-l)}
 .inv-table{width:100%;border-collapse:collapse}
 .inv-table th{text-align:left;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 16px;border-bottom:1px solid var(--border);font-weight:400}
@@ -300,43 +300,43 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .inv-table tr:hover td{background:rgba(255,255,255,.02)}
 .inv-id{font-size:11px;color:var(--muted);font-family:monospace;letter-spacing:1px}
 .inv-paid{color:var(--green);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;background:rgba(76,175,125,.1);border:1px solid rgba(76,175,125,.2)}
-.inv-dl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);background:none;border:1px solid rgba(250,249,246,.1);padding:4px 12px;cursor:pointer;font-family:sans-serif;transition:all .2s}
+.inv-dl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);background:none;border:1px solid rgba(250,249,246,.1);padding:4px 12px;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
 .inv-dl:hover{color:var(--gold);border-color:var(--gold)}
 .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .setting-group{display:flex;flex-direction:column;gap:7px}
 .setting-group.full{grid-column:1/-1}
 .setting-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
-.setting-input{background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:12px 15px;color:var(--white);font-size:13px;font-family:sans-serif;outline:none;transition:border .2s}
+.setting-input{background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:12px 15px;color:var(--white);font-size:13px;font-family:'Nunito Sans',sans-serif;outline:none;transition:border .2s}
 .setting-input:focus{border-color:var(--gold)}
 .setting-input::placeholder{color:var(--muted)}
 .settings-avatar-row{display:flex;align-items:center;gap:20px;margin-bottom:28px}
 .settings-big-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)}
-.settings-change-btn{padding:9px 20px;border:1px solid rgba(201,168,76,.35);background:transparent;color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:sans-serif;transition:all .2s}
+.settings-change-btn{padding:9px 20px;border:1px solid rgba(201,168,76,.35);background:transparent;color:var(--gold);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s}
 .settings-change-btn:hover{background:rgba(201,168,76,.08)}
-.settings-save{padding:13px 36px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:sans-serif;transition:all .25s;margin-top:20px}
+.settings-save{padding:13px 36px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .25s;margin-top:20px}
 .settings-save:hover{background:var(--gold-l)}
 .save-toast{display:inline-flex;align-items:center;gap:8px;margin-left:14px;font-size:11px;color:var(--green)}
 
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;z-index:2000;background:rgba(5,5,5,.92);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:24px}
 .modal-box{background:var(--black2);max-width:480px;width:100%;border:1px solid rgba(201,168,76,.2);position:relative;padding:40px}
-.modal-close-btn{position:absolute;top:16px;right:16px;background:rgba(201,168,76,.1);border:1px solid var(--gold);color:var(--gold);width:32px;height:32px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:sans-serif}
+.modal-close-btn{position:absolute;top:16px;right:16px;background:rgba(201,168,76,.1);border:1px solid var(--gold);color:var(--gold);width:32px;height:32px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Nunito Sans',sans-serif}
 .modal-eyebrow{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
 .modal-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;margin-bottom:24px}
 .modal-summary{background:var(--black3);padding:18px 20px;margin-bottom:24px}
 .modal-sum-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:8px}
 .modal-sum-row:last-child{margin:0;padding-top:8px;border-top:1px solid var(--border);font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold)}
 .modal-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;display:block}
-.modal-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:12px 14px;color:var(--white);font-size:13px;font-family:sans-serif;outline:none;margin-bottom:12px;transition:border .2s}
+.modal-input{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);padding:12px 14px;color:var(--white);font-size:13px;font-family:'Nunito Sans',sans-serif;outline:none;margin-bottom:12px;transition:border .2s}
 .modal-input:focus{border-color:var(--gold)}
 .modal-input::placeholder{color:var(--muted)}
 .modal-card-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:12px}
-.modal-submit{width:100%;padding:14px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:sans-serif;transition:all .2s;margin-top:8px}
+.modal-submit{width:100%;padding:14px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .2s;margin-top:8px}
 .modal-submit:hover{background:var(--gold-l)}
 .modal-secure{font-size:11px;color:var(--muted);text-align:center;margin-top:12px}
 .modal-success{text-align:center;padding:24px 0}
 .modal-success-icon{font-size:36px;margin-bottom:12px}
-.modal-success-title{font-family:Georgia,serif;font-size:28px;color:var(--gold);margin-bottom:8px}
+.modal-success-title{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold);margin-bottom:8px}
 .modal-success-text{font-size:13px;color:var(--muted);line-height:1.8}
 
 /* FOOTER */
@@ -355,13 +355,13 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 .auth-logo{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;letter-spacing:7px;color:var(--gold);text-transform:uppercase;text-align:center;margin-bottom:28px}
 .auth-logo span{color:var(--white)}
 .auth-tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:28px}
-.auth-tab{flex:1;background:none;border:none;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:sans-serif;padding:10px;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-1px}
+.auth-tab{flex:1;background:none;border:none;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Nunito Sans',sans-serif;padding:10px;cursor:pointer;transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-1px}
 .auth-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
 .auth-label{display:block;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;margin-top:16px}
-.auth-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(250,249,246,.12);color:var(--white);padding:11px 14px;font-size:13px;font-family:sans-serif;outline:none;transition:border .2s}
+.auth-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(250,249,246,.12);color:var(--white);padding:11px 14px;font-size:13px;font-family:'Nunito Sans',sans-serif;outline:none;transition:border .2s}
 .auth-input:focus{border-color:var(--gold)}
 .auth-input::placeholder{color:var(--muted)}
-.auth-submit{width:100%;margin-top:24px;padding:14px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:sans-serif;transition:all .25s}
+.auth-submit{width:100%;margin-top:24px;padding:14px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif;transition:all .25s}
 .auth-submit:hover{background:var(--gold-l)}
 .auth-switch{text-align:center;font-size:12px;color:var(--muted);margin-top:18px}
 .auth-switch span{color:var(--gold);cursor:pointer;font-weight:600}
@@ -403,16 +403,16 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
     <button class="nav-link"        id="nl-catalogue" onclick="navigate('catalogue')">Find a Tutor</button>
     <button class="nav-link"        id="nl-register"  onclick="navigate('register')">Become a Tutor</button>
     <button class="nav-cta"                           onclick="navigate('register')">Register</button>
-    <button class="nav-cta filled" id="myAccountBtn" onclick="enterDashboard()">My Account</button>
+    <button class="nav-cta filled"                    id="myAccountBtn" onclick="enterDashboard()">My Account</button>
   </div>
 </nav>
 
 <nav class="dash-nav" id="dashNav">
   <div class="nav-logo" onclick="exitDashboard()">Epi<span>phany</span></div>
   <div class="dash-nav-right">
-    <button class="dash-back-btn" onclick="exitDashboard()">&#8592; Browse Tutors</button>
+    <button class="dash-back-btn" onclick="goToCatalogue()">&#8592; Browse Tutors</button>
     <div class="dash-user">
-      <div id="dashAvatarEl" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--gold);overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:11px;background:#2D1B69;color:#C9A84C"></div>
+      <div id="dashAvatarEl" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:11px;background:#2D1B69;color:#C9A84C;flex-shrink:0;"></div>
       <span class="dash-uname" id="dashUnameEl"></span>
     </div>
   </div>
@@ -438,6 +438,7 @@ body{background:var(--black);color:var(--white);font-family:sans-serif;overflow-
 // AIRTABLE CONFIG
 // ── Replace BASE_ID with your base ID (starts with "app")
 // ── Replace TOKEN with your personal access token (starts with "pat")
+// ── Table name constants must match your Airtable tab names exactly
 // ═══════════════════════════════════════════════════════════════
 const API = '/api';
 
@@ -502,6 +503,8 @@ async function restoreSession() {
 }
 
 // ── DATA ─────────────────────────────────────────────────────────
+// TUTORS — fetched live from Airtable
+// When you set a tutor's Status to "Comfirmed" in Airtable,
 // they automatically appear in the catalogue on next page load.
 let TUTORS = [];
 let TUTORS_LOADED = false;
@@ -563,14 +566,13 @@ let INVOICES = [];
 let DUE_INV = [];
 
 // ── STATE ─────────────────────────────────────────────────────────
-let isLoggedIn    = false;
+let isLoggedIn = false;
 let tutorLoggedIn = false;
-let TUTOR = { name:'', email:'', phone:'', city:'', subject:'', rate:0, bio:'', qual:'', avatar:'https://i.pravatar.cc/200?img=3', since:'', password:'', airtableId:'' };
+let TUTOR = { name:'', email:'', phone:'', city:'', subject:'', rate:0, bio:'', qual:'', avatar:'', since:'', password:'', airtableId:'' };
 let TUTOR_SUB = { status:'none', trialStart:null, trialEnd:null, subStart:null, nextBilling:null };
 let tutorSessions = [], tutorPastSessions = [], tutorEarnings = [];
 const SUB_PRICE = 250;
 const TRIAL_DAYS = 30;
-const PAYFAST_SANDBOX = true;
 let authModal = null;
 let authError = '';
 let page = 'home', activeTutor = null;
@@ -589,27 +591,25 @@ const S = n => `<span class="stars-gold">${'&#9733;'.repeat(Math.floor(n))}${'&#
 const PILL_MAP = { confirmed: 'pill-confirmed', pending: 'pill-pending', completed: 'pill-completed', cancelled: 'pill-cancelled' };
 function pill(s) { return `<span class="lc-pill ${PILL_MAP[s] || ''}">${s}</span>`; }
 
+// ── AVATAR HELPERS ───────────────────────────────────────
+const AVATAR_COLORS=[{bg:'#2D1B69',fg:'#C9A84C'},{bg:'#1B3A2D',fg:'#4caf7d'},{bg:'#3A1B1B',fg:'#e05c5c'},{bg:'#1B2D3A',fg:'#5BA3C9'},{bg:'#2D2D1B',fg:'#C9C44C'},{bg:'#3A1B3A',fg:'#C94CAA'},{bg:'#1B3A3A',fg:'#4CC9C9'},{bg:'#2D1B2D',fg:'#9B4CC9'}];
+function getInitials(name){if(!name)return'??';const p=name.trim().split(' ').filter(x=>x.length>0);if(p.length===1)return p[0].substring(0,2).toUpperCase();return(p[0][0]+p[p.length-1][0]).toUpperCase();}
+function getAvatarColor(name){if(!name)return AVATAR_COLORS[0];let h=0;for(let i=0;i<name.length;i++)h=name.charCodeAt(i)+((h<<5)-h);return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length];}
+function avatarHTML(name,size,style){size=size||40;style=style||'';const i=getInitials(name);const c=getAvatarColor(name);const f=Math.round(size*0.35);return '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+c.bg+';display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:'+f+'px;color:'+c.fg+';letter-spacing:1px;flex-shrink:0;'+style+'">'+i+'</div>';}
+
 // ── ROUTING ───────────────────────────────────────────────────────
 function goToCatalogue() {
-  // Exit dashboard view and go to catalogue
-  document.getElementById('marketNav').style.display = 'flex';
-  document.getElementById('dashNav').style.display = 'none';
-  document.getElementById('siteFooter').style.display = 'flex';
+  document.getElementById('marketNav').style.display='flex';
+  document.getElementById('dashNav').style.display='none';
+  document.getElementById('siteFooter').style.display='flex';
   navigate('catalogue');
 }
-
 function updateNavBtn() {
-  const btn = document.getElementById('myAccountBtn');
-  if (!btn) return;
-  if (isLoggedIn || tutorLoggedIn) {
-    btn.textContent = '⬡ Dashboard';
-    btn.style.background = 'var(--gold)';
-    btn.style.color = 'var(--black)';
-  } else {
-    btn.textContent = 'My Account';
-  }
+  const btn=document.getElementById('myAccountBtn');
+  if(!btn)return;
+  if(isLoggedIn||tutorLoggedIn){btn.textContent='⬡ Dashboard';btn.style.background='var(--gold)';btn.style.color='var(--black)';}
+  else{btn.textContent='My Account';btn.style.background='';btn.style.color='';}
 }
-
 function navigate(p, tutor) {
   page = p;
   if (tutor) { activeTutor = tutor; selDay = null; selTime = null; bcName = ''; bcEmail = ''; bookingDone = false; }
@@ -622,54 +622,50 @@ function navigate(p, tutor) {
 }
 
 function goToDashboardAfterReg() {
-  restoreSession().then(() => {
-    if (isLoggedIn) enterDashboard();
-    else if (tutorLoggedIn) enterTutorDashboard();
-    else { isLoggedIn = true; enterDashboard(); }
-  });
+  // After registration isLoggedIn should already be true
+  // but force it just in case
+  if (!isLoggedIn) { isLoggedIn = true; }
+  enterDashboard();
 }
 
+async function loadLearnerData() {
+  if(!LEARNER.email)return;
+  try {
+    const sData=await apiGet('/sessions?email='+encodeURIComponent(LEARNER.email)+'&type=learner');
+    if(sData.sessions){
+      UPCOMING_L=sData.sessions.filter(s=>s.status==='confirmed'||s.status==='pending').map(s=>({id:s.id,tutor:s.tutor_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status}));
+      PAST_L=sData.sessions.filter(s=>s.status==='completed'||s.status==='cancelled').map(s=>({id:s.id,tutor:s.tutor_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status,rated:false,rating:null}));
+    }
+    const pData=await apiGet('/payments?email='+encodeURIComponent(LEARNER.email)+'&type=learner');
+    if(pData.payments)INVOICES=pData.payments.filter(p=>p.status==='paid').map(p=>({id:p.invoice_id||p.id,date:p.paid_on||'',tutor:p.tutor_name||'',subject:p.subject,amount:parseFloat(p.amount)||0}));
+  }catch(e){console.error('[loadLearnerData]',e);}
+}
 function enterDashboard() {
-  // If session still restoring, wait for it
-  if (window._sessionRestoring) {
-    window._sessionRestoring.then(() => {
-      if (isLoggedIn) enterDashboard();
-      else if (tutorLoggedIn) enterTutorDashboard();
-      else openAuthModal('signin');
-    });
-    return;
-  }
-  if (!isLoggedIn && !tutorLoggedIn) { openAuthModal('signin'); return; }
-  if (tutorLoggedIn && !isLoggedIn) { enterTutorDashboard(); return; }
-  document.getElementById('marketNav').style.display = 'none';
-  document.getElementById('dashNav').style.display = 'flex';
-  document.getElementById('siteFooter').style.display = 'none';
-  const nameEl = document.getElementById('dashUnameEl');
-  if (nameEl) nameEl.textContent = LEARNER.name;
-  const avatarEl = document.getElementById('dashAvatarEl');
-  if (avatarEl) {
-    const c = getAvatarColor(LEARNER.name);
-    avatarEl.style.background = c.bg;
-    avatarEl.style.color = c.fg;
-    avatarEl.textContent = getInitials(LEARNER.name);
-  }
-  dashTab = 'overview';
-  setCookie('epiphany_dash', 'learner', 30);
-  loadLearnerData().then(() => renderDashboard());
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if(window._sessionRestoring){window._sessionRestoring.then(()=>{if(isLoggedIn)enterDashboard();else if(tutorLoggedIn)enterTutorDashboard();else openAuthModal('signin');});return;}
+  if(!isLoggedIn&&!tutorLoggedIn){openAuthModal('signin');return;}
+  if(tutorLoggedIn&&!isLoggedIn){enterTutorDashboard();return;}
+  document.getElementById('marketNav').style.display='none';
+  document.getElementById('dashNav').style.display='flex';
+  document.getElementById('siteFooter').style.display='none';
+  const nameEl=document.getElementById('dashUnameEl');if(nameEl)nameEl.textContent=LEARNER.name;
+  const avatarEl=document.getElementById('dashAvatarEl');
+  if(avatarEl){const c=getAvatarColor(LEARNER.name);avatarEl.style.background=c.bg;avatarEl.style.color=c.fg;avatarEl.textContent=getInitials(LEARNER.name);}
+  dashTab='overview';
+  setCookie('epiphany_dash','learner',30);
+  loadLearnerData().then(()=>renderDashboard());
+  window.scrollTo({top:0,behavior:'smooth'});
 }
-
 function exitDashboard() {
-  clearCookie('epiphany_token'); clearCookie('epiphany_type'); clearCookie('epiphany_dash'); updateNavBtn();
-  isLoggedIn = false; tutorLoggedIn = false;
-  LEARNER = { name:'', email:'', phone:'', avatar:'https://i.pravatar.cc/200?img=47', since:'', password:'' };
-  TUTOR   = { name:'', email:'', phone:'', city:'', subject:'', rate:0, bio:'', qual:'', avatar:'https://i.pravatar.cc/200?img=3', since:'', password:'', airtableId:'' };
-  document.getElementById('marketNav').style.display = 'flex';
-  document.getElementById('dashNav').style.display = 'none';
-  document.getElementById('siteFooter').style.display = 'flex';
-  navigate('home');
+  clearCookie('epiphany_token');clearCookie('epiphany_type');clearCookie('epiphany_dash');
+  isLoggedIn=false;tutorLoggedIn=false;
+  LEARNER={name:'',email:'',phone:'',avatar:'',since:'',password:''};
+  TUTOR={name:'',email:'',phone:'',city:'',subject:'',rate:0,bio:'',qual:'',avatar:'',since:'',password:'',airtableId:''};
+  TUTOR_SUB={status:'none',trialStart:null,trialEnd:null,subStart:null,nextBilling:null};
+  document.getElementById('marketNav').style.display='flex';
+  document.getElementById('dashNav').style.display='none';
+  document.getElementById('siteFooter').style.display='flex';
+  updateNavBtn();navigate('home');
 }
-
 function switchTab(tab) { dashTab = tab; renderDashboard(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
 // ── AUTH MODAL ────────────────────────────────────────────────────
@@ -702,7 +698,7 @@ function renderAuthModal() {
   <label class="auth-label">Password</label>
   <input class="auth-input" id="aiPass" type="password" placeholder="Enter your password"/>
   <button class="auth-submit" onclick="doSignIn()">Sign In</button>
-  <div style="text-align:right;margin-top:8px"><span onclick="openForgotPassword()" style="font-size:12px;color:var(--muted);cursor:pointer;transition:color .2s" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Forgot password?</span></div>
+  <div style="text-align:right;margin-top:8px"><span onclick="openForgotPassword()" style="font-size:12px;color:var(--muted);cursor:pointer" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--muted)'">Forgot password?</span></div>
   <div class="auth-switch">Not registered yet? <span onclick="goToRegisterFromModal()">Create a learner account</span></div>
   ` : `
   <p style="font-size:13px;color:var(--muted);text-align:center;line-height:1.8;margin-bottom:8px">Register as a learner first to create your account.</p>
@@ -713,63 +709,8 @@ function renderAuthModal() {
 </div>`;
 }
 
-function openForgotPassword() {
-  const m = document.getElementById('authModalMount');
-  if (!m) return;
-  m.innerHTML = `
-<div class="auth-overlay" id="authOverlay" onclick="if(event.target.id==='authOverlay')closeAuthModal()">
-<div class="auth-box">
-  <button class="auth-close" onclick="closeAuthModal()">&#10005;</button>
-  <div class="auth-logo">Epi<span>phany</span></div>
-  <div style="text-align:center;margin-bottom:24px">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;margin-bottom:6px">Reset Password</div>
-    <div style="font-size:12px;color:var(--muted);line-height:1.7">Enter your email and new password below.</div>
-  </div>
-  <div id="fpError" style="display:none" class="auth-error"></div>
-  <div id="fpSuccess" style="display:none;background:rgba(76,175,125,.12);border:1px solid rgba(76,175,125,.3);color:var(--green);font-size:12px;padding:10px 14px;margin-bottom:4px"></div>
-  <label class="auth-label">Email Address</label>
-  <input class="auth-input" id="fpEmail" type="email" placeholder="your@email.com"/>
-  <label class="auth-label">New Password</label>
-  <input class="auth-input" id="fpPass" type="password" placeholder="New password (min. 6 characters)"/>
-  <label class="auth-label">Confirm New Password</label>
-  <input class="auth-input" id="fpPass2" type="password" placeholder="Repeat new password"/>
-  <button class="auth-submit" onclick="doResetPassword()">Reset Password</button>
-  <div class="auth-switch">Remember it? <span onclick="openAuthModal('signin')">Back to Sign In</span></div>
-</div>
-</div>`;
-}
-
-async function doResetPassword() {
-  const email = document.getElementById('fpEmail') ? document.getElementById('fpEmail').value.trim() : '';
-  const pass  = document.getElementById('fpPass')  ? document.getElementById('fpPass').value  : '';
-  const pass2 = document.getElementById('fpPass2') ? document.getElementById('fpPass2').value : '';
-
-  const errEl = document.getElementById('fpError');
-  const sucEl = document.getElementById('fpSuccess');
-
-  function showErr(msg) { errEl.textContent = msg; errEl.style.display='block'; sucEl.style.display='none'; }
-  function showSuc(msg) { sucEl.textContent = msg; sucEl.style.display='block'; errEl.style.display='none'; }
-
-  if (!email) { showErr('Please enter your email address.'); return; }
-  if (!pass)  { showErr('Please enter a new password.'); return; }
-  if (pass.length < 6) { showErr('Password must be at least 6 characters.'); return; }
-  if (pass !== pass2) { showErr('Passwords do not match.'); return; }
-
-  const btn = document.querySelector('.auth-submit');
-  if (btn) { btn.textContent = 'Resetting...'; btn.disabled = true; }
-
-  try {
-    const data = await apiPost('/reset-password', { email, password: pass });
-    if (data.error) { showErr(data.error); if(btn){btn.textContent='Reset Password';btn.disabled=false;} return; }
-    showSuc('Password reset successfully! You can now sign in with your new password.');
-    if (btn) { btn.textContent = 'Done!'; }
-    setTimeout(() => openAuthModal('signin'), 2000);
-  } catch(e) {
-    showErr('Something went wrong. Please try again.');
-    if(btn){btn.textContent='Reset Password';btn.disabled=false;}
-  }
-}
-
+function openForgotPassword(){const m=document.getElementById('authModalMount');if(!m)return;m.innerHTML='<div class="auth-overlay" id="authOverlay" onclick="if(event.target.id===&quot;authOverlay&quot;)closeAuthModal()"><div class="auth-box"><button class="auth-close" onclick="closeAuthModal()">&#10005;</button><div class="auth-logo">Epi<span>phany</span></div><div style="text-align:center;margin-bottom:24px"><div style="font-size:24px;font-weight:300;margin-bottom:6px">Reset Password</div></div><div id="fpError" style="display:none" class="auth-error"></div><div id="fpSuccess" style="display:none;background:rgba(76,175,125,.12);border:1px solid rgba(76,175,125,.3);color:var(--green);font-size:12px;padding:10px 14px;margin-bottom:4px"></div><label class="auth-label">Email Address</label><input class="auth-input" id="fpEmail" type="email" placeholder="your@email.com"/><label class="auth-label">New Password</label><input class="auth-input" id="fpPass" type="password" placeholder="New password"/><label class="auth-label">Confirm Password</label><input class="auth-input" id="fpPass2" type="password" placeholder="Repeat"/><button class="auth-submit" onclick="doResetPassword()">Reset Password</button><div class="auth-switch">Remember it? <span onclick="openAuthModal(&quot;signin&quot;)">Back to Sign In</span></div></div></div>';}
+async function doResetPassword(){const email=document.getElementById('fpEmail')?document.getElementById('fpEmail').value.trim():'';const pass=document.getElementById('fpPass')?document.getElementById('fpPass').value:'';const pass2=document.getElementById('fpPass2')?document.getElementById('fpPass2').value:'';const errEl=document.getElementById('fpError');const sucEl=document.getElementById('fpSuccess');if(!email){errEl.textContent='Enter your email.';errEl.style.display='block';return;}if(!pass||pass.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;}if(pass!==pass2){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}const btn=document.querySelector('.auth-submit');if(btn){btn.textContent='Resetting...';btn.disabled=true;}try{const data=await apiPost('/reset-password',{email,password:pass});if(data.error){errEl.textContent=data.error;errEl.style.display='block';if(btn){btn.textContent='Reset Password';btn.disabled=false;}return;}sucEl.textContent='Password reset! You can now sign in.';sucEl.style.display='block';if(btn)btn.textContent='Done!';setTimeout(()=>openAuthModal('signin'),2000);}catch(e){errEl.textContent='Something went wrong.';errEl.style.display='block';if(btn){btn.textContent='Reset Password';btn.disabled=false;}}}
 function goToRegisterFromModal() {
   closeAuthModal();
   regRole = 'learner';
@@ -794,7 +735,7 @@ async function doSignIn() {
       isLoggedIn=true;
       setCookie('epiphany_token', data.token, 30);
       setCookie('epiphany_type', 'learner', 30);
-      updateNavBtn(); closeAuthModal(); enterDashboard(); return;
+      updateNavBtn();closeAuthModal();enterDashboard(); return;
     }
     if (data.type === 'tutor') {
       const t=data.tutor;
@@ -808,7 +749,7 @@ async function doSignIn() {
       saveSubState();
       setCookie('epiphany_token', data.token, 30);
       setCookie('epiphany_type', 'tutor', 30);
-      updateNavBtn(); closeAuthModal(); enterTutorDashboard(); return;
+      updateNavBtn();closeAuthModal();enterTutorDashboard(); return;
     }
   } catch(e) { authError='Connection error. Please try again.'; renderAuthModal(); }
 }
@@ -824,14 +765,8 @@ function render() {
 }
 
 function renderHome() {
-  if (!TUTORS_LOADED) { loadTutors().then(() => render()); }
+  if (!TUTORS_LOADED) loadTutors().then(() => render());
   const feat = TUTORS.slice(0, 4);
-  const tutorCount = TUTORS.length;
-  const featuredSection = tutorCount > 0 ? `
-<section class="featured-strip">
-  <div class="strip-header"><div><div class="eyebrow">Featured Educators</div><div class="section-title">Meet our <em>top rated</em> tutors</div></div><button class="btn-ghost" onclick="navigate('catalogue')">View All Tutors &rarr;</button></div>
-  <div class="strip-grid">${feat.map(t => `<div class="strip-card" onclick="selectTutor(${t.id})">${(!t.photo || t.photo === '') ? `<div style="width:100%;height:100%;background:${getAvatarColor(t.name).bg};display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:72px;color:${getAvatarColor(t.name).fg};letter-spacing:4px">${getInitials(t.name)}</div>` : `<img src="${t.photo}" alt="${t.name}" loading="lazy"/>`}<div class="strip-card-overlay"></div><div class="strip-card-body">${t.badge ? `<div class="strip-card-badge"><span class="badge">${t.badge}</span></div>` : ''}<div class="strip-card-name">${t.name}</div><div class="strip-card-sub">${t.subjects[0]}</div></div></div>`).join('')}</div>
-</section>` : '';
   return `<div class="page">
 <section class="hero"><div class="hero-bg"></div><div class="hero-bg-text">EPIPHANY</div>
 <div class="hero-content">
@@ -840,13 +775,16 @@ function renderHome() {
   <p class="hero-sub">Connect with South Africa's finest educators. Expert tutors, flexible scheduling, and transformative results &mdash; all in one place.</p>
   <div class="hero-actions"><button class="btn-gold" onclick="navigate('catalogue')">Browse Tutors</button><button class="btn-ghost" onclick="navigate('register')">Become a Tutor</button></div>
   <div class="hero-stats">
-    <div><div class="stat-n">${tutorCount || '0'}</div><div class="stat-l">Expert Tutors</div></div>
-    <div><div class="stat-n">${TUTORS.reduce((s,t) => s + (t.sessions||0), 0) || '0'}</div><div class="stat-l">Sessions Booked</div></div>
+    <div><div class="stat-n">240+</div><div class="stat-l">Expert Tutors</div></div>
+    <div><div class="stat-n">4,800+</div><div class="stat-l">Sessions Booked</div></div>
     <div><div class="stat-n">98%</div><div class="stat-l">Satisfaction Rate</div></div>
-    <div><div class="stat-n">${[...new Set(TUTORS.flatMap(t => t.subjects))].length || '0'}</div><div class="stat-l">Subjects</div></div>
+    <div><div class="stat-n">9+</div><div class="stat-l">Subjects</div></div>
   </div>
 </div></section>
-${featuredSection}
+<section class="featured-strip">
+  <div class="strip-header"><div><div class="eyebrow">Featured Educators</div><div class="section-title">Meet our <em>top rated</em> tutors</div></div><button class="btn-ghost" onclick="navigate('catalogue')">View All Tutors &rarr;</button></div>
+  <div class="strip-grid">${feat.map(t => `<div class="strip-card" onclick="navigate('profile',t)"><img src="${t.photo}" alt="${t.name}" loading="lazy"/><div class="strip-card-overlay"></div><div class="strip-card-body">${t.badge ? `<div class="strip-card-badge"><span class="badge">${t.badge}</span></div>` : ''}<div class="strip-card-name">${t.name}</div><div class="strip-card-sub">${t.subjects[0]}</div></div></div>`).join('')}</div>
+</section>
 <section class="how-section">
   <div class="eyebrow">How It Works</div><div class="section-title">Simple. <em>Seamless.</em> Effective.</div>
   <div class="steps">
@@ -860,7 +798,7 @@ ${featuredSection}
 function renderCatalogue() {
   if (!TUTORS_LOADED) {
     loadTutors().then(() => render());
-    return `<div class="page"><div class="cat-hero"><div class="cat-hero-inner"><div><div class="eyebrow">Our Educators</div><div class="section-title">Tutor <em>Catalogue</em></div></div></div></div><div style="padding:80px;text-align:center;font-family:Georgia,serif;font-size:28px;color:var(--muted);font-style:italic">Loading tutors&hellip;</div></div>`;
+    return `<div class="page"><div class="cat-hero"><div class="cat-hero-inner"><div><div class="eyebrow">Our Educators</div><div class="section-title">Tutor <em>Catalogue</em></div></div></div></div><div style="padding:80px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--muted);font-style:italic">Loading tutors&hellip;</div></div>`;
   }
   const filtered = TUTORS.filter(t => {
     const ms = !catSearch || t.name.toLowerCase().includes(catSearch.toLowerCase()) || t.subjects.some(s => s.toLowerCase().includes(catSearch.toLowerCase()));
@@ -877,14 +815,14 @@ function renderCatalogue() {
   <div class="filter-group"><div class="filter-label">Location</div><select class="filter-select" onchange="catLocation=this.value;render()">${LOCATIONS.map(l => `<option${l === catLocation ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
   <div class="filter-group"><div class="filter-label">Mode</div><select class="filter-select" onchange="catMode=this.value;render()">${MODES.map(m => `<option${m === catMode ? ' selected' : ''}>${m}</option>`).join('')}</select></div>
 </div>
-<div class="catalogue-body"><div class="tutor-grid">${filtered.length === 0 ? filtered.length === 0 && TUTORS.length === 0 ? '<div class="no-results">No approved tutors yet. Check back soon!</div>' : '<div class="no-results">No tutors match your search criteria.</div>' : filtered.map(t => `<div class="t-card" onclick="selectTutor(${t.id})"><div class="t-card-img-wrap">${(!t.photo || t.photo === '') ? `<div style="width:100%;height:100%;background:${getAvatarColor(t.name).bg};display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:72px;color:${getAvatarColor(t.name).fg};letter-spacing:4px">${getInitials(t.name)}</div>` : `<img src="${t.photo}" alt="${t.name}" class="t-card-img" loading="lazy"/>`}<div class="t-card-overlay"></div><div class="t-card-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="t-card-mode">${m}</span>`).join('')}</div></div><div class="t-card-body"><div class="t-card-name">${t.name}</div><div class="t-card-location">&#128205; ${t.location} &middot; ${t.grade}</div><div class="t-card-subjects">${t.subjects.slice(0,3).map(s => `<span class="t-card-subj">${s}</span>`).join('')}</div><div class="t-card-bio">${t.bio}</div><div class="t-card-footer"><div class="t-card-rate">R${t.rate}/hr</div><div class="t-card-rating">${S(t.rating)}<span class="rating-num">${t.rating} (${t.reviews})</span></div></div></div></div>`).join('')}</div></div>
+<div class="catalogue-body"><div class="tutor-grid">${filtered.length === 0 ? '<div class="no-results">No tutors match your search criteria.</div>' : filtered.map(t => `<div class="t-card" onclick="navigate('profile',t)"><div class="t-card-img-wrap"><img src="${t.photo}" alt="${t.name}" class="t-card-img" loading="lazy"/><div class="t-card-overlay"></div><div class="t-card-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="t-card-mode">${m}</span>`).join('')}</div></div><div class="t-card-body"><div class="t-card-name">${t.name}</div><div class="t-card-location">&#128205; ${t.location} &middot; ${t.grade}</div><div class="t-card-subjects">${t.subjects.slice(0,3).map(s => `<span class="t-card-subj">${s}</span>`).join('')}</div><div class="t-card-bio">${t.bio}</div><div class="t-card-footer"><div class="t-card-rate">R${t.rate}/hr</div><div class="t-card-rating">${S(t.rating)}<span class="rating-num">${t.rating} (${t.reviews})</span></div></div></div></div>`).join('')}</div></div>
 </div>`;
 }
 
 function renderProfile() {
   const t = activeTutor; if (!t) return '';
   const panel = bookingDone
-    ? `<div class="booking-success-card"><div class="bsc-icon">&#10022;</div><div class="bsc-title">Booking Confirmed</div><div class="bsc-text">Your session with <strong style="color:var(--gold)">${t.name}</strong> is set for <strong style="color:var(--gold)">${selDay}</strong> at <strong style="color:var(--gold)">${selTime}</strong>.<br/><br/>A confirmation has been sent to <strong style="color:var(--gold)">${bcEmail}</strong>.<br/><br/><button onclick="isLoggedIn?enterDashboard():openAuthModal('signin')" style="margin-top:12px;padding:10px 22px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:sans-serif">View in Dashboard &rarr;</button></div></div>`
+    ? `<div class="booking-success-card"><div class="bsc-icon">&#10022;</div><div class="bsc-title">Booking Confirmed</div><div class="bsc-text">Your session with <strong style="color:var(--gold)">${t.name}</strong> is set for <strong style="color:var(--gold)">${selDay}</strong> at <strong style="color:var(--gold)">${selTime}</strong>.<br/><br/>A confirmation has been sent to <strong style="color:var(--gold)">${bcEmail}</strong>.<br/><br/><button onclick="isLoggedIn?enterDashboard():openAuthModal('signin')" style="margin-top:12px;padding:10px 22px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif">View in Dashboard &rarr;</button></div></div>`
     : `<div class="booking-card-title">Book a Session</div><div class="booking-card-sub">with ${t.name.split(' ')[0]}</div>
 <div class="bc-label">Select Day</div>
 <div class="bc-days">${DAYS.map(d => { const a = t.availability.includes(d); return `<div class="bc-day${!a ? '' : selDay === d ? ' sel' : ' avail'}"${a ? ` onclick="pickDay('${d}')"` : ''}>${d}</div>`; }).join('')}</div>
@@ -896,7 +834,7 @@ ${selDay ? `<div class="bc-label">Select Time</div><div class="bc-times">${TIMES
 <button class="bc-confirm" id="bookBtn" ${selDay && selTime && bcName.trim() && bcEmail.trim() ? '' : 'disabled'} onclick="confirmBooking()">Confirm Booking</button>`;
   return `<div class="page profile-page">
 <div class="profile-hero">
-  <div class="profile-hero-img">${(!t.photo || t.photo === '') ? `<div style="width:100%;height:100%;background:${getAvatarColor(t.name).bg};display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:140px;color:${getAvatarColor(t.name).fg};letter-spacing:8px">${getInitials(t.name)}</div>` : `<img src="${t.photo}" alt="${t.name}"/>`}</div>
+  <div class="profile-hero-img"><img src="${t.photo}" alt="${t.name}"/></div>
   <div class="profile-hero-content">
     <button class="profile-back" onclick="navigate('catalogue')">&larr; Back to Catalogue</button>
     <div class="profile-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="badge expert">${m}</span>`).join('')}</div>
@@ -958,7 +896,8 @@ function confirmBooking() {
     amount:  t.rate,
   });
 
-    apiPost('/sessions',{learnerName:bcName.trim(),learnerEmail:bcEmail.trim(),tutorName:t.name,subject:t.subjects[0],day:selDay,time:selTime,rate:t.rate,mode:t.mode[0]});
+  // Push to Airtable
+  apiPost('/sessions',{learnerName:bcName.trim(),learnerEmail:bcEmail.trim(),tutorName:t.name,subject:t.subjects[0],day:selDay,time:selTime,rate:t.rate,mode:t.mode[0]});
 
   render();
 }
@@ -1035,7 +974,8 @@ async function submitRegistration() {
     LEARNER.password = pass;
     LEARNER.since    = monthYear();
     isLoggedIn = true;
-        LEARNER._pendingToken = genToken();
+    // Set session cookie for new learner too (token saved after Airtable record created)
+    LEARNER._pendingToken = genToken();
     setCookie('epiphany_token', LEARNER._pendingToken, 30);
     setCookie('epiphany_type',  'learner', 30);
 
@@ -1047,10 +987,9 @@ async function submitRegistration() {
     // Go straight to dashboard after registration
     regDone = true;
     render();
-    // Auto-enter dashboard after short delay
-    setTimeout(() => {
-      if (isLoggedIn) enterDashboard();
-    }, 500);
+    setTimeout(()=>{if(isLoggedIn){updateNavBtn();enterDashboard();}},600);
+    // Auto-enter dashboard after short delay to allow render
+    setTimeout(() => enterDashboard(), 300);
 
   } else {
     // Tutor application
@@ -1090,7 +1029,7 @@ function lessonCard(l) {
   if (st === 'pending')   act += `<button class="lc-cancel" onclick="cancelLesson('${l.id}')">Cancel</button>`;
   if (st === 'completed' && !l.rated) act += `<button class="lc-rate-btn">Rate &#9733;</button>`;
   if (st === 'completed' && l.rated)  act += `<span class="lc-stars">${'&#9733;'.repeat(l.rating)}</span>`;
-  return `<div class="lc ${bcls}">${avatarHTML(l.tutor, 44)}<div class="lc-info"><div class="lc-tutor">${l.tutor}</div><div class="lc-subj">${l.subject}</div><div class="lc-meta"><span class="lc-date">&#128197; ${l.date} &middot; ${l.time}</span><span class="lc-mode">${l.mode}</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R${l.rate}</span>${pill(st)}${act}</div></div>`;
+  return `<div class="lc ${bcls}"><img src="${l.img}" class="lc-img" alt="${l.tutor}"/><div class="lc-info"><div class="lc-tutor">${l.tutor}</div><div class="lc-subj">${l.subject}</div><div class="lc-meta"><span class="lc-date">&#128197; ${l.date} &middot; ${l.time}</span><span class="lc-mode">${l.mode}</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R${l.rate}</span>${pill(st)}${act}</div></div>`;
 }
 
 function cancelLesson(id) { cancelledIds.push(id); renderDashboard(); }
@@ -1101,118 +1040,111 @@ function renderDashboard() {
   const outstanding = DUE_INV.filter(i => !paidIds.includes(i.id));
   const dueTotal    = outstanding.reduce((s, i) => s + i.amount, 0);
   const completedCt = PAST_L.filter(l => l.status === 'completed').length;
-  const firstName   = LEARNER.name ? LEARNER.name.split(' ')[0] : 'there';
-  const isNewUser   = UPCOMING_L.length === 0 && PAST_L.length === 0 && INVOICES.length === 0;
 
   const navItems = [
-    { id: 'overview', label: 'Overview',        icon: '&#9672;' },
-    { id: 'upcoming', label: 'Upcoming Lessons', icon: '&#9719;', badge: UPCOMING_L.length || null },
-    { id: 'history',  label: 'Session History',  icon: '&#9681;' },
-    { id: 'payments', label: 'Payments',         icon: '&#9678;', badge: outstanding.length || null },
-    { id: 'profile',  label: 'Profile Settings', icon: '&#9673;' },
+    { id: 'overview', label: 'Overview',         icon: '&#9672;' },
+    { id: 'upcoming', label: 'Upcoming Lessons',  icon: '&#9719;', badge: UPCOMING_L.length },
+    { id: 'history',  label: 'Session History',   icon: '&#9681;' },
+    { id: 'payments', label: 'Payments',          icon: '&#9678;', badge: outstanding.length || null },
+    { id: 'profile',  label: 'Profile Settings',  icon: '&#9673;' },
   ];
 
-  const signOutBtn = '<div style="padding:20px 28px;border-top:1px solid rgba(201,168,76,.08);position:absolute;bottom:0;left:0;right:0"><button onclick="exitDashboard()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(250,249,246,.1);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:sans-serif" onmouseover="this.style.borderColor=var(--red)" onmouseout="this.style.borderColor=rgba(250,249,246,.1)">&#8592; Sign Out</button></div>';
-
-  const navHtml = navItems.map(function(n) {
-    var active = dashTab===n.id?' active':'';
-    var badge = n.badge ? '<span class="dash-nav-badge">'+n.badge+'</span>' : '';
-    return '<button class="dash-nav-item'+active+'" onclick="switchTab(\'' +n.id+ '\')">'
-      +'<span class="dash-nav-icon">'+n.icon+'</span>'+n.label+badge+'</button>';
-  }).join('');
-
-  const sidebar = '<aside class="dash-sidebar">'
-    +'<div class="dash-sb-profile"><div class="dash-sb-label">My Account</div>'
-    +'<div class="dash-sb-user">'+avatarHTML(LEARNER.name, 40, 'border:1px solid var(--gold)')
-    +'<div><div class="dash-sb-uname">'+LEARNER.name+'</div><div class="dash-sb-role">Learner</div></div></div></div>'
-    +'<div class="dash-nav-label">Navigation</div>'
-    +navHtml+signOutBtn+'</aside>';
+  const sidebar = `<aside class="dash-sidebar">
+<div class="dash-sb-profile">
+  <div class="dash-sb-label">My Account</div>
+  <div class="dash-sb-user"><img src="${LEARNER.avatar}" class="dash-sb-avatar" alt=""/><div><div class="dash-sb-uname">${LEARNER.name}</div><div class="dash-sb-role">Learner</div></div></div>
+</div>
+<div class="dash-nav-label">Navigation</div>
+${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' : ''}" onclick="switchTab('${n.id}')"><span class="dash-nav-icon">${n.icon}</span>${n.label}${n.badge ? `<span class="dash-nav-badge">${n.badge}</span>` : ''}</button>`).join('')}
+</aside>`;
 
   let main = '';
 
   if (dashTab === 'overview') {
-    const nxt = UPCOMING_L.length > 0 ? UPCOMING_L[0] : null;
-    let m = '<div class="dash-section">';
-    m += '<div class="dash-eyebrow">Dashboard</div>';
-    m += '<div class="dash-title">Welcome back, <em>'+firstName+'</em></div>';
-    if (isNewUser) {
-      m += '<div style="background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.2);padding:40px;text-align:center;margin-bottom:32px">';
-      m += '<div style="font-size:32px;margin-bottom:12px">&#10022;</div>';
-      m += '<div style="font-family:Georgia,serif;font-size:28px;font-weight:300;color:var(--gold);margin-bottom:8px">Welcome to Epiphany, '+firstName+'!</div>';
-      m += '<div style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.8">Your dashboard is ready. Start by finding a tutor and booking your first session.</div>';
-      m += '<button onclick="goToCatalogue()" style="padding:13px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Browse Tutors &rarr;</button>';
-      m += '</div>';
-    }
-    m += '<div class="ov-grid">';
-    m += '<div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">'+UPCOMING_L.length+'</div><div class="ov-sub">'+(nxt?'Next: '+nxt.date:'No sessions yet')+'</div></div>';
-    m += '<div class="ov-card"><div class="ov-label">Completed Sessions</div><div class="ov-value">'+completedCt+'</div><div class="ov-sub">'+(LEARNER.since?'Since '+LEARNER.since:'None yet')+'</div></div>';
-    m += '<div class="ov-card"><div class="ov-label">Total Invested</div><div class="ov-value gld">R'+totalSpent.toLocaleString()+'</div><div class="ov-sub">'+INVOICES.length+' invoices paid</div></div>';
-    m += '<div class="ov-card"><div class="ov-label">Amount Due</div><div class="ov-value'+(dueTotal>0?' amb':'')+'">R'+dueTotal+'</div><div class="ov-sub">'+(dueTotal>0?'<span class="clk" onclick="switchTab(&quot;payments&quot;)">Pay now &rarr;</span>':'All clear')+'</div></div>';
-    m += '</div>';
-    m += '<div class="sub-hdg">Next Session <span class="sub-hdg-link" onclick="switchTab(&quot;upcoming&quot;)">View all &rarr;</span></div>';
-    m += nxt ? '<div class="lesson-list">'+lessonCard(nxt)+'</div>' : '<div style="padding:24px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>';
-    m += '<div class="sub-hdg">Recent Sessions <span class="sub-hdg-link" onclick="switchTab(&quot;history&quot;)">View all &rarr;</span></div>';
-    m += PAST_L.length > 0 ? '<div class="lesson-list">'+PAST_L.slice(0,3).map(lessonCard).join('')+'</div>' : '<div style="padding:24px 0;color:var(--muted);font-size:13px;text-align:center">No session history yet.</div>';
-    m += '</div>';
-    main = m;
+    const isNewUser = UPCOMING_L.length===0&&PAST_L.length===0&&INVOICES.length===0;
+    const nxt = UPCOMING_L[0];
+    main = `<div class="dash-section">
+<div class="dash-eyebrow">Dashboard</div>
+<div class="dash-title">Welcome back, <em>${LEARNER.name.split(' ')[0]}</em></div>
+<div class="ov-grid">
+  <div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">${UPCOMING_L.length}</div><div class="ov-sub">Next: ${nxt.date}</div></div>
+  <div class="ov-card"><div class="ov-label">Completed Sessions</div><div class="ov-value">${completedCt}</div><div class="ov-sub">Since ${LEARNER.since}</div></div>
+  <div class="ov-card"><div class="ov-label">Total Invested</div><div class="ov-value gld">R${totalSpent.toLocaleString()}</div><div class="ov-sub">${INVOICES.length} invoices paid</div></div>
+  <div class="ov-card"><div class="ov-label">Amount Due</div><div class="ov-value amb">R${dueTotal}</div><div class="ov-sub clk" onclick="switchTab('payments')">Pay now &rarr;</div></div>
+</div>
+<div class="sub-hdg">Next Session <span class="sub-hdg-link" onclick="switchTab('upcoming')">View all &rarr;</span></div>
+<div class="lesson-list">${lessonCard(nxt)}</div>
+<div class="sub-hdg">Recent Sessions <span class="sub-hdg-link" onclick="switchTab('history')">View all &rarr;</span></div>
+<div class="lesson-list">${PAST_L.slice(0, 3).map(lessonCard).join('')}</div>
+</div>`;
   }
 
   if (dashTab === 'upcoming') {
-    let m = '<div class="dash-section"><div class="dash-eyebrow">My Lessons</div><div class="dash-title"><em>Upcoming</em> Sessions</div>';
-    m += '<div class="sub-hdg">Confirmed &amp; Pending <span class="sub-hdg-count">'+UPCOMING_L.length+' sessions</span></div>';
-    m += UPCOMING_L.length > 0 ? '<div class="lesson-list">'+UPCOMING_L.map(lessonCard).join('')+'</div>' : '<div style="padding:48px 0;text-align:center;color:var(--muted);font-size:13px">No upcoming sessions yet.</div>';
-    m += '</div>';
-    main = m;
+    main = `<div class="dash-section">
+<div class="dash-eyebrow">My Lessons</div><div class="dash-title"><em>Upcoming</em> Sessions</div>
+<div class="sub-hdg">Confirmed &amp; Pending <span class="sub-hdg-count">${UPCOMING_L.length} sessions</span></div>
+<div class="lesson-list">${UPCOMING_L.map(lessonCard).join('')}</div>
+</div>`;
   }
 
   if (dashTab === 'history') {
     const f = histFilter === 'all' ? PAST_L : PAST_L.filter(l => l.status === histFilter);
-    let m = '<div class="dash-section"><div class="dash-eyebrow">My Lessons</div><div class="dash-title">Session <em>History</em></div>';
-    m += '<div class="filter-tabs">';
-    m += '<button class="ftab'+(histFilter==='all'?' active':'')+'" onclick="histFilter=&quot;all&quot;;renderDashboard()">All</button>';
-    m += '<button class="ftab'+(histFilter==='completed'?' active':'')+'" onclick="histFilter=&quot;completed&quot;;renderDashboard()">Completed</button>';
-    m += '<button class="ftab'+(histFilter==='cancelled'?' active':'')+'" onclick="histFilter=&quot;cancelled&quot;;renderDashboard()">Cancelled</button>';
-    m += '</div>';
-    m += '<div class="sub-hdg">Past Sessions <span class="sub-hdg-count">'+f.length+' sessions</span></div>';
-    m += f.length > 0 ? '<div class="lesson-list">'+f.map(lessonCard).join('')+'</div>' : '<div style="padding:48px 0;text-align:center;color:var(--muted);font-size:13px">No sessions yet.</div>';
-    m += '</div>';
-    main = m;
+    main = `<div class="dash-section">
+<div class="dash-eyebrow">My Lessons</div><div class="dash-title">Session <em>History</em></div>
+<div class="filter-tabs">
+  <button class="ftab${histFilter === 'all' ? ' active' : ''}" onclick="histFilter='all';renderDashboard()">All</button>
+  <button class="ftab${histFilter === 'completed' ? ' active' : ''}" onclick="histFilter='completed';renderDashboard()">Completed</button>
+  <button class="ftab${histFilter === 'cancelled' ? ' active' : ''}" onclick="histFilter='cancelled';renderDashboard()">Cancelled</button>
+</div>
+<div class="sub-hdg">Past Sessions <span class="sub-hdg-count">${f.length} sessions</span></div>
+<div class="lesson-list">${f.map(lessonCard).join('')}</div>
+</div>`;
   }
 
   if (dashTab === 'payments') {
     const modal = payInvoice ? renderPayModal() : '';
-    let m = '<div class="dash-section"><div class="dash-eyebrow">Finances</div><div class="dash-title">Payments &amp; <em>Invoices</em></div>';
-    m += '<div class="pay-top">';
-    m += '<div class="pay-card"><div class="pay-card-label">Total Spent (All Time)</div><div class="pay-card-value">R'+totalSpent.toLocaleString()+'</div><div class="pay-card-sub">'+INVOICES.length+' sessions paid</div></div>';
-    m += '<div class="pay-card"><div class="pay-card-label">Currently Due</div><div class="pay-card-value '+(dueTotal>0?'amb':'grn')+'">R'+dueTotal+'</div><div class="pay-card-sub">'+(outstanding.length===0?'All paid &#10003;':outstanding.length+' invoice'+(outstanding.length!==1?'s':'')+' outstanding')+'</div></div>';
-    m += '</div>';
-    if (outstanding.length > 0) {
-      m += '<div style="margin-bottom:28px"><div class="due-hdr"><span class="due-dot"></span>Outstanding Invoices</div>';
-      m += outstanding.map(function(inv){ return '<div class="due-card"><div class="due-info"><div class="due-inv-id">'+inv.id+'</div><div class="due-desc">'+inv.tutor+' &mdash; '+inv.subject+'</div><div class="due-date">Due: '+inv.dueDate+'</div></div><span class="due-amount">R'+inv.amount+'</span><button class="pay-now-btn" onclick="openPayModal(&quot;'+inv.id+'&quot;)">Pay Now</button></div>'; }).join('');
-      m += '</div>';
-    }
-    m += '<div class="sub-hdg">Invoice History <span class="sub-hdg-count">'+INVOICES.length+' invoices</span></div>';
-    m += '<table class="inv-table"><thead><tr><th>Invoice</th><th>Date</th><th>Tutor</th><th>Subject</th><th>Amount</th><th>Status</th><th></th></tr></thead><tbody>';
-    m += INVOICES.map(function(inv){ return '<tr><td><span class="inv-id">'+inv.id+'</span></td><td style="color:var(--muted);font-size:12px">'+inv.date+'</td><td>'+inv.tutor+'</td><td style="color:var(--muted)">'+inv.subject+'</td><td style="font-family:Georgia,serif;font-size:18px;color:var(--gold)">R'+inv.amount+'</td><td><span class="inv-paid">Paid</span></td><td><button class="inv-dl">&#8595; Receipt</button></td></tr>'; }).join('');
-    m += '</tbody></table>'+modal+'</div>';
-    main = m;
+    main = `<div class="dash-section">
+<div class="dash-eyebrow">Finances</div><div class="dash-title">Payments &amp; <em>Invoices</em></div>
+<div class="pay-top">
+  <div class="pay-card"><div class="pay-card-label">Total Spent (All Time)</div><div class="pay-card-value">R${totalSpent.toLocaleString()}</div><div class="pay-card-sub">${INVOICES.length} sessions paid</div></div>
+  <div class="pay-card"><div class="pay-card-label">Currently Due</div><div class="pay-card-value ${dueTotal > 0 ? 'amb' : 'grn'}">R${dueTotal}</div><div class="pay-card-sub">${outstanding.length === 0 ? 'All paid &#10003;' : `${outstanding.length} invoice${outstanding.length !== 1 ? 's' : ''} outstanding`}</div></div>
+</div>
+${outstanding.length > 0 ? `<div style="margin-bottom:28px"><div class="due-hdr"><span class="due-dot"></span>Outstanding Invoices</div>${outstanding.map(inv => `<div class="due-card"><div class="due-info"><div class="due-inv-id">${inv.id}</div><div class="due-desc">${inv.tutor} &mdash; ${inv.subject}</div><div class="due-date">Due: ${inv.dueDate}</div></div><span class="due-amount">R${inv.amount}</span><button class="pay-now-btn" onclick="openPayModal('${inv.id}')">Pay Now</button></div>`).join('')}</div>` : ''}
+<div class="sub-hdg">Invoice History <span class="sub-hdg-count">${INVOICES.length} invoices</span></div>
+<table class="inv-table">
+<thead><tr><th>Invoice</th><th>Date</th><th>Tutor</th><th>Subject</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+<tbody>${INVOICES.map(inv => `<tr><td><span class="inv-id">${inv.id}</span></td><td style="color:var(--muted);font-size:12px">${inv.date}</td><td>${inv.tutor}</td><td style="color:var(--muted)">${inv.subject}</td><td style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold)">R${inv.amount}</td><td><span class="inv-paid">Paid</span></td><td><button class="inv-dl">&#8595; Receipt</button></td></tr>`).join('')}</tbody>
+</table>${modal}
+</div>`;
   }
 
   if (dashTab === 'profile') {
-    let m = '<div class="dash-section"><div class="dash-eyebrow">Account</div><div class="dash-title">Profile <em>Settings</em></div><div class="gold-rule"></div>';
-    m += '<div class="settings-avatar-row">'+avatarHTML(LEARNER.name, 72, 'border:2px solid var(--gold)');
-    m += '<div><div style="font-size:16px;font-weight:600;margin-bottom:4px">'+LEARNER.name+'</div><div style="font-size:12px;color:var(--muted);margin-bottom:12px">Member since '+LEARNER.since+'</div><button class="settings-change-btn">Change Photo</button></div></div>';
-    m += '<div class="settings-grid">';
-    m += '<div class="setting-group"><label class="setting-label">Full Name</label><input class="setting-input" id="sName" value="'+LEARNER.name+'"/></div>';
-    m += '<div class="setting-group"><label class="setting-label">Email Address</label><input class="setting-input" id="sEmail" type="email" value="'+LEARNER.email+'"/></div>';
-    m += '<div class="setting-group"><label class="setting-label">Phone Number</label><input class="setting-input" id="sPhone" value="'+(LEARNER.phone||'')+'"/></div>';
-    m += '<div class="setting-group"><label class="setting-label">Location</label><input class="setting-input" id="sLocation" value=""/></div>';
-    m += '<div class="setting-group full"><label class="setting-label">New Password</label><input class="setting-input" id="sPass" type="password" placeholder="Leave blank to keep current"/></div>';
-    m += '</div><div style="display:flex;align-items:center"><button class="settings-save" onclick="saveProfile()">Save Changes</button><span class="save-toast" id="saveToast" style="display:none">&#10003; Saved successfully</span></div></div>';
-    main = m;
+    main = `<div class="dash-section">
+<div class="dash-eyebrow">Account</div><div class="dash-title">Profile <em>Settings</em></div>
+<div class="gold-rule"></div>
+<div class="settings-avatar-row">
+  <img src="${LEARNER.avatar}" class="settings-big-avatar" alt=""/>
+  <div>
+    <div style="font-size:16px;font-weight:600;margin-bottom:4px">${LEARNER.name}</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Member since ${LEARNER.since}</div>
+    <button class="settings-change-btn">Change Photo</button>
+  </div>
+</div>
+<div class="settings-grid">
+  <div class="setting-group"><label class="setting-label">Full Name</label><input class="setting-input" id="sName" value="${LEARNER.name}"/></div>
+  <div class="setting-group"><label class="setting-label">Email Address</label><input class="setting-input" id="sEmail" type="email" value="${LEARNER.email}"/></div>
+  <div class="setting-group"><label class="setting-label">Phone Number</label><input class="setting-input" id="sPhone" value="${LEARNER.phone}"/></div>
+  <div class="setting-group"><label class="setting-label">Location</label><input class="setting-input" id="sLocation" value="Johannesburg"/></div>
+  <div class="setting-group full"><label class="setting-label">New Password</label><input class="setting-input" id="sPass" type="password" placeholder="Leave blank to keep current"/></div>
+</div>
+<div style="display:flex;align-items:center">
+  <button class="settings-save" onclick="saveProfile()">Save Changes</button>
+  <span class="save-toast" id="saveToast" style="display:none">&#10003; Saved successfully</span>
+</div>
+</div>`;
   }
 
-  document.getElementById('app').innerHTML = '<div class="dashboard-wrap">'+sidebar+'<main class="dash-main">'+main+'</main></div>';
+  document.getElementById('app').innerHTML = `<div class="dashboard-wrap">${sidebar}<main class="dash-main">${main}</main></div>`;
 }
 
 // ── PAYMENT MODAL ─────────────────────────────────────────────────
@@ -1248,7 +1180,8 @@ function processPayment(invId) {
   if (!inv) return;
   paidIds.push(invId);
   payStep = 2;
-    apiPost('/payments',{invoiceId:inv.id,learnerName:LEARNER.name,learnerEmail:LEARNER.email,tutorName:inv.tutor,subject:inv.subject,amount:inv.amount});
+  // Push payment record to Airtable
+  apiPost('/payments',{invoiceId:inv.id,learnerName:LEARNER.name,learnerEmail:LEARNER.email,tutorName:inv.tutor,subject:inv.subject,amount:inv.amount});
   renderDashboard();
 }
 
@@ -1273,274 +1206,61 @@ function showSaveToast() {
   if (t) { t.style.display = 'inline-flex'; setTimeout(() => { t.style.display = 'none'; }, 2500); }
 }
 
-function subKey() { return 'epiphany_sub_' + TUTOR.email; }
-function saveSubState() { try { localStorage.setItem(subKey(), JSON.stringify(TUTOR_SUB)); } catch(e){} }
-function loadSubState() { try { const s = localStorage.getItem(subKey()); if(s) TUTOR_SUB=JSON.parse(s); } catch(e){} }
-function isSubActive() {
-  if (TUTOR_SUB.status==='active') return true;
-  if (TUTOR_SUB.status==='trial') return new Date() < new Date(TUTOR_SUB.trialEnd);
-  return false;
-}
-function daysLeft() {
-  if (!TUTOR_SUB.trialEnd) return 0;
-  return Math.max(0, Math.ceil((new Date(TUTOR_SUB.trialEnd)-new Date())/86400000));
-}
-function startTrial() {
-  const s=new Date(), e=new Date(s); e.setDate(e.getDate()+TRIAL_DAYS);
-  TUTOR_SUB={status:'trial',trialStart:s.toISOString(),trialEnd:e.toISOString(),subStart:null,nextBilling:e.toISOString()};
-  saveSubState();
-  if(TUTOR.airtableId) apiPost('/subscription',{action:'start_trial',tutorId:TUTOR.airtableId});
-  renderTutorDashboard();
-}
-function cancelSubscription() {
-  TUTOR_SUB.status='cancelled'; saveSubState();
-  if(TUTOR.airtableId) apiPost('/subscription',{action:'cancel',tutorId:TUTOR.airtableId});
-  renderTutorDashboard();
-}
-function goToRequests() { dashTab='requests'; renderTutorDashboard(); }
-function launchPayFast() { alert('PayFast integration coming soon!'); }
+function selectTutor(id){const t=TUTORS.find(t=>t.id===id);if(t)navigate('profile',t);}
 
-function selectTutor(id) {
-  const t = TUTORS.find(t => t.id === id);
-  if (t) navigate('profile', t);
-}
+function subKey(){return 'epiphany_sub_'+TUTOR.email;}
+function saveSubState(){try{localStorage.setItem(subKey(),JSON.stringify(TUTOR_SUB));}catch(e){}}
+function loadSubState(){try{const s=localStorage.getItem(subKey());if(s)TUTOR_SUB=JSON.parse(s);}catch(e){}}
+function isSubActive(){if(TUTOR_SUB.status==='active')return true;if(TUTOR_SUB.status==='trial')return new Date()<new Date(TUTOR_SUB.trialEnd);return false;}
+function daysLeft(){if(!TUTOR_SUB.trialEnd)return 0;return Math.max(0,Math.ceil((new Date(TUTOR_SUB.trialEnd)-new Date())/86400000));}
+function startTrial(){const s=new Date(),e=new Date(s);e.setDate(e.getDate()+TRIAL_DAYS);TUTOR_SUB={status:'trial',trialStart:s.toISOString(),trialEnd:e.toISOString(),subStart:null,nextBilling:e.toISOString()};saveSubState();if(TUTOR.airtableId)apiPost('/subscription',{action:'start_trial',tutorId:TUTOR.airtableId});renderTutorDashboard();}
+function cancelSubscription(){TUTOR_SUB.status='cancelled';saveSubState();if(TUTOR.airtableId)apiPost('/subscription',{action:'cancel',tutorId:TUTOR.airtableId});renderTutorDashboard();}
+function goToRequests(){dashTab='requests';renderTutorDashboard();}
+function launchPayFast(){alert('PayFast integration coming soon!');}
 
-async function loadLearnerData() {
-  if (!LEARNER.email) return;
-  try {
-    const sData = await apiGet(`/sessions?email=${encodeURIComponent(LEARNER.email)}&type=learner`);
-    if (sData.sessions) {
-      UPCOMING_L = sData.sessions.filter(s=>s.status==='confirmed'||s.status==='pending')
-        .map(s=>({id:s.id,tutor:s.tutor_name||'',img:'https://i.pravatar.cc/80?img=12',
-          subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status}));
-      PAST_L = sData.sessions.filter(s=>s.status==='completed'||s.status==='cancelled')
-        .map(s=>({id:s.id,tutor:s.tutor_name||'',img:'https://i.pravatar.cc/80?img=12',
-          subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status,rated:false,rating:null}));
-    }
-    const pData = await apiGet(`/payments?email=${encodeURIComponent(LEARNER.email)}&type=learner`);
-    if (pData.payments) {
-      INVOICES = pData.payments.filter(p=>p.status==='paid')
-        .map(p=>({id:p.invoice_id||p.id,date:p.paid_on||'',tutor:p.tutor_name||'',subject:p.subject,amount:parseFloat(p.amount)||0}));
-    }
-  } catch(e) { console.error('[loadLearnerData]',e); }
-}
+async function loadTutorData(){if(!TUTOR.email)return;try{const r1=await apiGet('/sessions?email='+encodeURIComponent(TUTOR.email)+'&type=tutor');tutorSessions=[];tutorPastSessions=[];if(r1.sessions)r1.sessions.forEach(s=>{const obj={id:s.id,learner:s.learner_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status};if(s.status==='confirmed'||s.status==='pending')tutorSessions.push(obj);else tutorPastSessions.push(obj);});const r2=await apiGet('/payments?email='+encodeURIComponent(TUTOR.email)+'&type=tutor');tutorEarnings=r2.payments?r2.payments.filter(p=>p.status==='paid').map(p=>({id:p.invoice_id||p.id,date:p.paid_on||'',learner:p.learner_name||'',subject:p.subject,amount:parseFloat(p.amount)||0})):[];}catch(e){console.error('[loadTutorData]',e);}}
 
-async function loadTutorData() {
-  if (!TUTOR.email) return;
-  try {
-    const r1 = await apiGet(`/sessions?email=${encodeURIComponent(TUTOR.email)}&type=tutor`);
-    tutorSessions=[]; tutorPastSessions=[];
-    if(r1.sessions) r1.sessions.forEach(s=>{
-      const obj={id:s.id,learner:s.learner_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status};
-      if(s.status==='confirmed'||s.status==='pending') tutorSessions.push(obj); else tutorPastSessions.push(obj);
-    });
-    const r2 = await apiGet(`/payments?email=${encodeURIComponent(TUTOR.email)}&type=tutor`);
-    tutorEarnings = r2.payments ? r2.payments.filter(p=>p.status==='paid')
-      .map(p=>({id:p.invoice_id||p.id,date:p.paid_on||'',learner:p.learner_name||'',subject:p.subject,amount:parseFloat(p.amount)||0})) : [];
-  } catch(e) { console.error('[loadTutorData]',e); }
-}
+function enterTutorDashboard(){document.getElementById('marketNav').style.display='none';document.getElementById('dashNav').style.display='flex';document.getElementById('siteFooter').style.display='none';const nameEl=document.getElementById('dashUnameEl');if(nameEl)nameEl.textContent=TUTOR.name;dashTab='overview';setCookie('epiphany_dash','tutor',30);loadTutorData().then(()=>renderTutorDashboard());window.scrollTo({top:0,behavior:'smooth'});}
 
-function enterTutorDashboard() {
-  document.getElementById('marketNav').style.display='none';
-  document.getElementById('dashNav').style.display='flex';
-  document.getElementById('siteFooter').style.display='none';
-  const nameEl=document.getElementById('dashUnameEl');
-  if(nameEl) nameEl.textContent=TUTOR.name;
-  dashTab='overview';
-  setCookie('epiphany_dash', 'tutor', 30);
-  loadTutorData().then(()=>renderTutorDashboard());
-  window.scrollTo({top:0,behavior:'smooth'});
-}
+function renderSubGate(){document.getElementById('app').innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px"><div style="max-width:560px;width:100%;text-align:center"><div style="font-family:Cormorant Garamond,serif;font-size:48px;font-weight:300;margin-bottom:12px">Start your <em style="color:var(--gold)">free trial</em></div><div style="width:56px;height:1px;background:var(--gold);margin:20px auto 28px"></div><div style="font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:40px">Get <strong style="color:var(--white)">30 days free</strong> then just <strong style="color:var(--gold)">R'+SUB_PRICE+'/month</strong>. Cancel anytime.</div><button onclick="startTrial()" style="width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-bottom:12px">Start Free 30-Day Trial</button></div></div>';}
+function renderSubExpired(){document.getElementById('app').innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px"><div style="max-width:480px;width:100%;text-align:center"><div style="font-family:Cormorant Garamond,serif;font-size:42px;font-weight:300;margin-bottom:12px">Subscription <em style="color:var(--red)">Expired</em></div><button onclick="launchPayFast()" style="width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-bottom:12px">Resubscribe</button><button onclick="exitDashboard()" style="width:100%;padding:14px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.12);cursor:pointer;">Back to Website</button></div></div>';}
 
-function renderTutorDashboard() {
-  loadSubState();
+function renderTutorDashboard(){
+  // KEY FIX: Only load from localStorage if TUTOR_SUB not already set from API
+  if(TUTOR_SUB.status==='none')loadSubState();
   if(TUTOR_SUB.status==='none'){renderSubGate();return;}
   if(!isSubActive()&&TUTOR_SUB.status!=='active'){renderSubExpired();return;}
-
   const totalEarned=tutorEarnings.reduce((s,e)=>s+e.amount,0);
   const requests=tutorSessions.filter(s=>s.status==='pending');
   const confirmed=tutorSessions.filter(s=>s.status==='confirmed');
   const completedCt=tutorPastSessions.filter(s=>s.status==='completed').length;
-
-  const navItems=[
-    {id:'overview',label:'Overview',icon:'&#9672;'},
-    {id:'sessions',label:'My Sessions',icon:'&#9719;',badge:confirmed.length||null},
-    {id:'requests',label:'Student Requests',icon:'&#9681;',badge:requests.length||null},
-    {id:'earnings',label:'Earnings',icon:'&#9678;'},
-    {id:'subscription',label:'Subscription',icon:'&#9670;'},
-    {id:'tprofile',label:'Profile Settings',icon:'&#9673;'}
-  ];
-
-  function tCard(s) {
-    var cls = s.status==='confirmed'?'lc-up':s.status==='pending'?'lc-pend':'lc-can';
-    return '<div class="lc '+cls+'">'+avatarHTML(s.learner||'Student',44)
-      +'<div class="lc-info"><div class="lc-tutor">'+(s.learner||'Student')+'</div>'
-      +'<div class="lc-subj">'+s.subject+'</div>'
-      +'<div class="lc-meta"><span class="lc-date">&#128197; '+s.date+' &middot; '+s.time+'</span>'
-      +'<span class="lc-mode">'+s.mode+'</span></div></div>'
-      +'<div class="lc-right"><span class="lc-rate-lbl">R'+s.rate+'</span>'+pill(s.status)+'</div></div>';
-  }
-
-  var trialDaysLeft = daysLeft();
-  var trialBanner = TUTOR_SUB.status==='trial'
-    ? '<div style="background:rgba(201,168,76,.12);border:1px solid var(--gold);padding:14px 20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;">'
-      +'<span style="font-size:13px;color:var(--gold)">&#9670; Free trial &mdash; <strong>'+trialDaysLeft+' day'+(trialDaysLeft!==1?'s':'')+' remaining</strong></span>'
-      +'<button onclick="dashTab=&quot;subscription&quot;;renderTutorDashboard()" style="font-size:10px;letter-spacing:2px;text-transform:uppercase;background:var(--gold);color:var(--black);border:none;padding:7px 16px;cursor:pointer;">Manage &rarr;</button></div>'
-    : '';
-
-  var signOutBtn = '<div style="padding:20px 28px;border-top:1px solid rgba(201,168,76,.08);position:absolute;bottom:0;left:0;right:0">'
-    +'<button onclick="exitDashboard()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(250,249,246,.1);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">&#8592; Sign Out</button></div>';
-
-  var navHtml = navItems.map(function(n) {
-    var active = dashTab===n.id?' active':'';
-    var badge = n.badge ? '<span class="dash-nav-badge">'+n.badge+'</span>' : '';
-    return '<button class="dash-nav-item'+active+'" onclick="dashTab=&quot;'+n.id+'&quot;;renderTutorDashboard()">'
-      +'<span class="dash-nav-icon">'+n.icon+'</span>'+n.label+badge+'</button>';
-  }).join('');
-
-  var sidebar = '<aside class="dash-sidebar">'
-    +'<div class="dash-sb-profile"><div class="dash-sb-label">Tutor Account</div>'
-    +'<div class="dash-sb-user">'+avatarHTML(TUTOR.name,40,'border:1px solid var(--gold)')
-    +'<div><div class="dash-sb-uname">'+TUTOR.name+'</div><div class="dash-sb-role" style="color:var(--gold)">Tutor</div></div></div></div>'
-    +'<div class="dash-nav-label">Navigation</div>'+navHtml+signOutBtn+'</aside>';
-
-  var main = '';
-
-  if(dashTab==='overview') {
-    var nxt = confirmed[0]||tutorSessions[0];
-    var m = '<div class="dash-section">'+trialBanner;
-    m += '<div class="dash-eyebrow">Tutor Dashboard</div>';
-    m += '<div class="dash-title">Welcome back, <em>'+(TUTOR.name.split(' ')[0]||'Tutor')+'</em></div>';
-    m += '<div class="ov-grid">';
-    m += '<div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">'+confirmed.length+'</div><div class="ov-sub">'+(nxt?'Next: '+nxt.date:'None scheduled')+'</div></div>';
-    m += '<div class="ov-card"><div class="ov-label">Completed Sessions</div><div class="ov-value">'+completedCt+'</div><div class="ov-sub">Since '+(TUTOR.since||'registration')+'</div></div>';
-    m += '<div class="ov-card"><div class="ov-label">Total Earned</div><div class="ov-value gld">R'+totalEarned.toLocaleString()+'</div><div class="ov-sub">'+tutorEarnings.length+' session'+(tutorEarnings.length!==1?'s':'')+' paid</div></div>';
-    m += '<div class="ov-card"><div class="ov-label">Pending Requests</div><div class="ov-value'+(requests.length?' amb':'')+'">'+requests.length+'</div><div class="ov-sub">'+(requests.length?'<span class="clk" onclick="goToRequests()">Review now &rarr;</span>':'None pending')+'</div></div>';
-    m += '</div>';
-    m += '<div class="sub-hdg">Next Session</div>';
-    m += nxt ? '<div class="lesson-list">'+tCard(nxt)+'</div>' : '<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>';
-    m += '</div>';
-    main = m;
-  }
-
-  if(dashTab==='sessions') {
-    var m = '<div class="dash-section"><div class="dash-eyebrow">My Sessions</div><div class="dash-title"><em>Upcoming</em> Sessions</div>';
-    m += confirmed.length>0 ? '<div class="lesson-list">'+confirmed.map(tCard).join('')+'</div>' : '<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>';
-    m += '<div class="sub-hdg" style="margin-top:16px">Past Sessions</div>';
-    m += tutorPastSessions.length>0 ? '<div class="lesson-list">'+tutorPastSessions.map(tCard).join('')+'</div>' : '<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No past sessions yet.</div>';
-    m += '</div>';
-    main = m;
-  }
-
-  if(dashTab==='requests') {
-    var m = '<div class="dash-section"><div class="dash-eyebrow">Student Requests</div><div class="dash-title"><em>Pending</em> Requests</div>';
-    if(requests.length>0) {
-      m += '<div class="lesson-list">'+requests.map(function(s){
-        return '<div class="lc lc-pend">'+avatarHTML(s.learner||'Student',44)
-          +'<div class="lc-info"><div class="lc-tutor">'+(s.learner||'Student')+'</div>'
-          +'<div class="lc-subj">'+s.subject+'</div>'
-          +'<div class="lc-meta"><span class="lc-date">&#128197; '+s.date+' &middot; '+s.time+'</span><span class="lc-mode">'+s.mode+'</span></div></div>'
-          +'<div class="lc-right"><span class="lc-rate-lbl">R'+s.rate+'</span>'+pill(s.status)
-          +'<button class="lc-join" onclick="alert(&quot;Session accepted!&quot;)">Accept</button>'
-          +'<button class="lc-cancel" onclick="alert(&quot;Session declined.&quot;)">Decline</button></div></div>';
-      }).join('')+'</div>';
-    } else {
-      m += '<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No pending requests.</div>';
-    }
-    m += '</div>';
-    main = m;
-  }
-
-  if(dashTab==='earnings') {
-    var m = '<div class="dash-section"><div class="dash-eyebrow">Finances</div><div class="dash-title">My <em>Earnings</em></div>';
-    m += '<div class="pay-top"><div class="pay-card"><div class="pay-card-label">Total Earned</div><div class="pay-card-value">R'+totalEarned.toLocaleString()+'</div></div>';
-    m += '<div class="pay-card"><div class="pay-card-label">Hourly Rate</div><div class="pay-card-value">R'+(TUTOR.rate||0)+'</div></div></div>';
-    if(tutorEarnings.length>0) {
-      m += '<table class="inv-table"><thead><tr><th>Invoice</th><th>Date</th><th>Learner</th><th>Subject</th><th>Amount</th></tr></thead><tbody>';
-      m += tutorEarnings.map(function(e){ return '<tr><td><span class="inv-id">'+e.id+'</span></td><td style="color:var(--muted);font-size:12px">'+e.date+'</td><td>'+e.learner+'</td><td style="color:var(--muted)">'+e.subject+'</td><td style="font-family:Georgia,serif;font-size:18px;color:var(--gold)">R'+e.amount+'</td></tr>'; }).join('');
-      m += '</tbody></table>';
-    } else {
-      m += '<div style="padding:32px 0;color:var(--muted);font-size:13px;text-align:center">No earnings yet.</div>';
-    }
-    m += '</div>';
-    main = m;
-  }
-
-  if(dashTab==='subscription') {
-    function fmt(d){ return d?new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'}):'—'; }
-    var statusLabel = TUTOR_SUB.status==='trial'?'Free Trial':TUTOR_SUB.status==='active'?'Active':'Inactive';
-    var m = '<div class="dash-section"><div class="dash-eyebrow">Billing</div><div class="dash-title">My <em>Subscription</em></div>';
-    m += '<div class="pay-top"><div class="pay-card"><div class="pay-card-label">Current Plan</div><div class="pay-card-value" style="font-size:32px">'+statusLabel+'</div></div>';
-    m += '<div class="pay-card"><div class="pay-card-label">Monthly Fee</div><div class="pay-card-value">R'+SUB_PRICE+'</div><div class="pay-card-sub">after free trial</div></div></div>';
-    if(TUTOR_SUB.status==='trial') {
-      m += '<div style="background:var(--black3);padding:32px;margin-bottom:24px;border:1px solid var(--border)">'
-        +'<div style="font-family:Georgia,serif;font-size:26px;margin-bottom:8px">Trial ends <span style="color:var(--gold)">'+fmt(TUTOR_SUB.trialEnd)+'</span></div>'
-        +'<div style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.8">Subscribe to keep your profile live. R'+SUB_PRICE+'/month. Cancel anytime.</div>'
-        +'<button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-right:12px">Subscribe Now</button>'
-        +'<button onclick="if(confirm(&quot;Cancel trial?&quot;))cancelSubscription()" style="padding:14px 20px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.15);cursor:pointer;">Cancel Trial</button></div>';
-    }
-    if(TUTOR_SUB.status==='active') {
-      m += '<div style="background:var(--black3);padding:32px;margin-bottom:24px;border:1px solid rgba(76,175,125,.2)">'
-        +'<div style="font-family:Georgia,serif;font-size:26px;margin-bottom:8px;color:var(--green)">&#10003; Active</div>'
-        +'<div style="font-size:13px;color:var(--muted);margin-bottom:24px">Next billing: '+fmt(TUTOR_SUB.nextBilling)+'</div>'
-        +'<button onclick="if(confirm(&quot;Cancel?&quot;))cancelSubscription()" style="padding:14px 20px;background:transparent;color:var(--red);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid var(--red);cursor:pointer;">Cancel Subscription</button></div>';
-    }
-    if(TUTOR_SUB.status==='cancelled'||TUTOR_SUB.status==='expired') {
-      m += '<div style="background:var(--black3);padding:32px;border:1px solid rgba(224,92,92,.2)">'
-        +'<div style="font-family:Georgia,serif;font-size:26px;margin-bottom:8px;color:var(--red)">Subscription '+(TUTOR_SUB.status==='cancelled'?'Cancelled':'Expired')+'</div>'
-        +'<button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Reactivate</button></div>';
-    }
-    m += '</div>';
-    main = m;
-  }
-
-  if(dashTab==='tprofile') {
-    var m = '<div class="dash-section"><div class="dash-eyebrow">Account</div><div class="dash-title">Tutor <em>Profile</em></div><div class="gold-rule"></div>';
-    m += '<div class="settings-avatar-row">'+avatarHTML(TUTOR.name,72,'border:2px solid var(--gold)');
-    m += '<div><div style="font-size:16px;font-weight:600;margin-bottom:4px">'+TUTOR.name+'</div><div style="font-size:12px;color:var(--gold);margin-bottom:4px">'+(TUTOR.subject||'')+'</div></div></div>';
-    m += '<div class="settings-grid">';
-    m += '<div class="setting-group"><label class="setting-label">Full Name</label><input class="setting-input" id="tpName" value="'+TUTOR.name+'"/></div>';
-    m += '<div class="setting-group"><label class="setting-label">Email</label><input class="setting-input" id="tpEmail" value="'+TUTOR.email+'"/></div>';
-    m += '<div class="setting-group"><label class="setting-label">Phone</label><input class="setting-input" id="tpPhone" value="'+(TUTOR.phone||'')+'"/></div>';
-    m += '<div class="setting-group"><label class="setting-label">City</label><input class="setting-input" id="tpCity" value="'+(TUTOR.city||'')+'"/></div>';
-    m += '<div class="setting-group full"><label class="setting-label">New Password</label><input class="setting-input" id="tpPass" type="password" placeholder="Leave blank to keep current"/></div>';
-    m += '</div><div style="display:flex;align-items:center"><button class="settings-save" onclick="saveTutorProfile()">Save Changes</button><span class="save-toast" id="saveToast" style="display:none">&#10003; Saved</span></div></div>';
-    main = m;
-  }
-
+  const navItems=[{id:'overview',label:'Overview',icon:'&#9672;'},{id:'sessions',label:'My Sessions',icon:'&#9719;',badge:confirmed.length||null},{id:'requests',label:'Student Requests',icon:'&#9681;',badge:requests.length||null},{id:'earnings',label:'Earnings',icon:'&#9678;'},{id:'subscription',label:'Subscription',icon:'&#9670;'},{id:'tprofile',label:'Profile Settings',icon:'&#9673;'}];
+  function tc(s){var cls=s.status==='confirmed'?'lc-up':s.status==='pending'?'lc-pend':'lc-can';return '<div class="lc '+cls+'">'+avatarHTML(s.learner||'Student',44)+'<div class="lc-info"><div class="lc-tutor">'+(s.learner||'Student')+'</div><div class="lc-subj">'+s.subject+'</div><div class="lc-meta"><span class="lc-date">'+s.date+' &middot; '+s.time+'</span><span class="lc-mode">'+s.mode+'</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R'+s.rate+'</span>'+pill(s.status)+'</div></div>';}
+  var dl=daysLeft();
+  var trialBanner=TUTOR_SUB.status==='trial'?'<div style="background:rgba(201,168,76,.12);border:1px solid var(--gold);padding:14px 20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;color:var(--gold)">&#9670; Free trial &mdash; <strong>'+dl+' day'+(dl!==1?'s':'')+' remaining</strong></span><button onclick="dashTab=&quot;subscription&quot;;renderTutorDashboard()" style="font-size:10px;background:var(--gold);color:var(--black);border:none;padding:7px 16px;cursor:pointer;">Manage &rarr;</button></div>':'';
+  var signOutBtn='<div style="padding:20px 28px;border-top:1px solid rgba(201,168,76,.08);position:absolute;bottom:0;left:0;right:0"><button onclick="exitDashboard()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(250,249,246,.1);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">&#8592; Sign Out</button></div>';
+  var navHtml=navItems.map(function(n){var active=dashTab===n.id?' active':'';var badge=n.badge?'<span class="dash-nav-badge">'+n.badge+'</span>':'';return '<button class="dash-nav-item'+active+'" onclick="dashTab=&quot;'+n.id+'&quot;;renderTutorDashboard()"><span class="dash-nav-icon">'+n.icon+'</span>'+n.label+badge+'</button>';}).join('');
+  var sidebar='<aside class="dash-sidebar"><div class="dash-sb-profile"><div class="dash-sb-label">Tutor Account</div><div class="dash-sb-user">'+avatarHTML(TUTOR.name,40,'border:1px solid var(--gold)')+'<div><div class="dash-sb-uname">'+TUTOR.name+'</div><div class="dash-sb-role" style="color:var(--gold)">Tutor</div></div></div></div><div class="dash-nav-label">Navigation</div>'+navHtml+signOutBtn+'</aside>';
+  var main='';
+  if(dashTab==='overview'){var nxt=confirmed[0]||tutorSessions[0];var m='<div class="dash-section">'+trialBanner+'<div class="dash-eyebrow">Tutor Dashboard</div><div class="dash-title">Welcome back, <em>'+(TUTOR.name.split(' ')[0]||'Tutor')+'</em></div><div class="ov-grid"><div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">'+confirmed.length+'</div><div class="ov-sub">'+(nxt?'Next: '+nxt.date:'None scheduled')+'</div></div><div class="ov-card"><div class="ov-label">Completed</div><div class="ov-value">'+completedCt+'</div></div><div class="ov-card"><div class="ov-label">Total Earned</div><div class="ov-value gld">R'+totalEarned.toLocaleString()+'</div></div><div class="ov-card"><div class="ov-label">Pending Requests</div><div class="ov-value'+(requests.length?' amb':'')+'">'+requests.length+'</div>'+(requests.length?'<div class="ov-sub clk" onclick="goToRequests()">Review now</div>':'')+'</div></div><div class="sub-hdg">Next Session</div>'+(nxt?'<div class="lesson-list">'+tc(nxt)+'</div>':'<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>')+'</div>';main=m;}
+  if(dashTab==='sessions'){var m='<div class="dash-section"><div class="dash-eyebrow">My Sessions</div><div class="dash-title"><em>Upcoming</em> Sessions</div>'+(confirmed.length>0?'<div class="lesson-list">'+confirmed.map(tc).join('')+'</div>':'<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>')+'<div class="sub-hdg" style="margin-top:16px">Past Sessions</div>'+(tutorPastSessions.length>0?'<div class="lesson-list">'+tutorPastSessions.map(tc).join('')+'</div>':'<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No past sessions yet.</div>')+'</div>';main=m;}
+  if(dashTab==='requests'){var m='<div class="dash-section"><div class="dash-eyebrow">Student Requests</div><div class="dash-title"><em>Pending</em> Requests</div>'+(requests.length>0?'<div class="lesson-list">'+requests.map(function(s){return '<div class="lc lc-pend">'+avatarHTML(s.learner||'Student',44)+'<div class="lc-info"><div class="lc-tutor">'+(s.learner||'Student')+'</div><div class="lc-subj">'+s.subject+'</div></div><div class="lc-right">'+pill(s.status)+'<button class="lc-join" onclick="alert(&quot;Accepted!&quot;)">Accept</button></div></div>';}).join('')+'</div>':'<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No pending requests.</div>')+'</div>';main=m;}
+  if(dashTab==='earnings'){var m='<div class="dash-section"><div class="dash-eyebrow">Finances</div><div class="dash-title">My <em>Earnings</em></div><div class="pay-top"><div class="pay-card"><div class="pay-card-label">Total Earned</div><div class="pay-card-value">R'+totalEarned.toLocaleString()+'</div></div><div class="pay-card"><div class="pay-card-label">Hourly Rate</div><div class="pay-card-value">R'+(TUTOR.rate||0)+'</div></div></div>'+(tutorEarnings.length>0?'<table class="inv-table"><thead><tr><th>Invoice</th><th>Date</th><th>Learner</th><th>Amount</th></tr></thead><tbody>'+tutorEarnings.map(function(e){return '<tr><td>'+e.id+'</td><td>'+e.date+'</td><td>'+e.learner+'</td><td style="color:var(--gold)">R'+e.amount+'</td></tr>';}).join('')+'</tbody></table>':'<div style="padding:32px 0;color:var(--muted);font-size:13px;text-align:center">No earnings yet.</div>')+'</div>';main=m;}
+  if(dashTab==='subscription'){function fmt(d){return d?new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'}):'—';}var statusLabel=TUTOR_SUB.status==='trial'?'Free Trial':TUTOR_SUB.status==='active'?'Active':'Inactive';var m='<div class="dash-section"><div class="dash-eyebrow">Billing</div><div class="dash-title">My <em>Subscription</em></div><div class="pay-top"><div class="pay-card"><div class="pay-card-label">Status</div><div class="pay-card-value" style="font-size:32px">'+statusLabel+'</div></div><div class="pay-card"><div class="pay-card-label">Monthly Fee</div><div class="pay-card-value">R'+SUB_PRICE+'</div></div></div>';if(TUTOR_SUB.status==='trial'){m+='<div style="background:var(--black3);padding:32px;margin-bottom:24px;border:1px solid var(--border)"><div style="font-family:Georgia,serif;font-size:22px;margin-bottom:8px">Trial ends <span style="color:var(--gold)">'+fmt(TUTOR_SUB.trialEnd)+'</span></div><div style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.8">Subscribe to keep your profile live. R'+SUB_PRICE+'/month. Cancel anytime.</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-right:12px">Subscribe Now</button><button onclick="if(confirm(&quot;Cancel trial?&quot;))cancelSubscription()" style="padding:14px 20px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.15);cursor:pointer;">Cancel Trial</button></div>';}if(TUTOR_SUB.status==='cancelled'||TUTOR_SUB.status==='expired'){m+='<div style="background:var(--black3);padding:32px;border:1px solid rgba(224,92,92,.2)"><div style="font-family:Georgia,serif;font-size:26px;margin-bottom:8px;color:var(--red)">Subscription Ended</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Reactivate</button></div>';}m+='</div>';main=m;}
+  if(dashTab==='tprofile'){var m='<div class="dash-section"><div class="dash-eyebrow">Account</div><div class="dash-title">Tutor <em>Profile</em></div><div class="gold-rule"></div><div class="settings-avatar-row">'+avatarHTML(TUTOR.name,72,'border:2px solid var(--gold)')+'<div><div style="font-size:16px;font-weight:600;margin-bottom:4px">'+TUTOR.name+'</div><div style="font-size:12px;color:var(--gold);margin-bottom:4px">'+(TUTOR.subject||'')+'</div></div></div><div class="settings-grid"><div class="setting-group"><label class="setting-label">Full Name</label><input class="setting-input" id="tpName" value="'+TUTOR.name+'"/></div><div class="setting-group"><label class="setting-label">Email</label><input class="setting-input" id="tpEmail" value="'+TUTOR.email+'"/></div><div class="setting-group"><label class="setting-label">Phone</label><input class="setting-input" id="tpPhone" value="'+(TUTOR.phone||'')+'"/></div><div class="setting-group"><label class="setting-label">City</label><input class="setting-input" id="tpCity" value="'+(TUTOR.city||'')+'"/></div></div><div style="display:flex;align-items:center"><button class="settings-save" onclick="saveTutorProfile()">Save Changes</button><span class="save-toast" id="saveToast" style="display:none">&#10003; Saved</span></div></div>';main=m;}
   document.getElementById('app').innerHTML='<div class="dashboard-wrap">'+sidebar+'<main class="dash-main">'+main+'</main></div>';
 }
-
-function renderSubGate() {
-  document.getElementById('app').innerHTML=`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px"><div style="max-width:560px;width:100%;text-align:center"><div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;line-height:1.1;margin-bottom:12px">Start your <em style="color:var(--gold)">free trial</em></div><div style="width:56px;height:1px;background:var(--gold);margin:20px auto 28px"></div><div style="font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:40px">Get <strong style="color:var(--white)">30 days free</strong> then just <strong style="color:var(--gold)">R${SUB_PRICE}/month</strong>. Cancel anytime.</div><button onclick="startTrial()" style="width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:sans-serif;margin-bottom:12px">Start Free 30-Day Trial</button><div style="font-size:11px;color:var(--muted)">No payment required during trial</div></div></div>`;
-}
-
-function renderSubExpired() {
-  document.getElementById('app').innerHTML=`<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px"><div style="max-width:480px;width:100%;text-align:center"><div style="font-family:'Cormorant Garamond',serif;font-size:42px;font-weight:300;margin-bottom:12px">Subscription <em style="color:var(--red)">Expired</em></div><div style="width:56px;height:1px;background:var(--gold);margin:20px auto 28px"></div><button onclick="launchPayFast()" style="width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:sans-serif;margin-bottom:12px">Resubscribe — R${SUB_PRICE}/month</button><button onclick="exitDashboard()" style="width:100%;padding:14px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.12);cursor:pointer;font-family:sans-serif">Back to Website</button></div></div>`;
-}
-
-function saveTutorProfile() {
-  const name=gv('tpName'),email=gv('tpEmail'),phone=gv('tpPhone'),city=gv('tpCity');
-  const pass=document.getElementById('tpPass')?document.getElementById('tpPass').value:'';
-  if(name)TUTOR.name=name; if(email)TUTOR.email=email; if(phone)TUTOR.phone=phone; if(city)TUTOR.city=city;
-  if(pass)TUTOR.password=pass;
-  const nameEl=document.getElementById('dashUnameEl'); if(nameEl) nameEl.textContent=TUTOR.name;
-  showSaveToast();
-}
+function saveTutorProfile(){const name=document.getElementById('tpName')?document.getElementById('tpName').value:'';const email=document.getElementById('tpEmail')?document.getElementById('tpEmail').value:'';const phone=document.getElementById('tpPhone')?document.getElementById('tpPhone').value:'';const city=document.getElementById('tpCity')?document.getElementById('tpCity').value:'';if(name)TUTOR.name=name;if(email)TUTOR.email=email;if(phone)TUTOR.phone=phone;if(city)TUTOR.city=city;const nameEl=document.getElementById('dashUnameEl');if(nameEl)nameEl.textContent=TUTOR.name;showSaveToast();}
 
 // ── INIT ──────────────────────────────────────────────────────────
 loadTutors();
 window._sessionRestoring = restoreSession().then(() => {
   window._sessionRestoring = null;
-  // If session restored and user was in dashboard, go back to dashboard
+  updateNavBtn();
   const wasInDash = getCookie('epiphany_dash');
-  if (wasInDash === 'learner' && isLoggedIn) {
-    enterDashboard();
-  } else if (wasInDash === 'tutor' && tutorLoggedIn) {
-    enterTutorDashboard();
-  } else {
-    render();
-  }
+  if(wasInDash==='learner'&&isLoggedIn){enterDashboard();}
+  else if(wasInDash==='tutor'&&tutorLoggedIn){enterTutorDashboard();}
+  else{render();}
 });
 </script>
 </body>
