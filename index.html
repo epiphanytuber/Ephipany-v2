@@ -566,7 +566,7 @@ let INVOICES = [];
 let DUE_INV = [];
 
 // ── STATE ─────────────────────────────────────────────────────────
-let isLoggedIn = false;
+let isLoggedIn    = false;
 let tutorLoggedIn = false;
 let TUTOR = { name:'', email:'', phone:'', city:'', subject:'', rate:0, bio:'', qual:'', avatar:'', since:'', password:'', airtableId:'' };
 let TUTOR_SUB = { status:'none', trialStart:null, trialEnd:null, subStart:null, nextBilling:null };
@@ -591,11 +591,11 @@ const S = n => `<span class="stars-gold">${'&#9733;'.repeat(Math.floor(n))}${'&#
 const PILL_MAP = { confirmed: 'pill-confirmed', pending: 'pill-pending', completed: 'pill-completed', cancelled: 'pill-cancelled' };
 function pill(s) { return `<span class="lc-pill ${PILL_MAP[s] || ''}">${s}</span>`; }
 
-// ── AVATAR HELPERS ───────────────────────────────────────
+// ── AVATAR HELPERS
 const AVATAR_COLORS=[{bg:'#2D1B69',fg:'#C9A84C'},{bg:'#1B3A2D',fg:'#4caf7d'},{bg:'#3A1B1B',fg:'#e05c5c'},{bg:'#1B2D3A',fg:'#5BA3C9'},{bg:'#2D2D1B',fg:'#C9C44C'},{bg:'#3A1B3A',fg:'#C94CAA'},{bg:'#1B3A3A',fg:'#4CC9C9'},{bg:'#2D1B2D',fg:'#9B4CC9'}];
-function getInitials(name){if(!name)return'??';const p=name.trim().split(' ').filter(x=>x.length>0);if(p.length===1)return p[0].substring(0,2).toUpperCase();return(p[0][0]+p[p.length-1][0]).toUpperCase();}
-function getAvatarColor(name){if(!name)return AVATAR_COLORS[0];let h=0;for(let i=0;i<name.length;i++)h=name.charCodeAt(i)+((h<<5)-h);return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length];}
-function avatarHTML(name,size,style){size=size||40;style=style||'';const i=getInitials(name);const c=getAvatarColor(name);const f=Math.round(size*0.35);return '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+c.bg+';display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:'+f+'px;color:'+c.fg+';letter-spacing:1px;flex-shrink:0;'+style+'">'+i+'</div>';}
+function getInitials(n){if(!n)return'??';var p=n.trim().split(' ').filter(function(x){return x.length>0;});if(p.length===1)return p[0].substring(0,2).toUpperCase();return(p[0][0]+p[p.length-1][0]).toUpperCase();}
+function getAvatarColor(n){if(!n)return AVATAR_COLORS[0];var h=0;for(var i=0;i<n.length;i++)h=n.charCodeAt(i)+((h<<5)-h);return AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length];}
+function avatarHTML(name,size,style){size=size||40;style=style||'';var i=getInitials(name);var c=getAvatarColor(name);var f=Math.round(size*0.35);return '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+c.bg+';display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:'+f+'px;color:'+c.fg+';letter-spacing:1px;flex-shrink:0;'+style+'">'+i+'</div>';}
 
 // ── ROUTING ───────────────────────────────────────────────────────
 function goToCatalogue() {
@@ -605,10 +605,20 @@ function goToCatalogue() {
   navigate('catalogue');
 }
 function updateNavBtn() {
-  const btn=document.getElementById('myAccountBtn');
+  var btn=document.getElementById('myAccountBtn');
   if(!btn)return;
   if(isLoggedIn||tutorLoggedIn){btn.textContent='⬡ Dashboard';btn.style.background='var(--gold)';btn.style.color='var(--black)';}
   else{btn.textContent='My Account';btn.style.background='';btn.style.color='';}
+}
+function goToDashboardAfterReg() {
+  if(isLoggedIn){enterDashboard();return;}
+  if(tutorLoggedIn){enterTutorDashboard();return;}
+  restoreSession().then(function(){if(isLoggedIn)enterDashboard();else if(tutorLoggedIn)enterTutorDashboard();else openAuthModal('signin');});
+}
+function selectTutor(id) {
+  var n=parseInt(id);
+  var t=TUTORS.find(function(x){return x.id===n||x.id===id;});
+  if(t)navigate('profile',t);
 }
 function navigate(p, tutor) {
   page = p;
@@ -630,29 +640,32 @@ function goToDashboardAfterReg() {
 
 async function loadLearnerData() {
   if(!LEARNER.email)return;
-  try {
-    const sData=await apiGet('/sessions?email='+encodeURIComponent(LEARNER.email)+'&type=learner');
+  try{
+    var sData=await apiGet('/sessions?email='+encodeURIComponent(LEARNER.email)+'&type=learner');
     if(sData.sessions){
-      UPCOMING_L=sData.sessions.filter(s=>s.status==='confirmed'||s.status==='pending').map(s=>({id:s.id,tutor:s.tutor_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status}));
-      PAST_L=sData.sessions.filter(s=>s.status==='completed'||s.status==='cancelled').map(s=>({id:s.id,tutor:s.tutor_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status,rated:false,rating:null}));
+      UPCOMING_L=sData.sessions.filter(function(s){return s.status==='confirmed'||s.status==='pending';}).map(function(s){return{id:s.id,tutor:s.tutor_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status};});
+      PAST_L=sData.sessions.filter(function(s){return s.status==='completed'||s.status==='cancelled';}).map(function(s){return{id:s.id,tutor:s.tutor_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status,rated:false,rating:null};});
     }
-    const pData=await apiGet('/payments?email='+encodeURIComponent(LEARNER.email)+'&type=learner');
-    if(pData.payments)INVOICES=pData.payments.filter(p=>p.status==='paid').map(p=>({id:p.invoice_id||p.id,date:p.paid_on||'',tutor:p.tutor_name||'',subject:p.subject,amount:parseFloat(p.amount)||0}));
+    var pData=await apiGet('/payments?email='+encodeURIComponent(LEARNER.email)+'&type=learner');
+    if(pData.payments)INVOICES=pData.payments.filter(function(p){return p.status==='paid';}).map(function(p){return{id:p.invoice_id||p.id,date:p.paid_on||'',tutor:p.tutor_name||'',subject:p.subject,amount:parseFloat(p.amount)||0};});
   }catch(e){console.error('[loadLearnerData]',e);}
 }
 function enterDashboard() {
-  if(window._sessionRestoring){window._sessionRestoring.then(()=>{if(isLoggedIn)enterDashboard();else if(tutorLoggedIn)enterTutorDashboard();else openAuthModal('signin');});return;}
+  if(window._sessionRestoring){
+    window._sessionRestoring.then(function(){if(isLoggedIn)enterDashboard();else if(tutorLoggedIn)enterTutorDashboard();else openAuthModal('signin');});
+    return;
+  }
   if(!isLoggedIn&&!tutorLoggedIn){openAuthModal('signin');return;}
   if(tutorLoggedIn&&!isLoggedIn){enterTutorDashboard();return;}
   document.getElementById('marketNav').style.display='none';
   document.getElementById('dashNav').style.display='flex';
   document.getElementById('siteFooter').style.display='none';
-  const nameEl=document.getElementById('dashUnameEl');if(nameEl)nameEl.textContent=LEARNER.name;
-  const avatarEl=document.getElementById('dashAvatarEl');
-  if(avatarEl){const c=getAvatarColor(LEARNER.name);avatarEl.style.background=c.bg;avatarEl.style.color=c.fg;avatarEl.textContent=getInitials(LEARNER.name);}
+  var nameEl=document.getElementById('dashUnameEl');if(nameEl)nameEl.textContent=LEARNER.name;
+  var avatarEl=document.getElementById('dashAvatarEl');
+  if(avatarEl){var c=getAvatarColor(LEARNER.name);avatarEl.style.background=c.bg;avatarEl.style.color=c.fg;avatarEl.textContent=getInitials(LEARNER.name);}
   dashTab='overview';
   setCookie('epiphany_dash','learner',30);
-  loadLearnerData().then(()=>renderDashboard());
+  loadLearnerData().then(function(){renderDashboard();});
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function exitDashboard() {
@@ -709,8 +722,8 @@ function renderAuthModal() {
 </div>`;
 }
 
-function openForgotPassword(){const m=document.getElementById('authModalMount');if(!m)return;m.innerHTML='<div class="auth-overlay" id="authOverlay" onclick="if(event.target.id===&quot;authOverlay&quot;)closeAuthModal()"><div class="auth-box"><button class="auth-close" onclick="closeAuthModal()">&#10005;</button><div class="auth-logo">Epi<span>phany</span></div><div style="text-align:center;margin-bottom:24px"><div style="font-size:24px;font-weight:300;margin-bottom:6px">Reset Password</div></div><div id="fpError" style="display:none" class="auth-error"></div><div id="fpSuccess" style="display:none;background:rgba(76,175,125,.12);border:1px solid rgba(76,175,125,.3);color:var(--green);font-size:12px;padding:10px 14px;margin-bottom:4px"></div><label class="auth-label">Email Address</label><input class="auth-input" id="fpEmail" type="email" placeholder="your@email.com"/><label class="auth-label">New Password</label><input class="auth-input" id="fpPass" type="password" placeholder="New password"/><label class="auth-label">Confirm Password</label><input class="auth-input" id="fpPass2" type="password" placeholder="Repeat"/><button class="auth-submit" onclick="doResetPassword()">Reset Password</button><div class="auth-switch">Remember it? <span onclick="openAuthModal(&quot;signin&quot;)">Back to Sign In</span></div></div></div>';}
-async function doResetPassword(){const email=document.getElementById('fpEmail')?document.getElementById('fpEmail').value.trim():'';const pass=document.getElementById('fpPass')?document.getElementById('fpPass').value:'';const pass2=document.getElementById('fpPass2')?document.getElementById('fpPass2').value:'';const errEl=document.getElementById('fpError');const sucEl=document.getElementById('fpSuccess');if(!email){errEl.textContent='Enter your email.';errEl.style.display='block';return;}if(!pass||pass.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;}if(pass!==pass2){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}const btn=document.querySelector('.auth-submit');if(btn){btn.textContent='Resetting...';btn.disabled=true;}try{const data=await apiPost('/reset-password',{email,password:pass});if(data.error){errEl.textContent=data.error;errEl.style.display='block';if(btn){btn.textContent='Reset Password';btn.disabled=false;}return;}sucEl.textContent='Password reset! You can now sign in.';sucEl.style.display='block';if(btn)btn.textContent='Done!';setTimeout(()=>openAuthModal('signin'),2000);}catch(e){errEl.textContent='Something went wrong.';errEl.style.display='block';if(btn){btn.textContent='Reset Password';btn.disabled=false;}}}
+function openForgotPassword(){var m=document.getElementById('authModalMount');if(!m)return;m.innerHTML='<div class="auth-overlay" id="authOverlay" onclick="if(event.target.id===&quot;authOverlay&quot;)closeAuthModal()"><div class="auth-box"><button class="auth-close" onclick="closeAuthModal()">&#10005;</button><div class="auth-logo">Epi<span>phany</span></div><div style="text-align:center;margin-bottom:20px"><div style="font-size:22px;font-weight:300;margin-bottom:4px">Reset Password</div><div style="font-size:12px;color:var(--muted)">Enter your email and a new password.</div></div><div id="fpError" class="auth-error" style="display:none"></div><div id="fpSuccess" style="display:none;background:rgba(76,175,125,.12);border:1px solid rgba(76,175,125,.3);color:var(--green);font-size:12px;padding:10px 14px;margin-bottom:4px"></div><label class="auth-label">Email</label><input class="auth-input" id="fpEmail" type="email" placeholder="your@email.com"/><label class="auth-label">New Password</label><input class="auth-input" id="fpPass" type="password" placeholder="Min. 6 characters"/><label class="auth-label">Confirm</label><input class="auth-input" id="fpPass2" type="password" placeholder="Repeat"/><button class="auth-submit" onclick="doResetPassword()">Reset Password</button><div class="auth-switch">Remember it? <span onclick="openAuthModal(&quot;signin&quot;)">Back to Sign In</span></div></div></div>';}
+async function doResetPassword(){var email=document.getElementById('fpEmail')?document.getElementById('fpEmail').value.trim():'';var pass=document.getElementById('fpPass')?document.getElementById('fpPass').value:'';var pass2=document.getElementById('fpPass2')?document.getElementById('fpPass2').value:'';var errEl=document.getElementById('fpError');var sucEl=document.getElementById('fpSuccess');if(!email){errEl.textContent='Enter your email.';errEl.style.display='block';return;}if(!pass||pass.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;}if(pass!==pass2){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}var btn=document.querySelector('.auth-submit');if(btn){btn.textContent='Resetting...';btn.disabled=true;}try{var data=await apiPost('/reset-password',{email:email,password:pass});if(data.error){errEl.textContent=data.error;errEl.style.display='block';if(btn){btn.textContent='Reset Password';btn.disabled=false;}return;}sucEl.textContent='Password reset! You can now sign in.';sucEl.style.display='block';if(btn)btn.textContent='Done!';setTimeout(function(){openAuthModal('signin');},2000);}catch(e){errEl.textContent='Something went wrong.';errEl.style.display='block';if(btn){btn.textContent='Reset Password';btn.disabled=false;}}}
 function goToRegisterFromModal() {
   closeAuthModal();
   regRole = 'learner';
@@ -733,9 +746,7 @@ async function doSignIn() {
       LEARNER.name=u.name||''; LEARNER.email=u.email||'';
       LEARNER.phone=u.phone||''; LEARNER.since=u.since||'';
       isLoggedIn=true;
-      setCookie('epiphany_token', data.token, 30);
-      setCookie('epiphany_type', 'learner', 30);
-      updateNavBtn();closeAuthModal();enterDashboard(); return;
+      setCookie('epiphany_token',data.token,30);setCookie('epiphany_type','learner',30);updateNavBtn();closeAuthModal();enterDashboard();return;
     }
     if (data.type === 'tutor') {
       const t=data.tutor;
@@ -747,9 +758,7 @@ async function doSignIn() {
       TUTOR_SUB={status:sub.status||'none',trialStart:sub.trialStart||null,
                  trialEnd:sub.trialEnd||null,subStart:null,nextBilling:sub.nextBilling||null};
       saveSubState();
-      setCookie('epiphany_token', data.token, 30);
-      setCookie('epiphany_type', 'tutor', 30);
-      updateNavBtn();closeAuthModal();enterTutorDashboard(); return;
+      setCookie('epiphany_token',data.token,30);setCookie('epiphany_type','tutor',30);updateNavBtn();closeAuthModal();enterTutorDashboard();return;
     }
   } catch(e) { authError='Connection error. Please try again.'; renderAuthModal(); }
 }
@@ -987,7 +996,6 @@ async function submitRegistration() {
     // Go straight to dashboard after registration
     regDone = true;
     render();
-    setTimeout(()=>{if(isLoggedIn){updateNavBtn();enterDashboard();}},600);
     // Auto-enter dashboard after short delay to allow render
     setTimeout(() => enterDashboard(), 300);
 
@@ -1036,6 +1044,7 @@ function cancelLesson(id) { cancelledIds.push(id); renderDashboard(); }
 
 // ── DASHBOARD RENDER ──────────────────────────────────────────────
 function renderDashboard() {
+  const isNewUser = UPCOMING_L.length===0&&PAST_L.length===0&&INVOICES.length===0;
   const totalSpent  = INVOICES.reduce((s, i) => s + i.amount, 0);
   const outstanding = DUE_INV.filter(i => !paidIds.includes(i.id));
   const dueTotal    = outstanding.reduce((s, i) => s + i.amount, 0);
@@ -1049,6 +1058,7 @@ function renderDashboard() {
     { id: 'profile',  label: 'Profile Settings',  icon: '&#9673;' },
   ];
 
+  const signOutBtnL = '<div style="padding:20px 28px;border-top:1px solid rgba(201,168,76,.08);position:absolute;bottom:0;left:0;right:0"><button onclick="exitDashboard()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(250,249,246,.1);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">&#8592; Sign Out</button></div>';
   const sidebar = `<aside class="dash-sidebar">
 <div class="dash-sb-profile">
   <div class="dash-sb-label">My Account</div>
@@ -1061,7 +1071,6 @@ ${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' 
   let main = '';
 
   if (dashTab === 'overview') {
-    const isNewUser = UPCOMING_L.length===0&&PAST_L.length===0&&INVOICES.length===0;
     const nxt = UPCOMING_L[0];
     main = `<div class="dash-section">
 <div class="dash-eyebrow">Dashboard</div>
@@ -1206,35 +1215,34 @@ function showSaveToast() {
   if (t) { t.style.display = 'inline-flex'; setTimeout(() => { t.style.display = 'none'; }, 2500); }
 }
 
-function selectTutor(id){const t=TUTORS.find(t=>t.id===id);if(t)navigate('profile',t);}
-
+// ── INIT ──────────────────────────────────────────────────────────
 function subKey(){return 'epiphany_sub_'+TUTOR.email;}
 function saveSubState(){try{localStorage.setItem(subKey(),JSON.stringify(TUTOR_SUB));}catch(e){}}
-function loadSubState(){try{const s=localStorage.getItem(subKey());if(s)TUTOR_SUB=JSON.parse(s);}catch(e){}}
+function loadSubState(){try{var s=localStorage.getItem(subKey());if(s)TUTOR_SUB=JSON.parse(s);}catch(e){}}
 function isSubActive(){if(TUTOR_SUB.status==='active')return true;if(TUTOR_SUB.status==='trial')return new Date()<new Date(TUTOR_SUB.trialEnd);return false;}
 function daysLeft(){if(!TUTOR_SUB.trialEnd)return 0;return Math.max(0,Math.ceil((new Date(TUTOR_SUB.trialEnd)-new Date())/86400000));}
-function startTrial(){const s=new Date(),e=new Date(s);e.setDate(e.getDate()+TRIAL_DAYS);TUTOR_SUB={status:'trial',trialStart:s.toISOString(),trialEnd:e.toISOString(),subStart:null,nextBilling:e.toISOString()};saveSubState();if(TUTOR.airtableId)apiPost('/subscription',{action:'start_trial',tutorId:TUTOR.airtableId});renderTutorDashboard();}
+function startTrial(){var s=new Date(),e=new Date(s);e.setDate(e.getDate()+TRIAL_DAYS);TUTOR_SUB={status:'trial',trialStart:s.toISOString(),trialEnd:e.toISOString(),subStart:null,nextBilling:e.toISOString()};saveSubState();if(TUTOR.airtableId)apiPost('/subscription',{action:'start_trial',tutorId:TUTOR.airtableId});renderTutorDashboard();}
 function cancelSubscription(){TUTOR_SUB.status='cancelled';saveSubState();if(TUTOR.airtableId)apiPost('/subscription',{action:'cancel',tutorId:TUTOR.airtableId});renderTutorDashboard();}
 function goToRequests(){dashTab='requests';renderTutorDashboard();}
 function launchPayFast(){alert('PayFast integration coming soon!');}
+function saveTutorProfile(){var name=document.getElementById('tpName')?document.getElementById('tpName').value:'';var email=document.getElementById('tpEmail')?document.getElementById('tpEmail').value:'';var phone=document.getElementById('tpPhone')?document.getElementById('tpPhone').value:'';var city=document.getElementById('tpCity')?document.getElementById('tpCity').value:'';if(name)TUTOR.name=name;if(email)TUTOR.email=email;if(phone)TUTOR.phone=phone;if(city)TUTOR.city=city;var nameEl=document.getElementById('dashUnameEl');if(nameEl)nameEl.textContent=TUTOR.name;showSaveToast();}
 
-async function loadTutorData(){if(!TUTOR.email)return;try{const r1=await apiGet('/sessions?email='+encodeURIComponent(TUTOR.email)+'&type=tutor');tutorSessions=[];tutorPastSessions=[];if(r1.sessions)r1.sessions.forEach(s=>{const obj={id:s.id,learner:s.learner_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status};if(s.status==='confirmed'||s.status==='pending')tutorSessions.push(obj);else tutorPastSessions.push(obj);});const r2=await apiGet('/payments?email='+encodeURIComponent(TUTOR.email)+'&type=tutor');tutorEarnings=r2.payments?r2.payments.filter(p=>p.status==='paid').map(p=>({id:p.invoice_id||p.id,date:p.paid_on||'',learner:p.learner_name||'',subject:p.subject,amount:parseFloat(p.amount)||0})):[];}catch(e){console.error('[loadTutorData]',e);}}
+async function loadTutorData(){if(!TUTOR.email)return;try{var r1=await apiGet('/sessions?email='+encodeURIComponent(TUTOR.email)+'&type=tutor');tutorSessions=[];tutorPastSessions=[];if(r1.sessions)r1.sessions.forEach(function(s){var obj={id:s.id,learner:s.learner_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status};if(s.status==='confirmed'||s.status==='pending')tutorSessions.push(obj);else tutorPastSessions.push(obj);});var r2=await apiGet('/payments?email='+encodeURIComponent(TUTOR.email)+'&type=tutor');tutorEarnings=r2.payments?r2.payments.filter(function(p){return p.status==='paid';}).map(function(p){return{id:p.invoice_id||p.id,date:p.paid_on||'',learner:p.learner_name||'',subject:p.subject,amount:parseFloat(p.amount)||0};}):[];}catch(e){console.error('[loadTutorData]',e);}}
 
-function enterTutorDashboard(){document.getElementById('marketNav').style.display='none';document.getElementById('dashNav').style.display='flex';document.getElementById('siteFooter').style.display='none';const nameEl=document.getElementById('dashUnameEl');if(nameEl)nameEl.textContent=TUTOR.name;dashTab='overview';setCookie('epiphany_dash','tutor',30);loadTutorData().then(()=>renderTutorDashboard());window.scrollTo({top:0,behavior:'smooth'});}
+function enterTutorDashboard(){document.getElementById('marketNav').style.display='none';document.getElementById('dashNav').style.display='flex';document.getElementById('siteFooter').style.display='none';var nameEl=document.getElementById('dashUnameEl');if(nameEl)nameEl.textContent=TUTOR.name;dashTab='overview';setCookie('epiphany_dash','tutor',30);loadTutorData().then(function(){renderTutorDashboard();});window.scrollTo({top:0,behavior:'smooth'});}
 
 function renderSubGate(){document.getElementById('app').innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px"><div style="max-width:560px;width:100%;text-align:center"><div style="font-family:Cormorant Garamond,serif;font-size:48px;font-weight:300;margin-bottom:12px">Start your <em style="color:var(--gold)">free trial</em></div><div style="width:56px;height:1px;background:var(--gold);margin:20px auto 28px"></div><div style="font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:40px">Get <strong style="color:var(--white)">30 days free</strong> then just <strong style="color:var(--gold)">R'+SUB_PRICE+'/month</strong>. Cancel anytime.</div><button onclick="startTrial()" style="width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-bottom:12px">Start Free 30-Day Trial</button></div></div>';}
 function renderSubExpired(){document.getElementById('app').innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px"><div style="max-width:480px;width:100%;text-align:center"><div style="font-family:Cormorant Garamond,serif;font-size:42px;font-weight:300;margin-bottom:12px">Subscription <em style="color:var(--red)">Expired</em></div><button onclick="launchPayFast()" style="width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-bottom:12px">Resubscribe</button><button onclick="exitDashboard()" style="width:100%;padding:14px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.12);cursor:pointer;">Back to Website</button></div></div>';}
 
 function renderTutorDashboard(){
-  // KEY FIX: Only load from localStorage if TUTOR_SUB not already set from API
   if(TUTOR_SUB.status==='none')loadSubState();
   if(TUTOR_SUB.status==='none'){renderSubGate();return;}
   if(!isSubActive()&&TUTOR_SUB.status!=='active'){renderSubExpired();return;}
-  const totalEarned=tutorEarnings.reduce((s,e)=>s+e.amount,0);
-  const requests=tutorSessions.filter(s=>s.status==='pending');
-  const confirmed=tutorSessions.filter(s=>s.status==='confirmed');
-  const completedCt=tutorPastSessions.filter(s=>s.status==='completed').length;
-  const navItems=[{id:'overview',label:'Overview',icon:'&#9672;'},{id:'sessions',label:'My Sessions',icon:'&#9719;',badge:confirmed.length||null},{id:'requests',label:'Student Requests',icon:'&#9681;',badge:requests.length||null},{id:'earnings',label:'Earnings',icon:'&#9678;'},{id:'subscription',label:'Subscription',icon:'&#9670;'},{id:'tprofile',label:'Profile Settings',icon:'&#9673;'}];
+  var totalEarned=tutorEarnings.reduce(function(s,e){return s+e.amount;},0);
+  var requests=tutorSessions.filter(function(s){return s.status==='pending';});
+  var confirmed=tutorSessions.filter(function(s){return s.status==='confirmed';});
+  var completedCt=tutorPastSessions.filter(function(s){return s.status==='completed';}).length;
+  var navItems=[{id:'overview',label:'Overview',icon:'&#9672;'},{id:'sessions',label:'My Sessions',icon:'&#9719;',badge:confirmed.length||null},{id:'requests',label:'Student Requests',icon:'&#9681;',badge:requests.length||null},{id:'earnings',label:'Earnings',icon:'&#9678;'},{id:'subscription',label:'Subscription',icon:'&#9670;'},{id:'tprofile',label:'Profile Settings',icon:'&#9673;'}];
   function tc(s){var cls=s.status==='confirmed'?'lc-up':s.status==='pending'?'lc-pend':'lc-can';return '<div class="lc '+cls+'">'+avatarHTML(s.learner||'Student',44)+'<div class="lc-info"><div class="lc-tutor">'+(s.learner||'Student')+'</div><div class="lc-subj">'+s.subject+'</div><div class="lc-meta"><span class="lc-date">'+s.date+' &middot; '+s.time+'</span><span class="lc-mode">'+s.mode+'</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R'+s.rate+'</span>'+pill(s.status)+'</div></div>';}
   var dl=daysLeft();
   var trialBanner=TUTOR_SUB.status==='trial'?'<div style="background:rgba(201,168,76,.12);border:1px solid var(--gold);padding:14px 20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;color:var(--gold)">&#9670; Free trial &mdash; <strong>'+dl+' day'+(dl!==1?'s':'')+' remaining</strong></span><button onclick="dashTab=&quot;subscription&quot;;renderTutorDashboard()" style="font-size:10px;background:var(--gold);color:var(--black);border:none;padding:7px 16px;cursor:pointer;">Manage &rarr;</button></div>':'';
@@ -1246,18 +1254,16 @@ function renderTutorDashboard(){
   if(dashTab==='sessions'){var m='<div class="dash-section"><div class="dash-eyebrow">My Sessions</div><div class="dash-title"><em>Upcoming</em> Sessions</div>'+(confirmed.length>0?'<div class="lesson-list">'+confirmed.map(tc).join('')+'</div>':'<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>')+'<div class="sub-hdg" style="margin-top:16px">Past Sessions</div>'+(tutorPastSessions.length>0?'<div class="lesson-list">'+tutorPastSessions.map(tc).join('')+'</div>':'<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No past sessions yet.</div>')+'</div>';main=m;}
   if(dashTab==='requests'){var m='<div class="dash-section"><div class="dash-eyebrow">Student Requests</div><div class="dash-title"><em>Pending</em> Requests</div>'+(requests.length>0?'<div class="lesson-list">'+requests.map(function(s){return '<div class="lc lc-pend">'+avatarHTML(s.learner||'Student',44)+'<div class="lc-info"><div class="lc-tutor">'+(s.learner||'Student')+'</div><div class="lc-subj">'+s.subject+'</div></div><div class="lc-right">'+pill(s.status)+'<button class="lc-join" onclick="alert(&quot;Accepted!&quot;)">Accept</button></div></div>';}).join('')+'</div>':'<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No pending requests.</div>')+'</div>';main=m;}
   if(dashTab==='earnings'){var m='<div class="dash-section"><div class="dash-eyebrow">Finances</div><div class="dash-title">My <em>Earnings</em></div><div class="pay-top"><div class="pay-card"><div class="pay-card-label">Total Earned</div><div class="pay-card-value">R'+totalEarned.toLocaleString()+'</div></div><div class="pay-card"><div class="pay-card-label">Hourly Rate</div><div class="pay-card-value">R'+(TUTOR.rate||0)+'</div></div></div>'+(tutorEarnings.length>0?'<table class="inv-table"><thead><tr><th>Invoice</th><th>Date</th><th>Learner</th><th>Amount</th></tr></thead><tbody>'+tutorEarnings.map(function(e){return '<tr><td>'+e.id+'</td><td>'+e.date+'</td><td>'+e.learner+'</td><td style="color:var(--gold)">R'+e.amount+'</td></tr>';}).join('')+'</tbody></table>':'<div style="padding:32px 0;color:var(--muted);font-size:13px;text-align:center">No earnings yet.</div>')+'</div>';main=m;}
-  if(dashTab==='subscription'){function fmt(d){return d?new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'}):'—';}var statusLabel=TUTOR_SUB.status==='trial'?'Free Trial':TUTOR_SUB.status==='active'?'Active':'Inactive';var m='<div class="dash-section"><div class="dash-eyebrow">Billing</div><div class="dash-title">My <em>Subscription</em></div><div class="pay-top"><div class="pay-card"><div class="pay-card-label">Status</div><div class="pay-card-value" style="font-size:32px">'+statusLabel+'</div></div><div class="pay-card"><div class="pay-card-label">Monthly Fee</div><div class="pay-card-value">R'+SUB_PRICE+'</div></div></div>';if(TUTOR_SUB.status==='trial'){m+='<div style="background:var(--black3);padding:32px;margin-bottom:24px;border:1px solid var(--border)"><div style="font-family:Georgia,serif;font-size:22px;margin-bottom:8px">Trial ends <span style="color:var(--gold)">'+fmt(TUTOR_SUB.trialEnd)+'</span></div><div style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.8">Subscribe to keep your profile live. R'+SUB_PRICE+'/month. Cancel anytime.</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-right:12px">Subscribe Now</button><button onclick="if(confirm(&quot;Cancel trial?&quot;))cancelSubscription()" style="padding:14px 20px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.15);cursor:pointer;">Cancel Trial</button></div>';}if(TUTOR_SUB.status==='cancelled'||TUTOR_SUB.status==='expired'){m+='<div style="background:var(--black3);padding:32px;border:1px solid rgba(224,92,92,.2)"><div style="font-family:Georgia,serif;font-size:26px;margin-bottom:8px;color:var(--red)">Subscription Ended</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Reactivate</button></div>';}m+='</div>';main=m;}
+  if(dashTab==='subscription'){function fmt(d){return d?new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'}):'—';}var sl=TUTOR_SUB.status==='trial'?'Free Trial — '+dl+' day'+(dl!==1?'s':'')+' remaining':TUTOR_SUB.status==='active'?'Active':'Inactive';var m='<div class="dash-section"><div class="dash-eyebrow">Billing</div><div class="dash-title">My <em>Subscription</em></div><div class="pay-top"><div class="pay-card"><div class="pay-card-label">Status</div><div class="pay-card-value" style="font-size:28px">'+(TUTOR_SUB.status==='trial'?'Free Trial':TUTOR_SUB.status==='active'?'Active':'Inactive')+'</div><div class="pay-card-sub">'+sl+'</div></div><div class="pay-card"><div class="pay-card-label">Monthly Fee</div><div class="pay-card-value">R'+SUB_PRICE+'</div><div class="pay-card-sub">after free trial</div></div></div>';if(TUTOR_SUB.status==='trial'){m+='<div style="background:var(--black3);padding:32px;margin-bottom:24px;border:1px solid var(--border)"><div style="font-family:Georgia,serif;font-size:22px;margin-bottom:8px">Trial ends <span style="color:var(--gold)">'+fmt(TUTOR_SUB.trialEnd)+'</span></div><div style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.8">Subscribe to keep your profile live. R'+SUB_PRICE+'/month. Cancel anytime.</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-right:12px">Subscribe Now</button><button onclick="if(confirm(&quot;Cancel trial?&quot;))cancelSubscription()" style="padding:14px 20px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.15);cursor:pointer;">Cancel Trial</button></div>';}if(TUTOR_SUB.status==='cancelled'||TUTOR_SUB.status==='expired'){m+='<div style="background:var(--black3);padding:32px;border:1px solid rgba(224,92,92,.2)"><div style="font-family:Georgia,serif;font-size:22px;margin-bottom:8px;color:var(--red)">Subscription Ended</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Reactivate</button></div>';}m+='</div>';main=m;}
   if(dashTab==='tprofile'){var m='<div class="dash-section"><div class="dash-eyebrow">Account</div><div class="dash-title">Tutor <em>Profile</em></div><div class="gold-rule"></div><div class="settings-avatar-row">'+avatarHTML(TUTOR.name,72,'border:2px solid var(--gold)')+'<div><div style="font-size:16px;font-weight:600;margin-bottom:4px">'+TUTOR.name+'</div><div style="font-size:12px;color:var(--gold);margin-bottom:4px">'+(TUTOR.subject||'')+'</div></div></div><div class="settings-grid"><div class="setting-group"><label class="setting-label">Full Name</label><input class="setting-input" id="tpName" value="'+TUTOR.name+'"/></div><div class="setting-group"><label class="setting-label">Email</label><input class="setting-input" id="tpEmail" value="'+TUTOR.email+'"/></div><div class="setting-group"><label class="setting-label">Phone</label><input class="setting-input" id="tpPhone" value="'+(TUTOR.phone||'')+'"/></div><div class="setting-group"><label class="setting-label">City</label><input class="setting-input" id="tpCity" value="'+(TUTOR.city||'')+'"/></div></div><div style="display:flex;align-items:center"><button class="settings-save" onclick="saveTutorProfile()">Save Changes</button><span class="save-toast" id="saveToast" style="display:none">&#10003; Saved</span></div></div>';main=m;}
   document.getElementById('app').innerHTML='<div class="dashboard-wrap">'+sidebar+'<main class="dash-main">'+main+'</main></div>';
 }
-function saveTutorProfile(){const name=document.getElementById('tpName')?document.getElementById('tpName').value:'';const email=document.getElementById('tpEmail')?document.getElementById('tpEmail').value:'';const phone=document.getElementById('tpPhone')?document.getElementById('tpPhone').value:'';const city=document.getElementById('tpCity')?document.getElementById('tpCity').value:'';if(name)TUTOR.name=name;if(email)TUTOR.email=email;if(phone)TUTOR.phone=phone;if(city)TUTOR.city=city;const nameEl=document.getElementById('dashUnameEl');if(nameEl)nameEl.textContent=TUTOR.name;showSaveToast();}
 
-// ── INIT ──────────────────────────────────────────────────────────
 loadTutors();
-window._sessionRestoring = restoreSession().then(() => {
+window._sessionRestoring = restoreSession().then(function() {
   window._sessionRestoring = null;
   updateNavBtn();
-  const wasInDash = getCookie('epiphany_dash');
+  var wasInDash = getCookie('epiphany_dash');
   if(wasInDash==='learner'&&isLoggedIn){enterDashboard();}
   else if(wasInDash==='tutor'&&tutorLoggedIn){enterTutorDashboard();}
   else{render();}
