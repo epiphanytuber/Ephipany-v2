@@ -774,7 +774,7 @@ function render() {
 }
 
 function renderHome() {
-  if (!TUTORS_LOADED) loadTutors().then(() => render());
+  if (!TUTORS_LOADED) { loadTutors().then(() => render()); }
   const feat = TUTORS.slice(0, 4);
   return `<div class="page">
 <section class="hero"><div class="hero-bg"></div><div class="hero-bg-text">EPIPHANY</div>
@@ -784,10 +784,10 @@ function renderHome() {
   <p class="hero-sub">Connect with South Africa's finest educators. Expert tutors, flexible scheduling, and transformative results &mdash; all in one place.</p>
   <div class="hero-actions"><button class="btn-gold" onclick="navigate('catalogue')">Browse Tutors</button><button class="btn-ghost" onclick="navigate('register')">Become a Tutor</button></div>
   <div class="hero-stats">
-    <div><div class="stat-n">240+</div><div class="stat-l">Expert Tutors</div></div>
-    <div><div class="stat-n">4,800+</div><div class="stat-l">Sessions Booked</div></div>
+    <div><div class="stat-n">${TUTORS.length||0}</div><div class="stat-l">Expert Tutors</div></div>
+    <div><div class="stat-n">${TUTORS.reduce(function(s,t){return s+(t.sessions||0);},0)||0}</div><div class="stat-l">Sessions Booked</div></div>
     <div><div class="stat-n">98%</div><div class="stat-l">Satisfaction Rate</div></div>
-    <div><div class="stat-n">9+</div><div class="stat-l">Subjects</div></div>
+    <div><div class="stat-n">${[...new Set(TUTORS.flatMap(function(t){return t.subjects;}))].length||0}</div><div class="stat-l">Subjects</div></div>
   </div>
 </div></section>
 <section class="featured-strip">
