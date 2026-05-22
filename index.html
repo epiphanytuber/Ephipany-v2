@@ -403,7 +403,7 @@ body{background:var(--black);color:var(--white);font-family:'Nunito Sans',sans-s
     <button class="nav-link"        id="nl-catalogue" onclick="navigate('catalogue')">Find a Tutor</button>
     <button class="nav-link"        id="nl-register"  onclick="navigate('register')">Become a Tutor</button>
     <button class="nav-cta"                           onclick="navigate('register')">Register</button>
-    <button class="nav-cta filled"                    id="myAccountBtn" onclick="enterDashboard()">My Account</button>
+    <button class="nav-cta filled"                    id="myAccountBtn" onclick="handleAccountClick()">My Account</button>
   </div>
 </nav>
 
@@ -591,6 +591,37 @@ const S = n => `<span class="stars-gold">${'&#9733;'.repeat(Math.floor(n))}${'&#
 const PILL_MAP = { confirmed: 'pill-confirmed', pending: 'pill-pending', completed: 'pill-completed', cancelled: 'pill-cancelled' };
 function pill(s) { return `<span class="lc-pill ${PILL_MAP[s] || ''}">${s}</span>`; }
 
+// ── ACCOUNT CLICK HANDLER (bulletproof) ──────────────────────────
+function handleAccountClick() {
+  // If logged in as learner → show learner dashboard
+  if (isLoggedIn) {
+    document.getElementById('marketNav').style.display = 'none';
+    document.getElementById('dashNav').style.display = 'flex';
+    document.getElementById('siteFooter').style.display = 'none';
+    var nameEl = document.getElementById('dashUnameEl');
+    if (nameEl) nameEl.textContent = LEARNER.name;
+    var avatarEl = document.getElementById('dashAvatarEl');
+    if (avatarEl) {
+      var c = getAvatarColor(LEARNER.name);
+      avatarEl.style.background = c.bg;
+      avatarEl.style.color = c.fg;
+      avatarEl.textContent = getInitials(LEARNER.name);
+    }
+    dashTab = 'overview';
+    setCookie('epiphany_dash', 'learner', 30);
+    loadLearnerData().then(function() { renderDashboard(); });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  // If logged in as tutor → show tutor dashboard
+  if (tutorLoggedIn) {
+    enterTutorDashboard();
+    return;
+  }
+  // Not logged in → show sign in modal
+  openAuthModal('signin');
+}
+
 // ── AVATAR HELPERS
 const AVATAR_COLORS=[{bg:'#2D1B69',fg:'#C9A84C'},{bg:'#1B3A2D',fg:'#4caf7d'},{bg:'#3A1B1B',fg:'#e05c5c'},{bg:'#1B2D3A',fg:'#5BA3C9'},{bg:'#2D2D1B',fg:'#C9C44C'},{bg:'#3A1B3A',fg:'#C94CAA'},{bg:'#1B3A3A',fg:'#4CC9C9'},{bg:'#2D1B2D',fg:'#9B4CC9'}];
 function getInitials(n){if(!n)return'??';var p=n.trim().split(' ').filter(function(x){return x.length>0;});if(p.length===1)return p[0].substring(0,2).toUpperCase();return(p[0][0]+p[p.length-1][0]).toUpperCase();}
@@ -663,6 +694,7 @@ function enterDashboard() {
   var nameEl=document.getElementById('dashUnameEl');if(nameEl)nameEl.textContent=LEARNER.name;
   var avatarEl=document.getElementById('dashAvatarEl');
   if(avatarEl){var c=getAvatarColor(LEARNER.name);avatarEl.style.background=c.bg;avatarEl.style.color=c.fg;avatarEl.textContent=getInitials(LEARNER.name);}
+  page = 'home'; // prevent render() from overwriting dashboard
   dashTab='overview';
   setCookie('epiphany_dash','learner',30);
   loadLearnerData().then(function(){renderDashboard();});
