@@ -1,6 +1,5 @@
 // api/tutors.js
-// GET /api/tutors — only returns tutors with status = 'Comfirmed' AND active subscription
-import { query, col, ok, err, cors, hashPassword } from './_db.js';
+import { query, col, ok, err, cors } from './_db.js';
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;
@@ -11,7 +10,7 @@ export default async function handler(req, res) {
       SELECT t.id, t.full_name, t.city, t.teaching_mode, t.primary_subject,
              t.grade_level, t.hourly_rate, t.qualification, t.availability,
              t.bio, t.photo_url, t.rating, t.reviews_count, t.sessions_count,
-             t.applied_on, s.status as sub_status
+             s.status as sub_status
       FROM epiphany.main.tutors t
       LEFT JOIN epiphany.main.subscriptions s ON s.tutor_id = t.id
       WHERE t.status = 'Comfirmed'
@@ -27,9 +26,8 @@ export default async function handler(req, res) {
         .filter(d=>['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].includes(d));
       return {
         id:            i + 1,
-        dbId:          String(col(t,'id')||''),
         name,
-        photo:         col(t,'photo_url') || '',  // empty = frontend generates avatar
+        photo:         col(t,'photo_url') || '',
         subjects:      (col(t,'primary_subject')||'General').split(',').map(s=>s.trim()),
         grade:         col(t,'grade_level') || 'All grades',
         bio:           col(t,'bio') || 'Experienced educator passionate about student success.',
@@ -45,13 +43,12 @@ export default async function handler(req, res) {
         languages:     ['English'],
         qualifications:(col(t,'qualification')||'').split(',').map(q=>q.trim()).filter(Boolean),
         testimonials:  [],
-        subStatus:     col(t,'sub_status') || 'none',
       };
     });
 
     return ok(res, { success: true, tutors });
   } catch(e) {
     console.error('[tutors]', e.message);
-    return err(res, 'Failed to load tutors', 500);
+    return err(res, 'Failed to load tutors: ' + e.message, 500);
   }
 }
