@@ -459,8 +459,6 @@ async function apiGet(endpoint) {
     return await res.json();
   } catch(e) { console.error(`[API] ${endpoint}:`, e); return { error: 'Network error' }; }
 }
-async function atPush() { return null; }
-
 // ── SESSION HELPERS ──────────────────────────────────────────────
 function genToken() {
   return 'tok_' + Math.random().toString(36).substr(2,9) + '_' + Date.now();
@@ -509,34 +507,7 @@ async function restoreSession() {
 let TUTORS = [];
 let TUTORS_LOADED = false;
 
-function airtableToTutor(r, idx) {
-  const f = r.fields;
-  const modeRaw = f['Teaching Mode'] || 'Online';
-  const mode = modeRaw === 'Both' ? ['In-Person','Online'] : [modeRaw];
-  const avail = (f['Availability'] || '').split(',').map(d => d.trim()).filter(d => ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].includes(d));
-  return {
-    id:             idx + 1,
-    airtableId:     r.id,
-    name:           f['Full Name'] || '',
-    photo:          f['Photo URL'] || `https://i.pravatar.cc/400?img=${(idx % 70) + 1}`,
-    subjects:       (f['Primary Subject'] || 'General').split(',').map(s => s.trim()),
-    grade:          f['Grade Level'] || 'All grades',
-    bio:            f['Bio'] || 'Experienced educator passionate about student success.',
-    longBio:        f['Bio'] || 'Experienced educator passionate about student success.',
-    rate:           f['Hourly Rate'] || 0,
-    rating:         parseFloat(f['Rating'] || '4.8'),
-    reviews:        parseInt(f['Reviews'] || '0'),
-    sessions:       parseInt(f['Sessions'] || '0'),
-    availability:   avail.length ? avail : ['Mon','Wed','Fri'],
-    location:       f['City'] || 'South Africa',
-    mode:           mode,
-    badge:          f['Badge'] || null,
-    languages:      ['English'],
-    qualifications: (f['Qualification'] || '').split(',').map(q => q.trim()).filter(Boolean),
-    testimonials:   [],
-    email:          f['Email'] || '',
-  };
-}
+// Tutors loaded from MotherDuck via /api/tutors
 
 async function loadTutors() {
   if (TUTORS_LOADED) return;
@@ -824,7 +795,7 @@ function renderHome() {
 </div></section>
 <section class="featured-strip">
   <div class="strip-header"><div><div class="eyebrow">Featured Educators</div><div class="section-title">Meet our <em>top rated</em> tutors</div></div><button class="btn-ghost" onclick="navigate('catalogue')">View All Tutors &rarr;</button></div>
-  <div class="strip-grid">${feat.map(t => `<div class="strip-card" onclick="selectTutor(${t.id})"><img src="${t.photo}" alt="${t.name}" loading="lazy"/><div class="strip-card-overlay"></div><div class="strip-card-body">${t.badge ? `<div class="strip-card-badge"><span class="badge">${t.badge}</span></div>` : ''}<div class="strip-card-name">${t.name}</div><div class="strip-card-sub">${t.subjects[0]}</div></div></div>`).join('')}</div>
+  <div class="strip-grid">${feat.map(t => `<div class="strip-card" onclick="selectTutor(${t.id})">${(t.photo && t.photo !== '') ? `<img src="${t.photo}" alt="${t.name}" loading="lazy"/>` : `<div style="width:100%;height:100%;background:${getAvatarColor(t.name).bg};display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:72px;color:${getAvatarColor(t.name).fg}">${getInitials(t.name)}</div>`}<div class="strip-card-overlay"></div><div class="strip-card-body">${t.badge ? `<div class="strip-card-badge"><span class="badge">${t.badge}</span></div>` : ''}<div class="strip-card-name">${t.name}</div><div class="strip-card-sub">${t.subjects[0]}</div></div></div>`).join('')}</div>
 </section>
 <section class="how-section">
   <div class="eyebrow">How It Works</div><div class="section-title">Simple. <em>Seamless.</em> Effective.</div>
@@ -856,7 +827,7 @@ function renderCatalogue() {
   <div class="filter-group"><div class="filter-label">Location</div><select class="filter-select" onchange="catLocation=this.value;render()">${LOCATIONS.map(l => `<option${l === catLocation ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
   <div class="filter-group"><div class="filter-label">Mode</div><select class="filter-select" onchange="catMode=this.value;render()">${MODES.map(m => `<option${m === catMode ? ' selected' : ''}>${m}</option>`).join('')}</select></div>
 </div>
-<div class="catalogue-body"><div class="tutor-grid">${filtered.length === 0 ? '<div class="no-results">No tutors match your search criteria.</div>' : filtered.map(t => `<div class="t-card" onclick="selectTutor(${t.id})"><div class="t-card-img-wrap"><img src="${t.photo}" alt="${t.name}" class="t-card-img" loading="lazy"/><div class="t-card-overlay"></div><div class="t-card-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="t-card-mode">${m}</span>`).join('')}</div></div><div class="t-card-body"><div class="t-card-name">${t.name}</div><div class="t-card-location">&#128205; ${t.location} &middot; ${t.grade}</div><div class="t-card-subjects">${t.subjects.slice(0,3).map(s => `<span class="t-card-subj">${s}</span>`).join('')}</div><div class="t-card-bio">${t.bio}</div><div class="t-card-footer"><div class="t-card-rate">R${t.rate}/hr</div><div class="t-card-rating">${S(t.rating)}<span class="rating-num">${t.rating} (${t.reviews})</span></div></div></div></div>`).join('')}</div></div>
+<div class="catalogue-body"><div class="tutor-grid">${filtered.length === 0 ? '<div class="no-results">No tutors match your search criteria.</div>' : filtered.map(t => `<div class="t-card" onclick="selectTutor(${t.id})"><div class="t-card-img-wrap">${(t.photo && t.photo !== '') ? `<img src="${t.photo}" alt="${t.name}" class="t-card-img" loading="lazy"/>` : `<div style="width:100%;height:100%;background:${getAvatarColor(t.name).bg};display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:80px;color:${getAvatarColor(t.name).fg}">${getInitials(t.name)}</div>`}<div class="t-card-overlay"></div><div class="t-card-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="t-card-mode">${m}</span>`).join('')}</div></div><div class="t-card-body"><div class="t-card-name">${t.name}</div><div class="t-card-location">&#128205; ${t.location} &middot; ${t.grade}</div><div class="t-card-subjects">${t.subjects.slice(0,3).map(s => `<span class="t-card-subj">${s}</span>`).join('')}</div><div class="t-card-bio">${t.bio}</div><div class="t-card-footer"><div class="t-card-rate">R${t.rate}/hr</div><div class="t-card-rating">${S(t.rating)}<span class="rating-num">${t.rating} (${t.reviews})</span></div></div></div></div>`).join('')}</div></div>
 </div>`;
 }
 
@@ -875,7 +846,7 @@ ${selDay ? `<div class="bc-label">Select Time</div><div class="bc-times">${TIMES
 <button class="bc-confirm" id="bookBtn" ${selDay && selTime && bcName.trim() && bcEmail.trim() ? '' : 'disabled'} onclick="confirmBooking()">Confirm Booking</button>`;
   return `<div class="page profile-page">
 <div class="profile-hero">
-  <div class="profile-hero-img"><img src="${t.photo}" alt="${t.name}"/></div>
+  <div class="profile-hero-img">${(t.photo && t.photo !== '') ? `<img src="${t.photo}" alt="${t.name}"/>` : `<div style="width:100%;height:100%;background:${getAvatarColor(t.name).bg};display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:140px;color:${getAvatarColor(t.name).fg}">${getInitials(t.name)}</div>`}</div>
   <div class="profile-hero-content">
     <button class="profile-back" onclick="navigate('catalogue')">&larr; Back to Catalogue</button>
     <div class="profile-badges">${t.badge ? `<span class="badge">${t.badge}</span>` : ''}${t.mode.map(m => `<span class="badge expert">${m}</span>`).join('')}</div>
