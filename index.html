@@ -834,7 +834,7 @@ function renderCatalogue() {
 function renderProfile() {
   const t = activeTutor; if (!t) return '';
   const panel = bookingDone
-    ? `<div class="booking-success-card"><div class="bsc-icon">&#10022;</div><div class="bsc-title">Booking Confirmed</div><div class="bsc-text">Your session with <strong style="color:var(--gold)">${t.name}</strong> is set for <strong style="color:var(--gold)">${selDay}</strong> at <strong style="color:var(--gold)">${selTime}</strong>.<br/><br/>A confirmation has been sent to <strong style="color:var(--gold)">${bcEmail}</strong>.<br/><br/><button onclick="isLoggedIn?enterDashboard():openAuthModal('signin')" style="margin-top:12px;padding:10px 22px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif">View in Dashboard &rarr;</button></div></div>`
+    ? `<div class="booking-success-card"><div class="bsc-icon">&#10022;</div><div class="bsc-title">Booking Confirmed</div><div class="bsc-text">Your session with <strong style="color:var(--gold)">${t.name}</strong> is set for <strong style="color:var(--gold)">${selDay}</strong> at <strong style="color:var(--gold)">${selTime}</strong>.<br/><br/>A confirmation has been sent to <strong style="color:var(--gold)">${bcEmail}</strong>.<br/><br/><button onclick="handleAccountClick()" style="margin-top:12px;padding:10px 22px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif">View in Dashboard &rarr;</button></div></div>`
     : `<div class="booking-card-title">Book a Session</div><div class="booking-card-sub">with ${t.name.split(' ')[0]}</div>
 <div class="bc-label">Select Day</div>
 <div class="bc-days">${DAYS.map(d => { const a = t.availability.includes(d); return `<div class="bc-day${!a ? '' : selDay === d ? ' sel' : ' avail'}"${a ? ` onclick="pickDay('${d}')"` : ''}>${d}</div>`; }).join('')}</div>
@@ -909,7 +909,21 @@ function confirmBooking() {
   });
 
   // Push to Airtable
-  apiPost('/sessions',{learnerName:bcName.trim(),learnerEmail:bcEmail.trim(),tutorName:t.name,subject:t.subjects[0],day:selDay,time:selTime,rate:t.rate,mode:t.mode[0]});
+  // Save session to MotherDuck
+  apiPost('/sessions',{
+    learnerName:bcName.trim(),
+    learnerEmail:bcEmail.trim(),
+    tutorName:t.name,
+    tutorEmail:t.email||'',
+    subject:t.subjects[0],
+    day:selDay,
+    time:selTime,
+    rate:t.rate,
+    mode:t.mode[0]
+  }).then(function(r){
+    if(r && r.error) console.error('[booking] session save failed:',r.error);
+    else console.log('[booking] session saved');
+  });
 
   render();
 }
