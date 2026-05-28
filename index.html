@@ -485,7 +485,9 @@ async function restoreSession() {
       const u=data.user;
       LEARNER.name=u.name||''; LEARNER.email=u.email||'';
       LEARNER.phone=u.phone||''; LEARNER.since=u.since||'';
-      isLoggedIn=true; console.log('[Session] Learner restored:',LEARNER.name); updateNavBtn();
+      isLoggedIn=true;
+      updateNavBtn();
+      console.log('[Session] Learner restored:',LEARNER.name);
     } else if (data.type==='tutor'&&data.tutor) {
       const t=data.tutor;
       TUTOR.name=t.name||''; TUTOR.email=t.email||''; TUTOR.phone=t.phone||'';
@@ -564,12 +566,11 @@ function pill(s) { return `<span class="lc-pill ${PILL_MAP[s] || ''}">${s}</span
 
 // ── ACCOUNT CLICK HANDLER (bulletproof) ──────────────────────────
 function handleAccountClick() {
-  // Wait for session restore if still in progress
+  // Always wait for session restore first
   if (window._sessionRestoring) {
     window._sessionRestoring.then(function() { handleAccountClick(); });
     return;
   }
-  // If logged in as learner → show learner dashboard
   if (isLoggedIn) {
     document.getElementById('marketNav').style.display = 'none';
     document.getElementById('dashNav').style.display = 'flex';
@@ -605,6 +606,25 @@ function getAvatarColor(n){if(!n)return AVATAR_COLORS[0];var h=0;for(var i=0;i<n
 function avatarHTML(name,size,style){size=size||40;style=style||'';var i=getInitials(name);var c=getAvatarColor(name);var f=Math.round(size*0.35);return '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+c.bg+';display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:'+f+'px;color:'+c.fg+';letter-spacing:1px;flex-shrink:0;'+style+'">'+i+'</div>';}
 
 // ── ROUTING ───────────────────────────────────────────────────────
+function goDashboardAfterBooking() {
+  // Force go to learner dashboard after booking
+  document.getElementById('marketNav').style.display = 'none';
+  document.getElementById('dashNav').style.display = 'flex';
+  document.getElementById('siteFooter').style.display = 'none';
+  var nameEl = document.getElementById('dashUnameEl');
+  if (nameEl) nameEl.textContent = LEARNER.name;
+  var avatarEl = document.getElementById('dashAvatarEl');
+  if (avatarEl) {
+    var c = getAvatarColor(LEARNER.name);
+    avatarEl.style.background = c.bg;
+    avatarEl.style.color = c.fg;
+    avatarEl.textContent = getInitials(LEARNER.name);
+  }
+  dashTab = 'overview';
+  setCookie('epiphany_dash', 'learner', 30);
+  loadLearnerData().then(function() { renderDashboard(); });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 function goLogoClick() {
   // If in dashboard, exit to home but DON'T log out
   if (document.getElementById('dashNav').style.display === 'flex') {
