@@ -403,12 +403,12 @@ body{background:var(--black);color:var(--white);font-family:'Nunito Sans',sans-s
     <button class="nav-link"        id="nl-catalogue" onclick="navigate('catalogue')">Find a Tutor</button>
     <button class="nav-link"        id="nl-register"  onclick="navigate('register')">Become a Tutor</button>
     <button class="nav-cta"                           onclick="navigate('register')">Register</button>
-    <button class="nav-cta filled"                    id="myAccountBtn" onclick="handleAccountClick()">My Account</button>
+    <button class="nav-cta filled"                    id="myAccountBtn" onclick="handleAccountClick()" style="margin-top:12px;padding:10px 22px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif">My Account</button>
   </div>
 </nav>
 
 <nav class="dash-nav" id="dashNav">
-  <div class="nav-logo" onclick="exitDashboard()">Epi<span>phany</span></div>
+  <div class="nav-logo" onclick="goLogoClick()">Epi<span>phany</span></div>
   <div class="dash-nav-right">
     <button class="dash-back-btn" onclick="goToCatalogue()">&#8592; Browse Tutors</button>
     <div class="dash-user">
@@ -485,13 +485,13 @@ async function restoreSession() {
       const u=data.user;
       LEARNER.name=u.name||''; LEARNER.email=u.email||'';
       LEARNER.phone=u.phone||''; LEARNER.since=u.since||'';
-      isLoggedIn=true; console.log('[Session] Learner restored:',LEARNER.name);
+      isLoggedIn=true; console.log('[Session] Learner restored:',LEARNER.name); updateNavBtn();
     } else if (data.type==='tutor'&&data.tutor) {
       const t=data.tutor;
       TUTOR.name=t.name||''; TUTOR.email=t.email||''; TUTOR.phone=t.phone||'';
       TUTOR.city=t.city||''; TUTOR.subject=t.subject||''; TUTOR.rate=t.rate||0;
       TUTOR.bio=t.bio||''; TUTOR.since=t.since||''; TUTOR.airtableId=t.id||'';
-      tutorLoggedIn=true;
+      tutorLoggedIn=true; console.log('[Session] Tutor restored:',TUTOR.name); updateNavBtn();
       const sub=data.subscription||{};
       TUTOR_SUB={status:sub.status||'none',trialStart:sub.trialStart||null,
                  trialEnd:sub.trialEnd||null,subStart:null,nextBilling:sub.nextBilling||null};
@@ -564,6 +564,11 @@ function pill(s) { return `<span class="lc-pill ${PILL_MAP[s] || ''}">${s}</span
 
 // ── ACCOUNT CLICK HANDLER (bulletproof) ──────────────────────────
 function handleAccountClick() {
+  // Wait for session restore if still in progress
+  if (window._sessionRestoring) {
+    window._sessionRestoring.then(function() { handleAccountClick(); });
+    return;
+  }
   // If logged in as learner → show learner dashboard
   if (isLoggedIn) {
     document.getElementById('marketNav').style.display = 'none';
@@ -600,6 +605,17 @@ function getAvatarColor(n){if(!n)return AVATAR_COLORS[0];var h=0;for(var i=0;i<n
 function avatarHTML(name,size,style){size=size||40;style=style||'';var i=getInitials(name);var c=getAvatarColor(name);var f=Math.round(size*0.35);return '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+c.bg+';display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:'+f+'px;color:'+c.fg+';letter-spacing:1px;flex-shrink:0;'+style+'">'+i+'</div>';}
 
 // ── ROUTING ───────────────────────────────────────────────────────
+function goLogoClick() {
+  // If in dashboard, exit to home but DON'T log out
+  if (document.getElementById('dashNav').style.display === 'flex') {
+    document.getElementById('marketNav').style.display = 'flex';
+    document.getElementById('dashNav').style.display = 'none';
+    document.getElementById('siteFooter').style.display = 'flex';
+    navigate('home');
+  } else {
+    navigate('home');
+  }
+}
 function goToCatalogue() {
   document.getElementById('marketNav').style.display='flex';
   document.getElementById('dashNav').style.display='none';
@@ -756,7 +772,7 @@ async function doSignIn() {
       TUTOR.name=t.name||''; TUTOR.email=t.email||''; TUTOR.phone=t.phone||'';
       TUTOR.city=t.city||''; TUTOR.subject=t.subject||''; TUTOR.rate=t.rate||0;
       TUTOR.bio=t.bio||''; TUTOR.since=t.since||''; TUTOR.airtableId=t.id||'';
-      tutorLoggedIn=true;
+      tutorLoggedIn=true; console.log('[Session] Tutor restored:',TUTOR.name); updateNavBtn();
       const sub=data.subscription||{};
       TUTOR_SUB={status:sub.status||'none',trialStart:sub.trialStart||null,
                  trialEnd:sub.trialEnd||null,subStart:null,nextBilling:sub.nextBilling||null};
@@ -834,16 +850,8 @@ function renderCatalogue() {
 function renderProfile() {
   const t = activeTutor; if (!t) return '';
   const panel = bookingDone
-    ? `<div class="booking-success-card"><div class="bsc-icon">&#10022;</div><div class="bsc-title">Booking Confirmed</div><div class="bsc-text">Your session with <strong style="color:var(--gold)">${t.name}</strong> is set for <strong style="color:var(--gold)">${selDay}</strong> at <strong style="color:var(--gold)">${selTime}</strong>.<br/><br/>A confirmation has been sent to <strong style="color:var(--gold)">${bcEmail}</strong>.<br/><br/><button onclick="handleAccountClick()" style="margin-top:12px;padding:10px 22px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif">View in Dashboard &rarr;</button></div></div>`
-    : `<div class="booking-card-title">Book a Session</div><div class="booking-card-sub">with ${t.name.split(' ')[0]}</div>
-<div class="bc-label">Select Day</div>
-<div class="bc-days">${DAYS.map(d => { const a = t.availability.includes(d); return `<div class="bc-day${!a ? '' : selDay === d ? ' sel' : ' avail'}"${a ? ` onclick="pickDay('${d}')"` : ''}>${d}</div>`; }).join('')}</div>
-${selDay ? `<div class="bc-label">Select Time</div><div class="bc-times">${TIMES.map(ti => `<button class="bc-time${selTime === ti ? ' sel' : ''}" onclick="pickTime('${ti}')">${ti}</button>`).join('')}</div>` : ''}
-<div class="bc-label" style="margin-top:8px">Your Details</div>
-<input class="bc-input" placeholder="Full name" value="${bcName}" oninput="bcName=this.value;updateBookBtn()"/>
-<input class="bc-input" placeholder="Email address" type="email" value="${bcEmail}" oninput="bcEmail=this.value;updateBookBtn()"/>
-<div class="bc-summary"><div class="bc-summary-row"><span>Session rate</span><span>R${t.rate}</span></div><div class="bc-summary-total"><span>Total</span><span>R${t.rate}</span></div></div>
-<button class="bc-confirm" id="bookBtn" ${selDay && selTime && bcName.trim() && bcEmail.trim() ? '' : 'disabled'} onclick="confirmBooking()">Confirm Booking</button>`;
+    ? `<div class="booking-success-card"><div class="bsc-icon">&#10022;</div><div class="bsc-title">Booking Confirmed</div><div class="bsc-text">Your session with <strong style="color:var(--gold)">${t.name}</strong> is set for <strong style="color:var(--gold)">${selDay}</strong> at <strong style="color:var(--gold)">${selTime}</strong>.<br/><br/>A confirmation has been sent to <strong style="color:var(--gold)">${bcEmail}</strong>.<br/><br/><button onclick="handleAccountClick()" style="margin-top:12px;padding:10px 22px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif" style="margin-top:12px;padding:10px 22px;background:var(--gold);color:var(--black);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;font-family:'Nunito Sans',sans-serif">View in Dashboard &rarr;</button></div></div>`
+    : buildBookingPanel(t);
   return `<div class="page profile-page">
 <div class="profile-hero">
   <div class="profile-hero-img">${(t.photo && t.photo !== '') ? `<img src="${t.photo}" alt="${t.name}"/>` : `<div style="width:100%;height:100%;background:${getAvatarColor(t.name).bg};display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:140px;color:${getAvatarColor(t.name).fg}">${getInitials(t.name)}</div>`}</div>
@@ -874,9 +882,39 @@ ${selDay ? `<div class="bc-label">Select Time</div><div class="bc-times">${TIMES
 </div></div>`;
 }
 
+function buildBookingPanel(t) {
+  var btnStyle = 'width:100%;padding:13px;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-bottom:10px';
+  if (!isLoggedIn) {
+    return '<div style="text-align:center;padding:32px 0">'
+      +'<div style="font-family:Georgia,serif;font-size:24px;color:var(--gold);margin-bottom:12px">Sign in to Book</div>'
+      +'<div style="font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:24px">You need a registered Epiphany account to book a session.</div>'
+      +'<button onclick="openAuthModal(&quot;signin&quot;)" style="'+btnStyle+';background:var(--gold);color:var(--black)">Sign In</button>'
+      +'<button onclick="goToRegisterFromModal()" style="'+btnStyle+';background:transparent;color:var(--white);border:1px solid rgba(250,249,246,.2)">Create Account</button>'
+      +'</div>';
+  }
+  var days = DAYS.map(function(d) {
+    var a = t.availability.includes(d);
+    var cls = 'bc-day' + (!a ? '' : selDay === d ? ' sel' : ' avail');
+    return '<div class="'+cls+'"'+(a?' onclick="pickDay(&quot;'+d+'&quot;)"':'')+'>'+d+'</div>';
+  }).join('');
+  var times = selDay ? '<div class="bc-label">Select Time</div><div class="bc-times">'
+    +TIMES.map(function(ti){ return '<button class="bc-time'+(selTime===ti?' sel':'')+'" onclick="pickTime(&quot;'+ti+'&quot;)">'+ti+'</button>'; }).join('')
+    +'</div>' : '';
+  return '<div class="booking-card-title">Book a Session</div>'
+    +'<div class="booking-card-sub">with '+t.name.split(' ')[0]+'</div>'
+    +'<div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--gold)">Booking as: <strong>'+LEARNER.name+'</strong></div>'
+    +'<div class="bc-label">Select Day</div>'
+    +'<div class="bc-days">'+days+'</div>'
+    +times
+    +'<div class="bc-summary" style="margin-top:16px">'
+    +'<div class="bc-summary-row"><span>Session rate</span><span>R'+t.rate+'</span></div>'
+    +'<div class="bc-summary-total"><span>Total</span><span>R'+t.rate+'</span></div></div>'
+    +'<button class="bc-confirm" id="bookBtn"'+(selDay&&selTime?'':' disabled')+' onclick="confirmBooking()">Confirm Booking</button>';
+}
+
 function pickDay(d) { selDay = d; selTime = null; render(); }
-function pickTime(t) { selTime = t; const b = document.getElementById('bookBtn'); if (b) b.disabled = !(selDay && selTime && bcName.trim() && bcEmail.trim()); }
-function updateBookBtn() { const b = document.getElementById('bookBtn'); if (b) b.disabled = !(selDay && selTime && bcName.trim() && bcEmail.trim()); }
+function pickTime(t) { selTime = t; const b = document.getElementById('bookBtn'); if (b) b.disabled = !(selDay && selTime); }
+function updateBookBtn() { const b = document.getElementById('bookBtn'); if (b) b.disabled = !(selDay && selTime); }
 
 function confirmBooking() {
   if (!(selDay && selTime && bcName.trim() && bcEmail.trim())) return;
