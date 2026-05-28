@@ -937,50 +937,35 @@ function pickTime(t) { selTime = t; const b = document.getElementById('bookBtn')
 function updateBookBtn() { const b = document.getElementById('bookBtn'); if (b) b.disabled = !(selDay && selTime); }
 
 function confirmBooking() {
-  if (!(selDay && selTime && bcName.trim() && bcEmail.trim())) return;
+  if (!isLoggedIn) { openAuthModal('signin'); return; }
+  if (!selDay || !selTime) return;
   bookingDone = true;
 
   const t = activeTutor;
   const newId = 'BK-' + Date.now();
   const invId = 'INV-' + Date.now();
 
-  // Add to live upcoming lessons so dashboard updates immediately
   UPCOMING_L.unshift({
-    id:      newId,
-    tutor:   t.name,
-    img:     t.photo,
-    subject: t.subjects[0],
-    date:    selDay,
-    time:    selTime,
-    mode:    t.mode[0],
-    rate:    t.rate,
-    status:  'confirmed',
+    id: newId, tutor: t.name, subject: t.subjects[0],
+    date: selDay, time: selTime, mode: t.mode[0], rate: t.rate, status: 'confirmed'
   });
-
-  // Add a due invoice for the booked session
   DUE_INV.unshift({
-    id:      invId,
-    dueDate: selDay,
-    tutor:   t.name,
-    subject: t.subjects[0],
-    amount:  t.rate,
+    id: invId, dueDate: selDay, tutor: t.name, subject: t.subjects[0], amount: t.rate
   });
 
-  // Push to Airtable
-  // Save session to MotherDuck
-  apiPost('/sessions',{
-    learnerName:bcName.trim(),
-    learnerEmail:bcEmail.trim(),
-    tutorName:t.name,
-    tutorEmail:t.email||'',
-    subject:t.subjects[0],
-    day:selDay,
-    time:selTime,
-    rate:t.rate,
-    mode:t.mode[0]
-  }).then(function(r){
-    if(r && r.error) console.error('[booking] session save failed:',r.error);
-    else console.log('[booking] session saved');
+  apiPost('/sessions', {
+    learnerName: LEARNER.name,
+    learnerEmail: LEARNER.email,
+    tutorName: t.name,
+    tutorEmail: t.email || '',
+    subject: t.subjects[0],
+    day: selDay,
+    time: selTime,
+    rate: t.rate,
+    mode: t.mode[0]
+  }).then(function(r) {
+    if (r && r.error) console.error('[booking] failed:', r.error);
+    else console.log('[booking] saved ✓');
   });
 
   render();
