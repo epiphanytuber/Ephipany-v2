@@ -1103,8 +1103,12 @@ function lessonCard(l) {
 function cancelLesson(id) { cancelledIds.push(id); renderDashboard(); }
 
 // ── DASHBOARD RENDER ──────────────────────────────────────────────
+function buildDueTile(due) {
+  var cls = due > 0 ? ' amb' : '';
+  var sub = due > 0 ? '<div class="ov-sub clk" onclick="switchTab(&quot;payments&quot;)">Pay now &rarr;</div>' : '<div class="ov-sub">All clear</div>';
+  return '<div class="ov-card"><div class="ov-label">Amount Due</div><div class="ov-value'+cls+'">R'+due+'</div>'+sub+'</div>';
+}
 function renderDashboard() {
-  const isNewUser = UPCOMING_L.length===0&&PAST_L.length===0&&INVOICES.length===0;
   const totalSpent  = INVOICES.reduce((s, i) => s + i.amount, 0);
   const outstanding = DUE_INV.filter(i => !paidIds.includes(i.id));
   const dueTotal    = outstanding.reduce((s, i) => s + i.amount, 0);
@@ -1131,29 +1135,45 @@ ${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' 
   let main = '';
 
   if (dashTab === 'overview') {
-    const nxt = UPCOMING_L[0];
-    main = `<div class="dash-section">
-<div class="dash-eyebrow">Dashboard</div>
-<div class="dash-title">Welcome back, <em>${LEARNER.name.split(' ')[0]}</em></div>
-<div class="ov-grid">
-  <div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">${UPCOMING_L.length}</div><div class="ov-sub">Next: ${nxt.date}</div></div>
-  <div class="ov-card"><div class="ov-label">Completed Sessions</div><div class="ov-value">${completedCt}</div><div class="ov-sub">Since ${LEARNER.since}</div></div>
-  <div class="ov-card"><div class="ov-label">Total Invested</div><div class="ov-value gld">R${totalSpent.toLocaleString()}</div><div class="ov-sub">${INVOICES.length} invoices paid</div></div>
-  <div class="ov-card"><div class="ov-label">Amount Due</div><div class="ov-value amb">R${dueTotal}</div><div class="ov-sub clk" onclick="switchTab('payments')">Pay now &rarr;</div></div>
-</div>
-<div class="sub-hdg">Next Session <span class="sub-hdg-link" onclick="switchTab('upcoming')">View all &rarr;</span></div>
-<div class="lesson-list">${lessonCard(nxt)}</div>
-<div class="sub-hdg">Recent Sessions <span class="sub-hdg-link" onclick="switchTab('history')">View all &rarr;</span></div>
-<div class="lesson-list">${PAST_L.slice(0, 3).map(lessonCard).join('')}</div>
-</div>`;
+    var nxt = UPCOMING_L.length > 0 ? UPCOMING_L[0] : null;
+    var firstName = LEARNER.name ? LEARNER.name.split(' ')[0] : 'there';
+    var isNewUser = UPCOMING_L.length === 0 && PAST_L.length === 0 && INVOICES.length === 0;
+    var welcomeBanner = isNewUser
+      ? '<div style="background:linear-gradient(135deg,rgba(201,168,76,.08),rgba(201,168,76,.03));border:1px solid rgba(201,168,76,.2);padding:40px;text-align:center;margin-bottom:32px">'
+        + '<div style="font-size:32px;margin-bottom:12px">&#10022;</div>'
+        + '<div style="font-family:Georgia,serif;font-size:28px;font-weight:300;color:var(--gold);margin-bottom:8px">Welcome to Epiphany!</div>'
+        + '<div style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.8">Your dashboard is ready. Start by finding a tutor and booking your first session.</div>'
+        + '<button onclick="goToCatalogue()" style="padding:13px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Browse Tutors &rarr;</button>'
+        + '</div>'
+      : '';
+    var nextSessionHtml = nxt
+      ? '<div class="lesson-list">' + lessonCard(nxt) + '</div>'
+      : '<div style="padding:24px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>';
+    var pastSessionsHtml = PAST_L.length > 0
+      ? '<div class="lesson-list">' + PAST_L.slice(0,3).map(lessonCard).join('') + '</div>'
+      : '<div style="padding:24px 0;color:var(--muted);font-size:13px;text-align:center">No past sessions yet.</div>';
+    main = '<div class="dash-section">'
+      + '<div class="dash-eyebrow">Dashboard</div>'
+      + '<div class="dash-title">Welcome back, <em>' + firstName + '</em></div>'
+      + welcomeBanner
+      + '<div class="ov-grid">'
+      + '<div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">' + UPCOMING_L.length + '</div><div class="ov-sub">' + (nxt ? 'Next: ' + nxt.date : 'None yet') + '</div></div>'
+      + '<div class="ov-card"><div class="ov-label">Completed Sessions</div><div class="ov-value">' + completedCt + '</div><div class="ov-sub">' + (LEARNER.since || 'Just joined') + '</div></div>'
+      + '<div class="ov-card"><div class="ov-label">Total Invested</div><div class="ov-value gld">R' + totalSpent.toLocaleString() + '</div><div class="ov-sub">' + INVOICES.length + ' invoices paid</div></div>'
+      + buildDueTile(dueTotal)
+      + '</div>'
+      + '<div class="sub-hdg">Next Session</div>'
+      + nextSessionHtml
+      + '<div class="sub-hdg">Recent Sessions</div>'
+      + pastSessionsHtml
+      + '</div>';
   }
 
   if (dashTab === 'upcoming') {
-    main = `<div class="dash-section">
-<div class="dash-eyebrow">My Lessons</div><div class="dash-title"><em>Upcoming</em> Sessions</div>
-<div class="sub-hdg">Confirmed &amp; Pending <span class="sub-hdg-count">${UPCOMING_L.length} sessions</span></div>
-<div class="lesson-list">${UPCOMING_L.map(lessonCard).join('')}</div>
-</div>`;
+    main = '<div class="dash-section"><div class="dash-eyebrow">My Lessons</div><div class="dash-title"><em>Upcoming</em> Sessions</div>'
+      + '<div class="sub-hdg">Confirmed &amp; Pending <span class="sub-hdg-count">' + UPCOMING_L.length + ' sessions</span></div>'
+      + (UPCOMING_L.length > 0 ? '<div class="lesson-list">' + UPCOMING_L.map(lessonCard).join('') + '</div>' : '<div style="padding:48px 0;text-align:center;color:var(--muted);font-size:13px">No upcoming sessions yet.<br><br><span style="color:var(--gold);cursor:pointer" onclick="goToCatalogue()">Browse Tutors &rarr;</span></div>')
+      + '</div>';
   }
 
   if (dashTab === 'history') {
