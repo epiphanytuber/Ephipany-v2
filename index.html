@@ -1126,7 +1126,7 @@ function renderDashboard() {
   const sidebar = `<aside class="dash-sidebar">
 <div class="dash-sb-profile">
   <div class="dash-sb-label">My Account</div>
-  <div class="dash-sb-user"><img src="${LEARNER.avatar}" class="dash-sb-avatar" alt=""/><div><div class="dash-sb-uname">${LEARNER.name}</div><div class="dash-sb-role">Learner</div></div></div>
+  <div class="dash-sb-user" onclick="handleAccountClick()" style="cursor:pointer">${avatarHTML(LEARNER.name,40,'border:1px solid var(--gold)')}<div><div class="dash-sb-uname">${LEARNER.name}</div><div class="dash-sb-role">Learner</div></div></div>
 </div>
 <div class="dash-nav-label">Navigation</div>
 ${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' : ''}" onclick="switchTab('${n.id}')"><span class="dash-nav-icon">${n.icon}</span>${n.label}${n.badge ? `<span class="dash-nav-badge">${n.badge}</span>` : ''}</button>`).join('')}
@@ -1212,7 +1212,7 @@ ${outstanding.length > 0 ? `<div style="margin-bottom:28px"><div class="due-hdr"
 <div class="dash-eyebrow">Account</div><div class="dash-title">Profile <em>Settings</em></div>
 <div class="gold-rule"></div>
 <div class="settings-avatar-row">
-  <img src="${LEARNER.avatar}" class="settings-big-avatar" alt=""/>
+  ${avatarHTML(LEARNER.name,72,'border:2px solid var(--gold)')}
   <div>
     <div style="font-size:16px;font-weight:600;margin-bottom:4px">${LEARNER.name}</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Member since ${LEARNER.since}</div>
