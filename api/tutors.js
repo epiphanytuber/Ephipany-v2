@@ -8,9 +8,10 @@ export default async function handler(req, res) {
   try {
     const rows = await query(`
       SELECT t.id, t.full_name, t.city, t.teaching_mode, t.primary_subject,
-             t.grade_level, t.hourly_rate, t.qualification, t.availability,
-             t.bio, t.photo_url, t.rating, t.reviews_count, t.sessions_count,
-             s.status as sub_status
+             t.grade_level, CAST(t.hourly_rate AS DOUBLE) as hourly_rate,
+             t.qualification, t.availability, t.bio, t.photo_url,
+             CAST(t.rating AS DOUBLE) as rating,
+             t.reviews_count, t.sessions_count, s.status as sub_status
       FROM epiphany.main.tutors t
       LEFT JOIN epiphany.main.subscriptions s ON s.tutor_id = t.id
       WHERE t.status = 'Comfirmed'
@@ -24,6 +25,14 @@ export default async function handler(req, res) {
       const mode = modeRaw === 'Both' ? ['In-Person','Online'] : [modeRaw];
       const avail = (col(t,'availability')||'').split(',').map(d=>d.trim())
         .filter(d=>['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].includes(d));
+
+      // Parse rate carefully — DuckDB DECIMAL can come back as string or number
+      const rawRate = col(t,'hourly_rate');
+      const rate = rawRate !== null && rawRate !== undefined ? Number(rawRate) : 0;
+
+      const rawRating = col(t,'rating');
+      const rating = rawRating !== null && rawRating !== undefined ? Number(rawRating) : 4.8;
+
       return {
         id:            i + 1,
         name,
@@ -32,8 +41,8 @@ export default async function handler(req, res) {
         grade:         col(t,'grade_level') || 'All grades',
         bio:           col(t,'bio') || 'Experienced educator passionate about student success.',
         longBio:       col(t,'bio') || 'Experienced educator passionate about student success.',
-        rate:          parseFloat(col(t,'hourly_rate')) || 0,
-        rating:        parseFloat(col(t,'rating')) || 4.8,
+        rate:          isNaN(rate) ? 0 : rate,
+        rating:        isNaN(rating) ? 4.8 : rating,
         reviews:       parseInt(col(t,'reviews_count')) || 0,
         sessions:      parseInt(col(t,'sessions_count')) || 0,
         availability:  avail.length ? avail : ['Mon','Wed','Fri'],
@@ -43,6 +52,7 @@ export default async function handler(req, res) {
         languages:     ['English'],
         qualifications:(col(t,'qualification')||'').split(',').map(q=>q.trim()).filter(Boolean),
         testimonials:  [],
+        email:         col(t,'email') || '',
       };
     });
 
