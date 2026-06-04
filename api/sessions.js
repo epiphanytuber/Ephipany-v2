@@ -13,23 +13,27 @@ export default async function handler(req, res) {
       let rows;
       if (type === 'tutor') {
         rows = await query(`
-          SELECT id, learner_name, learner_email, subject, day, time, mode, rate, status, booked_at
+          SELECT id, learner_name, learner_email, subject, day, time, mode,
+                 CAST(rate AS DOUBLE) as rate, status, booked_on
           FROM epiphany.main.sessions
-          WHERE tutor_email = '${esc(email)}'
-          ORDER BY booked_at DESC
+          WHERE tutor_name IN (
+            SELECT full_name FROM epiphany.main.tutors WHERE email = '${esc(email)}'
+          )
+          ORDER BY booked_on DESC
         `);
       } else {
         rows = await query(`
-          SELECT id, tutor_name, tutor_email, subject, day, time, mode, rate, status, booked_at
+          SELECT id, tutor_name, subject, day, time, mode,
+                 CAST(rate AS DOUBLE) as rate, status, booked_on
           FROM epiphany.main.sessions
           WHERE learner_email = '${esc(email)}'
-          ORDER BY booked_at DESC
+          ORDER BY booked_on DESC
         `);
       }
       return ok(res, { sessions: rows });
     } catch(e) {
       console.error('[sessions GET]', e.message);
-      return err(res, 'Failed to load sessions', 500);
+      return err(res, 'Failed to load sessions: ' + e.message, 500);
     }
   }
 
@@ -44,14 +48,24 @@ export default async function handler(req, res) {
       const id = 'BK-' + Date.now();
       await query(`
         INSERT INTO epiphany.main.sessions
-          (id, learner_name, learner_email, tutor_name, tutor_email, subject, day, time, rate, mode, status, booked_at)
+          (id, learner_name, learner_email, tutor_name, subject, day, time,
+           rate, mode, status, booked_on)
         VALUES (
-          '${esc(id)}', '${esc(learnerName)}', '${esc(learnerEmail)}',
-          '${esc(tutorName)}', '${esc(tutorEmail||'')}', '${esc(subject)}',
-          '${esc(day)}', '${esc(time)}', ${parseFloat(rate)||0},
-          '${esc(mode||'Online')}', 'confirmed', NOW()
+          '${esc(id)}',
+          '${esc(learnerName)}',
+          '${esc(learnerEmail)}',
+          '${esc(tutorName)}',
+          '${esc(subject)}',
+          '${esc(day)}',
+          '${esc(time)}',
+          ${parseFloat(rate) || 0},
+          '${esc(mode || 'Online')}',
+          'confirmed',
+          NOW()
         )
       `);
+
+      console.log('[sessions] Saved booking:', id, learnerName, tutorName);
 
       // Send confirmation email to learner
       try {
@@ -60,19 +74,20 @@ export default async function handler(req, res) {
           subject: `Session Confirmed — ${subject} with ${tutorName}`,
           html: `
             <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px">
-              <h2 style="color:#C9A84C">Session Confirmed ✦</h2>
+              <div style="font-family:Georgia,serif;font-size:24px;letter-spacing:6px;color:#C9A84C;margin-bottom:24px">EPIPHANY</div>
+              <h2 style="color:#C9A84C;font-weight:300">Session Confirmed ✦</h2>
               <p>Hi ${learnerName},</p>
               <p>Your tutoring session has been booked successfully!</p>
-              <table style="width:100%;border-collapse:collapse;margin:24px 0">
-                <tr><td style="padding:8px 0;color:#888">Tutor</td><td style="padding:8px 0"><strong>${tutorName}</strong></td></tr>
-                <tr><td style="padding:8px 0;color:#888">Subject</td><td style="padding:8px 0"><strong>${subject}</strong></td></tr>
-                <tr><td style="padding:8px 0;color:#888">Day</td><td style="padding:8px 0"><strong>${day}</strong></td></tr>
-                <tr><td style="padding:8px 0;color:#888">Time</td><td style="padding:8px 0"><strong>${time}</strong></td></tr>
-                <tr><td style="padding:8px 0;color:#888">Mode</td><td style="padding:8px 0"><strong>${mode||'Online'}</strong></td></tr>
-                <tr><td style="padding:8px 0;color:#888">Rate</td><td style="padding:8px 0"><strong>R${rate}/hr</strong></td></tr>
+              <table style="width:100%;border-collapse:collapse;margin:24px 0;background:#f9f9f9;padding:16px">
+                <tr><td style="padding:8px 12px;color:#666">Tutor</td><td style="padding:8px 12px"><strong>${tutorName}</strong></td></tr>
+                <tr><td style="padding:8px 12px;color:#666">Subject</td><td style="padding:8px 12px"><strong>${subject}</strong></td></tr>
+                <tr><td style="padding:8px 12px;color:#666">Day</td><td style="padding:8px 12px"><strong>${day}</strong></td></tr>
+                <tr><td style="padding:8px 12px;color:#666">Time</td><td style="padding:8px 12px"><strong>${time}</strong></td></tr>
+                <tr><td style="padding:8px 12px;color:#666">Mode</td><td style="padding:8px 12px"><strong>${mode || 'Online'}</strong></td></tr>
+                <tr><td style="padding:8px 12px;color:#666">Rate</td><td style="padding:8px 12px"><strong>R${rate}/hr</strong></td></tr>
               </table>
-              <p>Visit <a href="https://epiphanytutors.co.za" style="color:#C9A84C">epiphanytutors.co.za</a> to view your dashboard.</p>
-              <p style="color:#888;font-size:12px">— The Epiphany Team</p>
+              <a href="https://epiphanytutors.co.za" style="display:inline-block;padding:14px 32px;background:#C9A84C;color:#000;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;text-decoration:none;">View Dashboard →</a>
+              <p style="color:#888;font-size:12px;margin-top:24px">— The Epiphany Team</p>
             </div>
           `
         });
@@ -80,7 +95,7 @@ export default async function handler(req, res) {
         console.error('[sessions] learner email failed:', emailErr.message);
       }
 
-      // Send notification email to tutor if we have their email
+      // Send notification to tutor
       if (tutorEmail) {
         try {
           await sendEmail({
@@ -88,18 +103,19 @@ export default async function handler(req, res) {
             subject: `New Booking — ${subject} with ${learnerName}`,
             html: `
               <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px">
-                <h2 style="color:#C9A84C">New Session Booked ✦</h2>
+                <div style="font-family:Georgia,serif;font-size:24px;letter-spacing:6px;color:#C9A84C;margin-bottom:24px">EPIPHANY</div>
+                <h2 style="color:#C9A84C;font-weight:300">New Session Booked ✦</h2>
                 <p>Hi ${tutorName},</p>
                 <p>You have a new tutoring session booked!</p>
-                <table style="width:100%;border-collapse:collapse;margin:24px 0">
-                  <tr><td style="padding:8px 0;color:#888">Learner</td><td style="padding:8px 0"><strong>${learnerName}</strong></td></tr>
-                  <tr><td style="padding:8px 0;color:#888">Subject</td><td style="padding:8px 0"><strong>${subject}</strong></td></tr>
-                  <tr><td style="padding:8px 0;color:#888">Day</td><td style="padding:8px 0"><strong>${day}</strong></td></tr>
-                  <tr><td style="padding:8px 0;color:#888">Time</td><td style="padding:8px 0"><strong>${time}</strong></td></tr>
-                  <tr><td style="padding:8px 0;color:#888">Mode</td><td style="padding:8px 0"><strong>${mode||'Online'}</strong></td></tr>
+                <table style="width:100%;border-collapse:collapse;margin:24px 0;background:#f9f9f9;padding:16px">
+                  <tr><td style="padding:8px 12px;color:#666">Learner</td><td style="padding:8px 12px"><strong>${learnerName}</strong></td></tr>
+                  <tr><td style="padding:8px 12px;color:#666">Subject</td><td style="padding:8px 12px"><strong>${subject}</strong></td></tr>
+                  <tr><td style="padding:8px 12px;color:#666">Day</td><td style="padding:8px 12px"><strong>${day}</strong></td></tr>
+                  <tr><td style="padding:8px 12px;color:#666">Time</td><td style="padding:8px 12px"><strong>${time}</strong></td></tr>
+                  <tr><td style="padding:8px 12px;color:#666">Mode</td><td style="padding:8px 12px"><strong>${mode || 'Online'}</strong></td></tr>
                 </table>
-                <p>Log in to <a href="https://epiphanytutors.co.za" style="color:#C9A84C">epiphanytutors.co.za</a> to manage your sessions.</p>
-                <p style="color:#888;font-size:12px">— The Epiphany Team</p>
+                <a href="https://epiphanytutors.co.za" style="display:inline-block;padding:14px 32px;background:#C9A84C;color:#000;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;text-decoration:none;">View Dashboard →</a>
+                <p style="color:#888;font-size:12px;margin-top:24px">— The Epiphany Team</p>
               </div>
             `
           });
