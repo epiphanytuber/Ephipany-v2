@@ -484,7 +484,7 @@ async function restoreSession() {
     if (data.type==='learner'&&data.user) {
       const u=data.user;
       LEARNER.name=u.name||''; LEARNER.email=u.email||'';
-      LEARNER.phone=u.phone||''; LEARNER.since=u.since||'';
+      LEARNER.phone=u.phone||''; LEARNER.since=u.since ? (typeof u.since==='string' ? u.since.substring(0,7) : new Date(u.since).toLocaleString('en-ZA',{month:'long',year:'numeric'})) : '';
       isLoggedIn=true;
       updateNavBtn();
       console.log('[Session] Learner restored:',LEARNER.name);
@@ -783,7 +783,7 @@ async function doSignIn() {
     if (data.type === 'learner') {
       const u = data.user;
       LEARNER.name=u.name||''; LEARNER.email=u.email||'';
-      LEARNER.phone=u.phone||''; LEARNER.since=u.since||'';
+      LEARNER.phone=u.phone||''; LEARNER.since=u.since ? (typeof u.since==='string' ? u.since.substring(0,7) : new Date(u.since).toLocaleString('en-ZA',{month:'long',year:'numeric'})) : '';
       isLoggedIn=true;
       setCookie('epiphany_token',data.token,30);setCookie('epiphany_type','learner',30);updateNavBtn();closeAuthModal();enterDashboard();return;
     }
@@ -1010,7 +1010,10 @@ ${isTutor ? `<div class="photo-drop"><div class="photo-drop-icon">&#128247;</div
   <div class="reg-group"><label class="reg-label">Hourly Rate (ZAR)</label><input class="reg-input" id="rRate" placeholder="e.g. 400" type="number"/></div>
   <div class="reg-group"><label class="reg-label">Highest Qualification</label><select class="reg-select" id="rQual"><option value="">Select&hellip;</option><option>Matric / Grade 12</option><option>Diploma</option><option>Bachelor&rsquo;s Degree</option><option>Honours Degree</option><option>Master&rsquo;s Degree</option><option>Doctorate (PhD)</option></select></div>
   <div class="reg-group reg-group-full"><label class="reg-label">Availability</label><div class="day-checks">${DAYS.map(d => `<label class="day-check"><input type="checkbox" class="tAvailDay" value="${d}"/> ${d}</label>`).join('')}</div></div>
-  <div class="reg-group reg-group-full"><label class="reg-label">Bio / About You</label><textarea class="reg-input" id="rBio" rows="5" placeholder="Tell parents and learners about your background&hellip;" style="resize:vertical"></textarea></div>`
+  <div class="reg-group reg-group-full"><label class="reg-label">Bio / About You</label><textarea class="reg-input" id="rBio" rows="5" placeholder="Tell parents and learners about your background&hellip;" style="resize:vertical"></textarea></div>
+  <div class="reg-group"><label class="reg-label">Password</label><input class="reg-input" id="rTPass" type="password" placeholder="Create a password (min. 6 characters)"/></div>
+  <div class="reg-group"><label class="reg-label">Confirm Password</label><input class="reg-input" id="rTPass2" type="password" placeholder="Repeat your password"/></div>
+  ${regError ? `<div class="reg-group reg-group-full"><div class="reg-field-error">${regError}</div></div>` : ''}`
   : `
   <div class="reg-group"><label class="reg-label">Grade / Year</label><select class="reg-select" id="rGrade"><option value="">Select grade&hellip;</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option><option>University Year 1</option><option>University Year 2+</option><option>Adult learner</option></select></div>
   <div class="reg-group"><label class="reg-label">Location</label><select class="reg-select" id="rLocation"><option value="">Select city</option>${LOCATIONS.slice(1).map(l => `<option>${l}</option>`).join('')}</select></div>
@@ -1085,7 +1088,11 @@ async function submitRegistration() {
 
     if (!first || !last || !email) { regError = 'Please fill in your name and email.'; render(); return; }
 
-    const tutorPass = gv('rTPass')||(first.toLowerCase()+'123');
+    const tutorPass  = document.getElementById('rTPass')  ? document.getElementById('rTPass').value  : '';
+    const tutorPass2 = document.getElementById('rTPass2') ? document.getElementById('rTPass2').value : '';
+    if (!tutorPass)  { regError = 'Please create a password.'; render(); return; }
+    if (tutorPass.length < 6) { regError = 'Password must be at least 6 characters.'; render(); return; }
+    if (tutorPass !== tutorPass2) { regError = 'Passwords do not match.'; render(); return; }
     const tReg = await apiPost('/register',{type:'tutor',first,last,email,phone,password:tutorPass,
       city,teachingMode:tMode||'Online',subject,gradeLevel,rate,qual,availability:availDays,bio});
     if (tReg.error) { regError=tReg.error; render(); return; }
@@ -1232,7 +1239,13 @@ ${outstanding.length > 0 ? `<div style="margin-bottom:28px"><div class="due-hdr"
   <div class="setting-group"><label class="setting-label">Email Address</label><input class="setting-input" id="sEmail" type="email" value="${LEARNER.email}"/></div>
   <div class="setting-group"><label class="setting-label">Phone Number</label><input class="setting-input" id="sPhone" value="${LEARNER.phone}"/></div>
   <div class="setting-group"><label class="setting-label">Location</label><input class="setting-input" id="sLocation" value="Johannesburg"/></div>
-  <div class="setting-group full"><label class="setting-label">New Password</label><input class="setting-input" id="sPass" type="password" placeholder="Leave blank to keep current"/></div>
+  <div class="setting-group full">
+    <label class="setting-label">New Password</label>
+    <div style="position:relative">
+      <input class="setting-input" id="sPass" type="password" placeholder="Leave blank to keep current" style="width:100%;padding-right:48px"/>
+      <button onclick="togglePassVis('sPass',this)" type="button" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px" title="Show/hide password">&#128065;</button>
+    </div>
+  </div>
 </div>
 <div style="display:flex;align-items:center">
   <button class="settings-save" onclick="saveProfile()">Save Changes</button>
@@ -1298,6 +1311,19 @@ function saveProfile() {
   showSaveToast();
 }
 
+function togglePassVis(inputId, btn) {
+  var input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.innerHTML = '&#128064;'; // open eye
+    btn.style.color = 'var(--gold)';
+  } else {
+    input.type = 'password';
+    btn.innerHTML = '&#128065;'; // closed eye
+    btn.style.color = 'var(--muted)';
+  }
+}
 function showSaveToast() {
   const t = document.getElementById('saveToast');
   if (t) { t.style.display = 'inline-flex'; setTimeout(() => { t.style.display = 'none'; }, 2500); }
