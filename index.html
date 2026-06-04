@@ -681,8 +681,26 @@ async function loadLearnerData() {
   try{
     var sData=await apiGet('/sessions?email='+encodeURIComponent(LEARNER.email)+'&type=learner');
     if(sData.sessions){
-      UPCOMING_L=sData.sessions.filter(function(s){return s.status==='confirmed'||s.status==='pending';}).map(function(s){return{id:s.id,tutor:s.tutor_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status};});
-      PAST_L=sData.sessions.filter(function(s){return s.status==='completed'||s.status==='cancelled';}).map(function(s){return{id:s.id,tutor:s.tutor_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status,rated:false,rating:null};});
+      UPCOMING_L=sData.sessions.filter(function(s){return s.status==='confirmed'||s.status==='pending';}).map(function(s){
+        var tname = s.tutor_name||(s[1])||'';
+        var subj  = s.subject   ||(s[3])||'';
+        var d     = s.day       ||(s[4])||'';
+        var t     = s.time      ||(s[5])||'';
+        var m     = s.mode      ||(s[6])||'Online';
+        var r     = parseFloat(s.rate||(s[7]))||0;
+        var st    = s.status    ||(s[8])||'confirmed';
+        return {id:s.id||(s[0]),tutor:tname,subject:subj,date:d,time:t,mode:m,rate:r,status:st};
+      });
+      PAST_L=sData.sessions.filter(function(s){return s.status==='completed'||s.status==='cancelled';}).map(function(s){
+        var tname = s.tutor_name||(s[1])||'';
+        var subj  = s.subject   ||(s[3])||'';
+        var d     = s.day       ||(s[4])||'';
+        var t     = s.time      ||(s[5])||'';
+        var m     = s.mode      ||(s[6])||'Online';
+        var r     = parseFloat(s.rate||(s[7]))||0;
+        var st    = s.status    ||(s[8])||'completed';
+        return {id:s.id||(s[0]),tutor:tname,subject:subj,date:d,time:t,mode:m,rate:r,status:st,rated:false,rating:null};
+      });
     }
     var pData=await apiGet('/payments?email='+encodeURIComponent(LEARNER.email)+'&type=learner');
     if(pData.payments)INVOICES=pData.payments.filter(function(p){return p.status==='paid';}).map(function(p){return{id:p.invoice_id||p.id,date:p.paid_on||'',tutor:p.tutor_name||'',subject:p.subject,amount:parseFloat(p.amount)||0};});
