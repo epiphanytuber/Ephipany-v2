@@ -523,7 +523,7 @@ async function loadTutors() {
   TUTORS_LOADED = true;
 }
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-const TIMES=["08:00","09:00","10:00","11:00","14:00","15:00","16:00","17:00","18:00"];
+const TIMES=["08:00–10:00","09:00–11:00","10:00–12:00","11:00–13:00","12:00–14:00","13:00–15:00","14:00–16:00","15:00–17:00","16:00–18:00","17:00–19:00"];
 const SUBJECTS=["All Subjects","Mathematics","English","Sciences","Commerce","Languages","Computer Science","History"];
 const LOCATIONS=["All Locations","Johannesburg","Cape Town","Pretoria","Durban","Stellenbosch"];
 const MODES=["All Modes","In-Person","Online"];
@@ -551,6 +551,7 @@ let authError = '';
 let page = 'home', activeTutor = null;
 let catSearch = '', catSubject = 'All Subjects', catLocation = 'All Locations', catMode = 'All Modes';
 let selDay = null, selTime = null, selMode = null, bcName = '', bcEmail = '', bookingDone = false;
+let BOOKED_SLOTS = []; // [{day, time}] for active tutor
 let regRole = 'learner', regDone = false, regError = '';
 let dashTab = 'overview', histFilter = 'all';
 let cancelledIds = [], paidIds = [];
@@ -654,9 +655,22 @@ function goToDashboardAfterReg() {
   restoreSession().then(function(){if(isLoggedIn)enterDashboard();else if(tutorLoggedIn)enterTutorDashboard();else openAuthModal('signin');});
 }
 function selectTutor(id) {
-  var n=parseInt(id);
-  var t=TUTORS.find(function(x){return x.id===n||x.id===id;});
-  if(t)navigate('profile',t);
+  var n = parseInt(id);
+  var t = TUTORS.find(function(x){ return x.id===n || x.id===id; });
+  if (!t) return;
+  BOOKED_SLOTS = [];
+  // Load booked slots for this tutor
+  apiGet('/sessions?tutorName=' + encodeURIComponent(t.name) + '&type=tutor-slots').then(function(data) {
+    if (data.slots) {
+      BOOKED_SLOTS = data.slots; // [{day, time}]
+      // Re-render booking panel if already on profile page
+      var panel = document.querySelector('.booking-card');
+      if (panel && activeTutor && activeTutor.id === t.id) {
+        panel.innerHTML = buildBookingPanel(activeTutor);
+      }
+    }
+  }).catch(function(){});
+  navigate('profile', t);
 }
 function navigate(p, tutor) {
   page = p;
@@ -943,8 +957,17 @@ function buildBookingPanel(t) {
     var cls = 'bc-day' + (!a ? '' : selDay === d ? ' sel' : ' avail');
     return '<div class="'+cls+'"'+(a?' onclick="pickDay(&quot;'+d+'&quot;)"':'')+'>'+d+'</div>';
   }).join('');
+  var bookedForDay = BOOKED_SLOTS.filter(function(s){ return s.day === selDay; }).map(function(s){ return s.time; });
   var times = selDay ? '<div class="bc-label">Select Time</div><div class="bc-times">'
-    +TIMES.map(function(ti){ return '<button class="bc-time'+(selTime===ti?' sel':'')+'" onclick="pickTime(&quot;'+ti+'&quot;)">'+ti+'</button>'; }).join('')
+    +TIMES.map(function(ti){
+      var isBooked = bookedForDay.includes(ti);
+      var isSel    = selTime === ti;
+      var cls      = isBooked ? 'bc-time' : (isSel ? 'bc-time sel' : 'bc-time');
+      var style    = isBooked ? 'opacity:0.35;cursor:not-allowed;filter:blur(1px);position:relative;' : '';
+      var click    = isBooked ? '' : ' onclick="pickTime(&quot;'+ti+'&quot;)"';
+      var label    = isBooked ? ti+' <span style="font-size:9px;letter-spacing:1px;color:var(--red)">BOOKED</span>' : ti;
+      return '<button class="'+cls+'" style="'+style+'"'+click+' '+(isBooked?'disabled':'')+'>'+label+'</button>';
+    }).join('')
     +'</div>' : '';
   // Build mode selector based on what the tutor offers
   var tutorModes = t.mode || ['Online'];
@@ -981,8 +1004,9 @@ function buildBookingPanel(t) {
     +'<div class="bc-days">'+days+'</div>'
     +times
     +'<div class="bc-summary" style="margin-top:16px">'
-    +'<div class="bc-summary-row"><span>Session rate</span><span>R'+t.rate+'</span></div>'
-    +'<div class="bc-summary-total"><span>Total</span><span>R'+t.rate+'</span></div></div>'
+    +'<div class="bc-summary-row"><span>Duration</span><span>2 hours</span></div>'
+    +'<div class="bc-summary-row"><span>Rate</span><span>R'+t.rate+'/hr</span></div>'
+    +'<div class="bc-summary-total"><span>Total</span><span>R'+(t.rate*2)+'</span></div></div>'
     +'<button class="bc-confirm" id="bookBtn"'+(selDay&&selTime&&selMode?'':' disabled')+' onclick="confirmBooking()">Confirm Booking</button>';
 }
 
@@ -1023,7 +1047,7 @@ function confirmBooking() {
     subject: t.subjects[0],
     day: selDay,
     time: selTime,
-    rate: t.rate,
+    rate: t.rate * 2, // 2-hour session
     mode: selMode || t.mode[0]
   }).then(function(r) {
     if (r && r.error) console.error('[booking] failed:', r.error);
