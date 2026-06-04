@@ -1299,12 +1299,46 @@ function showSaveToast() {
 function subKey(){return 'epiphany_sub_'+TUTOR.email;}
 function saveSubState(){try{localStorage.setItem(subKey(),JSON.stringify(TUTOR_SUB));}catch(e){}}
 function loadSubState(){try{var s=localStorage.getItem(subKey());if(s)TUTOR_SUB=JSON.parse(s);}catch(e){}}
-function isSubActive(){if(TUTOR_SUB.status==='active')return true;if(TUTOR_SUB.status==='trial')return new Date()<new Date(TUTOR_SUB.trialEnd);return false;}
+function isSubActive(){
+  if(TUTOR_SUB.status==='active') return true;
+  if(TUTOR_SUB.status==='trial') {
+    if(!TUTOR_SUB.trialEnd) return true; // no end date = still valid
+    return new Date() < new Date(TUTOR_SUB.trialEnd);
+  }
+  return false;
+}
 function daysLeft(){if(!TUTOR_SUB.trialEnd)return 0;return Math.max(0,Math.ceil((new Date(TUTOR_SUB.trialEnd)-new Date())/86400000));}
 function startTrial(){var s=new Date(),e=new Date(s);e.setDate(e.getDate()+TRIAL_DAYS);TUTOR_SUB={status:'trial',trialStart:s.toISOString(),trialEnd:e.toISOString(),subStart:null,nextBilling:e.toISOString()};saveSubState();if(TUTOR.airtableId)apiPost('/subscription',{action:'start_trial',tutorId:TUTOR.airtableId});renderTutorDashboard();}
 function cancelSubscription(){TUTOR_SUB.status='cancelled';saveSubState();if(TUTOR.airtableId)apiPost('/subscription',{action:'cancel',tutorId:TUTOR.airtableId});renderTutorDashboard();}
 function goToRequests(){dashTab='requests';renderTutorDashboard();}
-function launchPayFast(){alert('PayFast integration coming soon!');}
+async function launchPayFast() {
+  var btn = event && event.target ? event.target : null;
+  if (btn) { btn.textContent = 'Redirecting to PayFast...'; btn.disabled = true; }
+  try {
+    var data = await apiPost('/subscribe', {
+      tutorId: TUTOR.airtableId || '',
+      tutorEmail: TUTOR.email,
+      tutorName: TUTOR.name
+    });
+    if (data.error) { alert('Payment error: ' + data.error); if(btn){btn.textContent='Subscribe Now';btn.disabled=false;} return; }
+    // Build and submit a form to PayFast
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = data.payfastUrl;
+    Object.entries(data.formData).forEach(function(kv) {
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = kv[0];
+      input.value = kv[1];
+      form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+  } catch(e) {
+    alert('Something went wrong. Please try again.');
+    if(btn){btn.textContent='Subscribe Now';btn.disabled=false;}
+  }
+}
 function saveTutorProfile(){var name=document.getElementById('tpName')?document.getElementById('tpName').value:'';var email=document.getElementById('tpEmail')?document.getElementById('tpEmail').value:'';var phone=document.getElementById('tpPhone')?document.getElementById('tpPhone').value:'';var city=document.getElementById('tpCity')?document.getElementById('tpCity').value:'';if(name)TUTOR.name=name;if(email)TUTOR.email=email;if(phone)TUTOR.phone=phone;if(city)TUTOR.city=city;var nameEl=document.getElementById('dashUnameEl');if(nameEl)nameEl.textContent=TUTOR.name;showSaveToast();}
 
 async function loadTutorData(){if(!TUTOR.email)return;try{var r1=await apiGet('/sessions?email='+encodeURIComponent(TUTOR.email)+'&type=tutor');tutorSessions=[];tutorPastSessions=[];if(r1.sessions)r1.sessions.forEach(function(s){var obj={id:s.id,learner:s.learner_name||'',subject:s.subject,date:s.day,time:s.time,mode:s.mode,rate:parseFloat(s.rate)||0,status:s.status};if(s.status==='confirmed'||s.status==='pending')tutorSessions.push(obj);else tutorPastSessions.push(obj);});var r2=await apiGet('/payments?email='+encodeURIComponent(TUTOR.email)+'&type=tutor');tutorEarnings=r2.payments?r2.payments.filter(function(p){return p.status==='paid';}).map(function(p){return{id:p.invoice_id||p.id,date:p.paid_on||'',learner:p.learner_name||'',subject:p.subject,amount:parseFloat(p.amount)||0};}):[];}catch(e){console.error('[loadTutorData]',e);}}
@@ -1315,9 +1349,12 @@ function renderSubGate(){document.getElementById('app').innerHTML='<div style="m
 function renderSubExpired(){document.getElementById('app').innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px"><div style="max-width:480px;width:100%;text-align:center"><div style="font-family:Cormorant Garamond,serif;font-size:42px;font-weight:300;margin-bottom:12px">Subscription <em style="color:var(--red)">Expired</em></div><button onclick="launchPayFast()" style="width:100%;padding:16px;background:var(--gold);color:var(--black);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-bottom:12px">Resubscribe</button><button onclick="exitDashboard()" style="width:100%;padding:14px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.12);cursor:pointer;">Back to Website</button></div></div>';}
 
 function renderTutorDashboard(){
-  if(TUTOR_SUB.status==='none')loadSubState();
+  // Only load from localStorage if API hasn't set subscription yet
+  if(TUTOR_SUB.status==='none' && !TUTOR_SUB.trialEnd) loadSubState();
+  // If still none after localStorage check, show trial gate
   if(TUTOR_SUB.status==='none'){renderSubGate();return;}
-  if(!isSubActive()&&TUTOR_SUB.status!=='active'){renderSubExpired();return;}
+  // Check if trial/subscription is actually active
+  if(!isSubActive()&&TUTOR_SUB.status!=='active'&&TUTOR_SUB.status!=='trial'){renderSubExpired();return;}
   var totalEarned=tutorEarnings.reduce(function(s,e){return s+e.amount;},0);
   var requests=tutorSessions.filter(function(s){return s.status==='pending';});
   var confirmed=tutorSessions.filter(function(s){return s.status==='confirmed';});
