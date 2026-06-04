@@ -11,7 +11,15 @@ export default async function handler(req, res) {
     if (!email) return err(res, 'Email required');
     try {
       let rows;
-      if (type === 'tutor') {
+      if (type === 'tutor-slots') {
+        // Return just booked day+time slots for a tutor (by name)
+        const tutorName = req.query.tutorName || '';
+        const slots = await query(`
+          SELECT day, time FROM epiphany.main.sessions
+          WHERE tutor_name = '${esc(tutorName)}' AND status = 'confirmed'
+        `);
+        return ok(res, { slots: slots.map(function(r){ return { day: r.day||r[0], time: r.time||r[1] }; }) });
+      } else if (type === 'tutor') {
         rows = await query(`
           SELECT id, learner_name, learner_email, subject, day, time, mode,
                  CAST(rate AS DOUBLE) as rate, status, booked_on
