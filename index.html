@@ -814,6 +814,14 @@ function render() {
 
 function renderHome() {
   if (!TUTORS_LOADED) { loadTutors().then(() => render()); }
+  // Load live stats from API
+  apiGet('/stats').then(function(data) {
+    if (data.error) return;
+    var el;
+    el = document.getElementById('statStudents'); if (el) el.textContent = data.students || 0;
+    el = document.getElementById('statTutors');   if (el) el.textContent = data.tutors   || TUTORS.length || 0;
+    el = document.getElementById('statSubjects'); if (el) el.textContent = data.subjects || 0;
+  }).catch(function(){});
   const feat = TUTORS.slice(0, 4);
   return `<div class="page">
 <section class="hero"><div class="hero-bg"></div><div class="hero-bg-text">EPIPHANY</div>
@@ -822,11 +830,11 @@ function renderHome() {
   <h1 class="hero-title">Unlock your child's<br><em>true potential</em></h1>
   <p class="hero-sub">Connect with South Africa's finest educators. Expert tutors, flexible scheduling, and transformative results &mdash; all in one place.</p>
   <div class="hero-actions"><button class="btn-gold" onclick="navigate('catalogue')">Browse Tutors</button><button class="btn-ghost" onclick="navigate('register')">Become a Tutor</button></div>
-  <div class="hero-stats">
-    <div><div class="stat-n">${TUTORS.length||0}</div><div class="stat-l">Expert Tutors</div></div>
-    <div><div class="stat-n">${TUTORS.reduce(function(s,t){return s+(t.sessions||0);},0)||0}</div><div class="stat-l">Sessions Booked</div></div>
+  <div class="hero-stats" id="heroStats">
+    <div><div class="stat-n" id="statTutors">${TUTORS.length||0}</div><div class="stat-l">Expert Tutors</div></div>
+    <div><div class="stat-n" id="statStudents">0</div><div class="stat-l">Students Registered</div></div>
     <div><div class="stat-n">98%</div><div class="stat-l">Satisfaction Rate</div></div>
-    <div><div class="stat-n">${[...new Set(TUTORS.flatMap(function(t){return t.subjects;}))].length||0}</div><div class="stat-l">Subjects</div></div>
+    <div><div class="stat-n" id="statSubjects">${[...new Set(TUTORS.flatMap(function(t){return t.subjects;}))].length||0}</div><div class="stat-l">Subjects</div></div>
   </div>
 </div></section>
 <section class="featured-strip">
