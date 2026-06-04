@@ -1050,9 +1050,24 @@ function confirmBooking() {
     rate: t.rate * 2, // 2-hour session
     mode: selMode || t.mode[0]
   }).then(function(r) {
-    if (r && r.error) console.error('[booking] failed:', r.error);
-    else console.log('[booking] saved ✓');
+    if (r && r.error) {
+      console.error('[booking] failed:', r.error);
+      // If double booking error, reset and show message
+      if (r.error.includes('already been booked')) {
+        bookingDone = false;
+        selTime = null;
+        // Add the slot to local booked list immediately
+        BOOKED_SLOTS.push({ day: selDay, time: selTime });
+        alert('Sorry! This time slot was just booked by someone else. Please choose another time.');
+        render();
+      }
+    } else {
+      console.log('[booking] saved ✓');
+      // Add to local booked slots so same user can't double book
+      BOOKED_SLOTS.push({ day: selDay, time: t_time });
+    }
   });
+  var t_time = selTime; // capture before render
 
   render();
 }
