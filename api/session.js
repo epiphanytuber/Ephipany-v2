@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       const u = rows[0];
       return ok(res, { success: true, type: 'learner',
         user: { id: String(col(u,'id')||''), name: col(u,'full_name')||'',
-                email: col(u,'email')||'', phone: col(u,'phone')||'', since: col(u,'registered_on')||'' }
+                email: col(u,'email')||'', phone: col(u,'phone')||'', since: col(u,'registered_on') ? new Date(String(col(u,'registered_on'))).toLocaleString('en-ZA',{month:'long',year:'numeric'}) : '' }
       });
     }
 
