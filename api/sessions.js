@@ -54,6 +54,20 @@ export default async function handler(req, res) {
 
     try {
       const id = 'BK-' + Date.now();
+
+      // ── SERVER-SIDE double booking check ──────────────────────────
+      const conflict = await query(`
+        SELECT id FROM epiphany.main.sessions
+        WHERE tutor_name = '${esc(tutorName)}'
+          AND day = '${esc(day)}'
+          AND time = '${esc(time)}'
+          AND status = 'confirmed'
+        LIMIT 1
+      `);
+      if (conflict.length > 0) {
+        return err(res, 'This time slot has already been booked. Please choose another time.');
+      }
+
       await query(`
         INSERT INTO epiphany.main.sessions
           (id, learner_name, learner_email, tutor_name, subject, day, time,
