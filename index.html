@@ -550,7 +550,7 @@ let authModal = null;
 let authError = '';
 let page = 'home', activeTutor = null;
 let catSearch = '', catSubject = 'All Subjects', catLocation = 'All Locations', catMode = 'All Modes';
-let selDay = null, selTime = null, bcName = '', bcEmail = '', bookingDone = false;
+let selDay = null, selTime = null, selMode = null, bcName = '', bcEmail = '', bookingDone = false;
 let regRole = 'learner', regDone = false, regError = '';
 let dashTab = 'overview', histFilter = 'all';
 let cancelledIds = [], paidIds = [];
@@ -660,7 +660,7 @@ function selectTutor(id) {
 }
 function navigate(p, tutor) {
   page = p;
-  if (tutor) { activeTutor = tutor; selDay = null; selTime = null; bcName = ''; bcEmail = ''; bookingDone = false; }
+  if (tutor) { activeTutor = tutor; selDay = null; selTime = null; selMode = null; bcName = ''; bcEmail = ''; bookingDone = false; }
   ['home','catalogue','register'].forEach(id => {
     const el = document.getElementById('nl-' + id);
     if (el) el.classList.toggle('active', id === p);
@@ -928,18 +928,54 @@ function buildBookingPanel(t) {
   var times = selDay ? '<div class="bc-label">Select Time</div><div class="bc-times">'
     +TIMES.map(function(ti){ return '<button class="bc-time'+(selTime===ti?' sel':'')+'" onclick="pickTime(&quot;'+ti+'&quot;)">'+ti+'</button>'; }).join('')
     +'</div>' : '';
+  // Build mode selector based on what the tutor offers
+  var tutorModes = t.mode || ['Online'];
+  var hasOnline    = tutorModes.includes('Online');
+  var hasInPerson  = tutorModes.includes('In-Person');
+  var bothModes    = hasOnline && hasInPerson;
+
+  var modeSelector = '<div class="bc-label">Session Mode</div><div style="display:flex;gap:8px;margin-bottom:20px">';
+  var onlineStyle  = hasOnline
+    ? (selMode==='Online' ? 'bc-day sel' : 'bc-day avail')
+    : 'bc-day';
+  var inPersonStyle = hasInPerson
+    ? (selMode==='In-Person' ? 'bc-day sel' : 'bc-day avail')
+    : 'bc-day';
+  var onlineClick   = hasOnline   ? ' onclick="pickMode(&quot;Online&quot;)"'    : '';
+  var inPersonClick = hasInPerson ? ' onclick="pickMode(&quot;In-Person&quot;)"' : '';
+  var disabledStyle = 'opacity:0.35;cursor:not-allowed;filter:blur(1px)';
+
+  modeSelector += '<div class="'+onlineStyle+'" style="width:auto;padding:0 16px;'+(hasOnline?'':''+disabledStyle)+'"'+onlineClick+'>&#128187; Online</div>';
+  modeSelector += '<div class="'+inPersonStyle+'" style="width:auto;padding:0 16px;'+(hasInPerson?'':''+disabledStyle)+'"'+inPersonClick+'>&#127979; In-Person</div>';
+  modeSelector += '</div>';
+
+  // Auto-select mode if tutor only offers one
+  if (!selMode) {
+    if (!hasOnline && hasInPerson) selMode = 'In-Person';
+    else if (hasOnline && !hasInPerson) selMode = 'Online';
+  }
+
   return '<div class="booking-card-title">Book a Session</div>'
     +'<div class="booking-card-sub">with '+t.name.split(' ')[0]+'</div>'
     +'<div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--gold)">Booking as: <strong>'+LEARNER.name+'</strong></div>'
+    +modeSelector
     +'<div class="bc-label">Select Day</div>'
     +'<div class="bc-days">'+days+'</div>'
     +times
     +'<div class="bc-summary" style="margin-top:16px">'
     +'<div class="bc-summary-row"><span>Session rate</span><span>R'+t.rate+'</span></div>'
     +'<div class="bc-summary-total"><span>Total</span><span>R'+t.rate+'</span></div></div>'
-    +'<button class="bc-confirm" id="bookBtn"'+(selDay&&selTime?'':' disabled')+' onclick="confirmBooking()">Confirm Booking</button>';
+    +'<button class="bc-confirm" id="bookBtn"'+(selDay&&selTime&&selMode?'':' disabled')+' onclick="confirmBooking()">Confirm Booking</button>';
 }
 
+function pickMode(m) {
+  selMode = m;
+  var t = activeTutor;
+  if (t) {
+    var panel = document.querySelector('.booking-card');
+    if (panel) panel.innerHTML = buildBookingPanel(t);
+  }
+}
 function pickDay(d) { selDay = d; selTime = null; render(); }
 function pickTime(t) { selTime = t; const b = document.getElementById('bookBtn'); if (b) b.disabled = !(selDay && selTime); }
 function updateBookBtn() { const b = document.getElementById('bookBtn'); if (b) b.disabled = !(selDay && selTime); }
@@ -970,7 +1006,7 @@ function confirmBooking() {
     day: selDay,
     time: selTime,
     rate: t.rate,
-    mode: t.mode[0]
+    mode: selMode || t.mode[0]
   }).then(function(r) {
     if (r && r.error) console.error('[booking] failed:', r.error);
     else console.log('[booking] saved ✓');
