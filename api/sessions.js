@@ -12,7 +12,6 @@ export default async function handler(req, res) {
     try {
       let rows;
       if (type === 'tutor-slots') {
-        // Return just booked day+time slots for a tutor (by name)
         const tutorName = req.query.tutorName || '';
         const slots = await query(`
           SELECT day, time FROM epiphany.main.sessions
