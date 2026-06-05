@@ -380,20 +380,134 @@ body{background:var(--black);color:var(--white);font-family:'Nunito Sans',sans-s
   .settings-grid{grid-template-columns:1fr}
   .modal-card-row{grid-template-columns:1fr}
 }
+@media(max-width:1024px){
+  .tutor-grid{grid-template-columns:repeat(2,1fr)}
+  .strip-grid{grid-template-columns:repeat(2,1fr)}
+  .ov-grid{grid-template-columns:repeat(2,1fr)}
+  .pay-top{grid-template-columns:1fr}
+  .settings-grid{grid-template-columns:1fr}
+  .modal-card-row{grid-template-columns:1fr}
+}
+
 @media(max-width:768px){
-  .nav,.dash-nav{padding:0 24px}
-  .hero,.featured-strip,.how-section,.cat-hero,.catalogue-body,.profile-main,.profile-sidebar,.register-page,.dash-section{padding-left:24px;padding-right:24px}
-  .filters-bar{padding-left:24px;padding-right:24px;top:64px}
-  .hero-title{font-size:52px}
-  .tutor-grid{grid-template-columns:1fr}
-  .steps{grid-template-columns:1fr}
+  /* ── NAV ── */
+  .mob-menu-btn{display:flex!important}
+  .mob-bottom-nav{display:none}
+  .nav{padding:0 16px;height:60px}
+  .nav-logo{font-size:20px;letter-spacing:5px}
+  .nav-links{gap:4px}
+  .nav-link{display:none}
+  .nav-cta{display:none}
+  .nav-cta.filled{display:flex;padding:8px 14px;font-size:9px;letter-spacing:1.5px}
+  .dash-nav{padding:0 16px;height:60px}
+  .dash-back-btn{font-size:9px;padding:6px 12px;letter-spacing:1px}
+  .dash-uname{font-size:12px}
+
+  /* ── HAMBURGER MENU ── */
+  .mob-menu-btn{display:flex!important}
+
+  /* ── HERO ── */
+  .hero{min-height:auto;padding:48px 20px 40px}
+  .hero-bg-text{display:none}
+  .hero-title{font-size:38px;line-height:1.1;margin-bottom:20px}
+  .hero-sub{font-size:13px;margin-bottom:28px}
+  .hero-actions{flex-direction:column;gap:10px;margin-bottom:40px}
+  .hero-actions .btn-gold,.hero-actions .btn-ghost{width:100%;text-align:center;padding:14px}
+  .hero-stats{gap:24px;flex-wrap:wrap;padding-top:28px}
+  .stat-n{font-size:32px}
+  .stat-l{font-size:9px}
+
+  /* ── FEATURED STRIP ── */
+  .featured-strip{padding:40px 16px}
+  .strip-header{flex-direction:column;gap:16px;margin-bottom:24px}
+  .strip-grid{grid-template-columns:1fr 1fr;gap:2px}
+  .strip-card{aspect-ratio:2/3}
+  .strip-card-name{font-size:16px}
+
+  /* ── HOW IT WORKS ── */
+  .how-section{padding:40px 16px}
+  .steps{grid-template-columns:1fr;gap:28px;margin-top:28px}
+  .step-num{font-size:48px;margin-bottom:10px}
+
+  /* ── CATALOGUE ── */
+  .cat-hero{padding:40px 16px 24px}
+  .cat-hero-inner{flex-direction:column;gap:8px}
+  .filters-bar{padding:16px;top:60px;gap:10px}
+  .filter-search{min-width:100%}
+  .filter-select{min-width:140px}
+  .catalogue-body{padding:20px 16px}
+  .tutor-grid{grid-template-columns:1fr;gap:8px}
+  .t-card-img-wrap{height:200px}
+  .t-card-body{padding:16px}
+  .t-card-name{font-size:18px}
+
+  /* ── PROFILE ── */
   .profile-hero{grid-template-columns:1fr}
-  .profile-hero-img{height:320px}
+  .profile-hero-img{height:260px}
+  .profile-hero-img::after{background:linear-gradient(to top,var(--black) 0%,transparent 60%)}
+  .profile-hero-content{padding:24px 16px}
+  .profile-name{font-size:36px}
+  .profile-quick{gap:20px}
+  .pq-val{font-size:20px}
   .profile-body{grid-template-columns:1fr}
-  .dash-sidebar{display:none}
+  .profile-main{padding:24px 16px;border-right:none;border-bottom:1px solid var(--border)}
+  .profile-sidebar{padding:24px 16px}
+  .booking-card{position:static}
+  .bc-days{gap:4px}
+  .bc-day{width:38px;height:38px;font-size:8px}
+
+  /* ── REGISTER ── */
+  .register-page{padding:40px 16px;max-width:100%}
   .reg-grid{grid-template-columns:1fr}
   .reg-group-full{grid-column:1}
-  .footer{padding:32px 24px;flex-direction:column;align-items:flex-start}
+  .reg-tabs{gap:0}
+  .reg-tab{padding:10px 16px;font-size:9px}
+  .section-title{font-size:32px}
+
+  /* ── DASHBOARD ── */
+  .dashboard-wrap{flex-direction:column}
+  .dash-sidebar{display:none!important}
+  .dash-main{width:100%}
+  .dash-section{padding:24px 16px}
+  .dash-title{font-size:28px}
+  .ov-grid{grid-template-columns:1fr 1fr;gap:2px;margin-bottom:24px}
+  .ov-card{padding:16px}
+  .ov-value{font-size:28px}
+  .ov-label{font-size:8px}
+  .lc{padding:12px;gap:10px;flex-wrap:wrap}
+  .lc-img{width:36px;height:36px}
+  .lc-right{width:100%;justify-content:flex-start;gap:8px;flex-wrap:wrap}
+  .lc-join,.lc-cancel{padding:6px 12px;font-size:8px}
+  .sub-hdg{font-size:18px}
+  .pay-card{padding:20px}
+  .pay-card-value{font-size:32px}
+  .inv-table{font-size:11px}
+  .inv-table th,.inv-table td{padding:8px}
+  .settings-grid{grid-template-columns:1fr}
+
+  /* ── MOBILE BOTTOM NAV ── */
+  .mob-bottom-nav{display:flex!important}
+
+  /* ── AUTH MODAL ── */
+  .auth-box{padding:28px 20px;max-width:100%;border-radius:0;position:fixed;bottom:0;left:0;right:0;top:auto;border-bottom:none;max-height:90vh}
+  .auth-overlay{align-items:flex-end;padding:0}
+
+  /* ── FOOTER ── */
+  .footer{padding:28px 16px;flex-direction:column;gap:16px}
+  .footer-links{gap:16px;flex-wrap:wrap}
+  .footer-link{font-size:9px}
+
+  /* ── MISC ── */
+  .modal-box{margin:16px;padding:24px}
+  .profile-section-title{font-size:22px}
+}
+
+/* ── EXTRA SMALL ── */
+@media(max-width:380px){
+  .hero-title{font-size:32px}
+  .ov-grid{grid-template-columns:1fr}
+  .strip-grid{grid-template-columns:1fr}
+  .nav-cta.filled{font-size:8px;padding:7px 10px}
 }
 </style>
 </head>
@@ -401,7 +515,12 @@ body{background:var(--black);color:var(--white);font-family:'Nunito Sans',sans-s
 
 <nav class="nav" id="marketNav">
   <div class="nav-logo" onclick="navigate('home')">Epi<span>phany</span></div>
-  <div class="nav-links">
+  <button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleMobMenu()" style="display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:8px">
+    <span style="display:block;width:22px;height:2px;background:var(--gold);transition:all .3s"></span>
+    <span style="display:block;width:22px;height:2px;background:var(--gold);transition:all .3s"></span>
+    <span style="display:block;width:16px;height:2px;background:var(--gold);transition:all .3s"></span>
+  </button>
+  <div class="nav-links" id="navLinks">
     <button class="nav-link active" id="nl-home"      onclick="navigate('home')">Home</button>
     <button class="nav-link"        id="nl-catalogue" onclick="navigate('catalogue')">Find a Tutor</button>
     <button class="nav-link"        id="nl-register"  onclick="navigate('register')">Become a Tutor</button>
@@ -422,6 +541,32 @@ body{background:var(--black);color:var(--white);font-family:'Nunito Sans',sans-s
 </nav>
 
 <div id="authModalMount"></div>
+<div id="mobMenu" style="display:none;position:fixed;inset:0;z-index:998;background:rgba(8,8,8,.98);backdrop-filter:blur(20px);flex-direction:column;align-items:center;justify-content:center;gap:8px">
+  <button onclick="closeMobMenu();navigate('home')" style="width:80%;padding:18px;background:none;border:none;color:var(--white);font-size:14px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-bottom:1px solid rgba(201,168,76,.1);font-family:sans-serif">Home</button>
+  <button onclick="closeMobMenu();navigate('catalogue')" style="width:80%;padding:18px;background:none;border:none;color:var(--white);font-size:14px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-bottom:1px solid rgba(201,168,76,.1);font-family:sans-serif">Find a Tutor</button>
+  <button onclick="closeMobMenu();navigate('register')" style="width:80%;padding:18px;background:none;border:none;color:var(--white);font-size:14px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border-bottom:1px solid rgba(201,168,76,.1);font-family:sans-serif">Become a Tutor</button>
+  <button onclick="closeMobMenu();handleAccountClick()" style="width:80%;padding:18px;background:var(--gold);color:var(--black);font-size:14px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;border:none;font-weight:700;font-family:sans-serif;margin-top:16px" id="mobAccountBtn">My Account</button>
+  <button onclick="closeMobMenu()" style="margin-top:16px;background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer">&#10005;</button>
+</div>
+
+<!-- Mobile bottom nav for dashboard -->
+<nav id="mobBottomNav" class="mob-bottom-nav" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:997;background:rgba(8,8,8,.97);border-top:1px solid var(--border);padding:8px 0;justify-content:space-around;align-items:center">
+  <button onclick="switchTab('overview')" style="background:none;border:none;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;font-family:sans-serif" id="mobTabOverview">
+    <span style="font-size:18px">&#9672;</span><span style="font-size:8px;letter-spacing:1px;text-transform:uppercase">Home</span>
+  </button>
+  <button onclick="switchTab('upcoming')" style="background:none;border:none;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;font-family:sans-serif" id="mobTabUpcoming">
+    <span style="font-size:18px">&#9719;</span><span style="font-size:8px;letter-spacing:1px;text-transform:uppercase">Sessions</span>
+  </button>
+  <button onclick="switchTab('payments')" style="background:none;border:none;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;font-family:sans-serif" id="mobTabPayments">
+    <span style="font-size:18px">&#9678;</span><span style="font-size:8px;letter-spacing:1px;text-transform:uppercase">Payments</span>
+  </button>
+  <button onclick="switchTab('profile')" style="background:none;border:none;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;font-family:sans-serif" id="mobTabProfile">
+    <span style="font-size:18px">&#9673;</span><span style="font-size:8px;letter-spacing:1px;text-transform:uppercase">Profile</span>
+  </button>
+  <button onclick="exitDashboard()" style="background:none;border:none;color:var(--muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;font-family:sans-serif">
+    <span style="font-size:18px">&#8592;</span><span style="font-size:8px;letter-spacing:1px;text-transform:uppercase">Exit</span>
+  </button>
+</nav>
 <div id="app"></div>
 
 <footer class="footer" id="siteFooter">
@@ -629,6 +774,33 @@ function goDashboardAfterBooking() {
   loadLearnerData().then(function() { renderDashboard(); });
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+function toggleMobMenu() {
+  var m = document.getElementById('mobMenu');
+  if (!m) return;
+  var isOpen = m.style.display === 'flex';
+  m.style.display = isOpen ? 'none' : 'flex';
+  // Update account button text
+  var btn = document.getElementById('mobAccountBtn');
+  if (btn) btn.textContent = (isLoggedIn||tutorLoggedIn) ? '⬡ Dashboard' : 'My Account';
+}
+function closeMobMenu() {
+  var m = document.getElementById('mobMenu');
+  if (m) m.style.display = 'none';
+}
+function showMobBottomNav() {
+  var n = document.getElementById('mobBottomNav');
+  if (n) n.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+}
+function hideMobBottomNav() {
+  var n = document.getElementById('mobBottomNav');
+  if (n) n.style.display = 'none';
+}
+function updateMobTabActive() {
+  ['overview','upcoming','payments','profile'].forEach(function(t) {
+    var btn = document.getElementById('mobTab'+t.charAt(0).toUpperCase()+t.slice(1));
+    if (btn) btn.style.color = dashTab===t ? 'var(--gold)' : 'var(--muted)';
+  });
+}
 function goLogoClick() {
   // If in dashboard, exit to home but DON'T log out
   if (document.getElementById('dashNav').style.display === 'flex') {
@@ -752,7 +924,7 @@ function enterDashboard() {
   page = 'home'; // prevent render() from overwriting dashboard
   dashTab='overview';
   setCookie('epiphany_dash','learner',30);
-  loadLearnerData().then(function(){renderDashboard();});
+  loadLearnerData().then(function(){renderDashboard();showMobBottomNav();});
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function exitDashboard() {
@@ -764,9 +936,9 @@ function exitDashboard() {
   document.getElementById('marketNav').style.display='flex';
   document.getElementById('dashNav').style.display='none';
   document.getElementById('siteFooter').style.display='flex';
-  updateNavBtn();navigate('home');
+  hideMobBottomNav();updateNavBtn();navigate('home');
 }
-function switchTab(tab) { dashTab = tab; renderDashboard(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function switchTab(tab) { dashTab = tab; renderDashboard(); updateMobTabActive(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
 // ── AUTH MODAL ────────────────────────────────────────────────────
 function openAuthModal(mode) { authModal = mode; authError = ''; renderAuthModal(); }
@@ -1697,6 +1869,7 @@ function renderTutorDashboard(){
   var signOutBtn='<div style="padding:20px 28px;border-top:1px solid rgba(201,168,76,.08);position:absolute;bottom:0;left:0;right:0"><button onclick="exitDashboard()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(250,249,246,.1);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">&#8592; Sign Out</button></div>';
   var navHtml=navItems.map(function(n){var active=dashTab===n.id?' active':'';var badge=n.badge?'<span class="dash-nav-badge">'+n.badge+'</span>':'';return '<button class="dash-nav-item'+active+'" onclick="dashTab=&quot;'+n.id+'&quot;;renderTutorDashboard()"><span class="dash-nav-icon">'+n.icon+'</span>'+n.label+badge+'</button>';}).join('');
   var sidebar='<aside class="dash-sidebar"><div class="dash-sb-profile"><div class="dash-sb-label">Tutor Account</div><div class="dash-sb-user">'+avatarHTML(TUTOR.name,40,'border:1px solid var(--gold)')+'<div><div class="dash-sb-uname">'+TUTOR.name+'</div><div class="dash-sb-role" style="color:var(--gold)">Tutor</div></div></div></div><div class="dash-nav-label">Navigation</div>'+navHtml+signOutBtn+'</aside>';
+  var mainPad = window.innerWidth<=768 ? 'padding-bottom:80px' : '';
   var main='';
   if(dashTab==='overview'){var nxt=confirmed[0]||tutorSessions[0];var m='<div class="dash-section">'+trialBanner+'<div class="dash-eyebrow">Tutor Dashboard</div><div class="dash-title">Welcome back, <em>'+(TUTOR.name.split(' ')[0]||'Tutor')+'</em></div><div class="ov-grid"><div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">'+confirmed.length+'</div><div class="ov-sub">'+(nxt?'Next: '+nxt.date:'None scheduled')+'</div></div><div class="ov-card"><div class="ov-label">Completed</div><div class="ov-value">'+completedCt+'</div></div><div class="ov-card"><div class="ov-label">Total Earned</div><div class="ov-value gld">R'+totalEarned.toLocaleString()+'</div></div><div class="ov-card"><div class="ov-label">Pending Requests</div><div class="ov-value'+(requests.length?' amb':'')+'">'+requests.length+'</div>'+(requests.length?'<div class="ov-sub clk" onclick="goToRequests()">Review now</div>':'')+'</div></div><div class="sub-hdg">Next Session</div>'+(nxt?'<div class="lesson-list">'+tc(nxt)+'</div>':'<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>')+'</div>';main=m;}
   if(dashTab==='sessions'){var m='<div class="dash-section"><div class="dash-eyebrow">My Sessions</div><div class="dash-title"><em>Upcoming</em> Sessions</div>'+(confirmed.length>0?'<div class="lesson-list">'+confirmed.map(tc).join('')+'</div>':'<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>')+'<div class="sub-hdg" style="margin-top:16px">Past Sessions</div>'+(tutorPastSessions.length>0?'<div class="lesson-list">'+tutorPastSessions.map(tc).join('')+'</div>':'<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No past sessions yet.</div>')+'</div>';main=m;}
@@ -1704,7 +1877,7 @@ function renderTutorDashboard(){
   if(dashTab==='earnings'){var m='<div class="dash-section"><div class="dash-eyebrow">Finances</div><div class="dash-title">My <em>Earnings</em></div><div class="pay-top"><div class="pay-card"><div class="pay-card-label">Total Earned</div><div class="pay-card-value">R'+totalEarned.toLocaleString()+'</div></div><div class="pay-card"><div class="pay-card-label">Hourly Rate</div><div class="pay-card-value">R'+(TUTOR.rate||0)+'</div></div></div>'+(tutorEarnings.length>0?'<table class="inv-table"><thead><tr><th>Invoice</th><th>Date</th><th>Learner</th><th>Amount</th></tr></thead><tbody>'+tutorEarnings.map(function(e){return '<tr><td>'+e.id+'</td><td>'+e.date+'</td><td>'+e.learner+'</td><td style="color:var(--gold)">R'+e.amount+'</td></tr>';}).join('')+'</tbody></table>':'<div style="padding:32px 0;color:var(--muted);font-size:13px;text-align:center">No earnings yet.</div>')+'</div>';main=m;}
   if(dashTab==='subscription'){function fmt(d){return d?new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'}):'—';}var sl=TUTOR_SUB.status==='trial'?'Free Trial — '+dl+' day'+(dl!==1?'s':'')+' remaining':TUTOR_SUB.status==='active'?'Active':'Inactive';var m='<div class="dash-section"><div class="dash-eyebrow">Billing</div><div class="dash-title">My <em>Subscription</em></div><div class="pay-top"><div class="pay-card"><div class="pay-card-label">Status</div><div class="pay-card-value" style="font-size:28px">'+(TUTOR_SUB.status==='trial'?'Free Trial':TUTOR_SUB.status==='active'?'Active':'Inactive')+'</div><div class="pay-card-sub">'+sl+'</div></div><div class="pay-card"><div class="pay-card-label">Monthly Fee</div><div class="pay-card-value">R'+SUB_PRICE+'</div><div class="pay-card-sub">after free trial</div></div></div>';if(TUTOR_SUB.status==='trial'){m+='<div style="background:var(--black3);padding:32px;margin-bottom:24px;border:1px solid var(--border)"><div style="font-family:Georgia,serif;font-size:22px;margin-bottom:8px">Trial ends <span style="color:var(--gold)">'+fmt(TUTOR_SUB.trialEnd)+'</span></div><div style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.8">Subscribe to keep your profile live. R'+SUB_PRICE+'/month. Cancel anytime.</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-right:12px">Subscribe Now</button><button onclick="if(confirm(&quot;Cancel trial?&quot;))cancelSubscription()" style="padding:14px 20px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.15);cursor:pointer;">Cancel Trial</button></div>';}if(TUTOR_SUB.status==='cancelled'||TUTOR_SUB.status==='expired'){m+='<div style="background:var(--black3);padding:32px;border:1px solid rgba(224,92,92,.2)"><div style="font-family:Georgia,serif;font-size:22px;margin-bottom:8px;color:var(--red)">Subscription Ended</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Reactivate</button></div>';}m+='</div>';main=m;}
   if(dashTab==='tprofile'){var m='<div class="dash-section"><div class="dash-eyebrow">Account</div><div class="dash-title">Tutor <em>Profile</em></div><div class="gold-rule"></div><div class="settings-avatar-row">'+avatarHTML(TUTOR.name,72,'border:2px solid var(--gold)')+'<div><div style="font-size:16px;font-weight:600;margin-bottom:4px">'+TUTOR.name+'</div><div style="font-size:12px;color:var(--gold);margin-bottom:4px">'+(TUTOR.subject||'')+'</div></div></div><div class="settings-grid"><div class="setting-group"><label class="setting-label">Full Name</label><input class="setting-input" id="tpName" value="'+TUTOR.name+'"/></div><div class="setting-group"><label class="setting-label">Email</label><input class="setting-input" id="tpEmail" value="'+TUTOR.email+'"/></div><div class="setting-group"><label class="setting-label">Phone</label><input class="setting-input" id="tpPhone" value="'+(TUTOR.phone||'')+'"/></div><div class="setting-group"><label class="setting-label">City</label><input class="setting-input" id="tpCity" value="'+(TUTOR.city||'')+'"/></div></div><div style="display:flex;align-items:center"><button class="settings-save" onclick="saveTutorProfile()">Save Changes</button><span class="save-toast" id="saveToast" style="display:none">&#10003; Saved</span></div></div>';main=m;}
-  document.getElementById('app').innerHTML='<div class="dashboard-wrap">'+sidebar+'<main class="dash-main">'+main+'</main></div>';
+  document.getElementById('app').innerHTML='<div class="dashboard-wrap">'+sidebar+'<main class="dash-main" style="'+mainPad+'">'+main+'</main></div>';
 }
 
 loadTutors();
