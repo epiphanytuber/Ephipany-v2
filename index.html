@@ -968,12 +968,44 @@ function buildBookingPanel(t) {
       +'<button onclick="goToRegisterFromModal()" style="'+btnStyle+';background:transparent;color:var(--white);border:1px solid rgba(250,249,246,.2)">Create Account</button>'
       +'</div>';
   }
-  var days = DAYS.map(function(d) {
-    var a = t.availability.includes(d);
-    var cls = 'bc-day' + (!a ? '' : selDay === d ? ' sel' : ' avail');
-    return '<div class="'+cls+'"'+(a?' onclick="pickDay(&quot;'+d+'&quot;)"':'')+'>'+d+'</div>';
-  }).join('');
-  var bookedForDay = BOOKED_SLOTS.filter(function(s){ return s.day === selDay; }).map(function(s){ return s.time; });
+  // Build next 30 days that match tutor availability
+  var DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var today = new Date();
+  var availDates = [];
+  for (var di = 1; di <= 60; di++) {
+    var d = new Date(today);
+    d.setDate(today.getDate() + di);
+    var dayName = DAY_NAMES[d.getDay()];
+    if (t.availability.includes(dayName)) {
+      availDates.push({
+        dayName: dayName,
+        date: d,
+        iso: d.toISOString().split('T')[0],
+        label: d.toLocaleDateString('en-ZA', {weekday:'short', day:'numeric', month:'short', year:'numeric'})
+      });
+    }
+    if (availDates.length >= 20) break;
+  }
+  var days = '<div style="display:flex;flex-wrap:wrap;gap:6px">'
+    + availDates.map(function(ad) {
+        var isSel = selDay === ad.iso;
+        var isBooked = BOOKED_SLOTS.some(function(s){
+          // Match ISO date OR day name (for legacy bookings)
+          return s.day === ad.iso || s.day === ad.dayName;
+        });
+        var cls = isBooked ? 'bc-day' : (isSel ? 'bc-day sel' : 'bc-day avail');
+        var style = isBooked ? 'width:auto;padding:0 10px;font-size:9px;opacity:0.35;cursor:not-allowed;filter:blur(1px)' : 'width:auto;padding:0 10px;font-size:9px';
+        var click = isBooked ? '' : ' onclick="pickDay(&quot;'+ad.iso+'&quot;)"';
+        var label = isBooked ? ad.label+' BOOKED' : ad.label;
+        return '<div class="'+cls+'" style="'+style+'"'+click+'>'+label+'</div>';
+      }).join('')
+    + '</div>';
+  // Build day name from ISO date for legacy comparisons
+  var DAY_NAMES2 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var selDayName = selDay && selDay.length === 10 ? DAY_NAMES2[new Date(selDay+'T12:00:00').getDay()] : selDay;
+  var bookedForDay = BOOKED_SLOTS.filter(function(s){
+    return s.day === selDay || s.day === selDayName;
+  }).map(function(s){ return s.time; });
   var times = selDay ? '<div class="bc-label">Select Time</div><div class="bc-times">'
     +TIMES.map(function(ti){
       var isBooked = bookedForDay.includes(ti);
@@ -1213,17 +1245,39 @@ async function submitRegistration() {
 
 // ── LESSON CARD ───────────────────────────────────────────────────
 function lessonCard(l) {
-  const cancelled = cancelledIds.includes(l.id);
-  const st = cancelled ? 'cancelled' : l.status;
-  const bcls = st === 'confirmed' ? 'lc-up' : st === 'pending' ? 'lc-pend' : st === 'cancelled' ? 'lc-can' : '';
-  let act = '';
-  if (st === 'confirmed') act += `<button class="lc-join" onclick="alert('Opening session link...')">Join &rarr;</button>`;
-  if (st === 'pending')   act += `<button class="lc-cancel" onclick="cancelLesson('${l.id}')">Cancel</button>`;
-  if (st === 'completed' && !l.rated) act += `<button class="lc-rate-btn">Rate &#9733;</button>`;
-  if (st === 'completed' && l.rated)  act += `<span class="lc-stars">${'&#9733;'.repeat(l.rating)}</span>`;
-  return `<div class="lc ${bcls}"><img src="${l.img}" class="lc-img" alt="${l.tutor}"/><div class="lc-info"><div class="lc-tutor">${l.tutor}</div><div class="lc-subj">${l.subject}</div><div class="lc-meta"><span class="lc-date">&#128197; ${l.date} &middot; ${l.time}</span><span class="lc-mode">${l.mode}</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R${l.rate}</span>${pill(st)}${act}</div></div>`;
+  var cancelled = cancelledIds.includes(l.id) || l.status === 'cancelled';
+  var st = cancelled ? 'cancelled' : l.status;
+  var bcls = st==='confirmed'?'lc-up':st==='pending'?'lc-pend':st==='cancelled'?'lc-can':'';
+  var act = '';
+  var dateStr = l.date && l.date.length===10
+    ? new Date(l.date+'T12:00:00').toLocaleDateString('en-ZA',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
+    : (l.date || '—');
+  if (st === 'confirmed') {
+    act += '<button class="lc-join" onclick="alert(&quot;Session joining link coming soon!&quot;)">Join &rarr;</button>';
+    act += '<button class="lc-cancel" onclick="doCancelFromCard(this)" data-id="'+l.id+'" data-tutor="'+l.tutor+'" data-subject="'+l.subject+'">Cancel</button>';
+  }
+  if (st === 'completed' && !l.rated) act += '<button class="lc-rate-btn">Rate &#9733;</button>';
+  if (st === 'completed' && l.rated)  act += '<span class="lc-stars">'+'&#9733;'.repeat(l.rating)+'</span>';
+  return '<div class="lc '+bcls+'">'
+    +avatarHTML(l.tutor,44)
+    +'<div class="lc-info">'
+    +'<div class="lc-tutor">'+l.tutor+'</div>'
+    +'<div class="lc-subj">'+l.subject+'</div>'
+    +'<div class="lc-meta">'
+    +'<span class="lc-date">&#128197; '+dateStr+' &middot; '+l.time+'</span>'
+    +'<span class="lc-mode">'+l.mode+'</span>'
+    +'<span class="lc-mode">2hrs</span>'
+    +'</div></div>'
+    +'<div class="lc-right"><span class="lc-rate-lbl">R'+l.rate+'</span>'+pill(st)+act+'</div>'
+    +'</div>';
 }
 
+function doCancelFromCard(btn) {
+  var id      = btn.getAttribute('data-id');
+  var tutor   = btn.getAttribute('data-tutor');
+  var subject = btn.getAttribute('data-subject');
+  showCancelModal(id, tutor, subject);
+}
 function showCancelModal(sessionId, tutorName, subject) {
   // Store for later use
   window._cancelSessionId = sessionId;
@@ -1345,9 +1399,10 @@ ${signOutBtnL}
   }
 
   if (dashTab === 'upcoming') {
+    var upcomingFiltered = UPCOMING_L.filter(function(s){ return s.status !== 'cancelled'; });
     main = '<div class="dash-section"><div class="dash-eyebrow">My Lessons</div><div class="dash-title"><em>Upcoming</em> Sessions</div>'
-      + '<div class="sub-hdg">Confirmed &amp; Pending <span class="sub-hdg-count">' + UPCOMING_L.length + ' sessions</span></div>'
-      + (UPCOMING_L.length > 0 ? '<div class="lesson-list">' + UPCOMING_L.map(lessonCard).join('') + '</div>' : '<div style="padding:48px 0;text-align:center;color:var(--muted);font-size:13px">No upcoming sessions yet.<br><br><span style="color:var(--gold);cursor:pointer" onclick="goToCatalogue()">Browse Tutors &rarr;</span></div>')
+      + '<div class="sub-hdg">Confirmed &amp; Pending <span class="sub-hdg-count">' + upcomingFiltered.length + ' sessions</span></div>'
+      + (upcomingFiltered.length > 0 ? '<div class="lesson-list">' + upcomingFiltered.map(lessonCard).join('') + '</div>' : '<div style="padding:48px 0;text-align:center;color:var(--muted);font-size:13px">No upcoming sessions yet.<br><br><span style="color:var(--gold);cursor:pointer" onclick="goToCatalogue()">Browse Tutors &rarr;</span></div>')
       + '</div>';
   }
 
