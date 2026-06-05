@@ -34,7 +34,7 @@ export default async function handler(req, res) {
     // Cancel the session
     await query(`
       UPDATE epiphany.main.sessions
-      SET status = 'cancelled', updated_at = NOW()
+      SET status = 'cancelled'
       WHERE id = '${esc(sessionId)}'
     `);
 
