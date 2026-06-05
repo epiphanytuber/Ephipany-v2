@@ -565,7 +565,7 @@ function gv(id) { const el = document.getElementById(id); return el ? el.value.t
 function today() { return new Date().toISOString().split('T')[0]; }
 function monthYear() { return new Date().toLocaleString('en-ZA', { month: 'long', year: 'numeric' }); }
 const S = n => `<span class="stars-gold">${'&#9733;'.repeat(Math.floor(n))}${'&#9734;'.repeat(5 - Math.floor(n))}</span>`;
-const PILL_MAP = { confirmed: 'pill-confirmed', pending: 'pill-pending', completed: 'pill-completed', cancelled: 'pill-cancelled' };
+const PILL_MAP = { confirmed: 'pill-confirmed', pending: 'pill-pending', pending_payment: 'pill-pending', completed: 'pill-completed', cancelled: 'pill-cancelled' };
 function pill(s) { return `<span class="lc-pill ${PILL_MAP[s] || ''}">${s}</span>`; }
 
 // ── ACCOUNT CLICK HANDLER (bulletproof) ──────────────────────────
@@ -698,7 +698,7 @@ async function loadLearnerData() {
   try{
     var sData=await apiGet('/sessions?email='+encodeURIComponent(LEARNER.email)+'&type=learner');
     if(sData.sessions){
-      UPCOMING_L=sData.sessions.filter(function(s){return s.status==='confirmed'||s.status==='pending';}).map(function(s){
+      UPCOMING_L=sData.sessions.filter(function(s){return s.status==='confirmed'||s.status==='pending'||s.status==='pending_payment';}).map(function(s){
         var tname = s.tutor_name||(s[1])||'';
         var subj  = s.subject   ||(s[3])||'';
         var d     = s.day       ||(s[4])||'';
@@ -1055,7 +1055,7 @@ function buildBookingPanel(t) {
     +'<div class="bc-summary-row"><span>Duration</span><span>2 hours</span></div>'
     +'<div class="bc-summary-row"><span>Rate</span><span>R'+t.rate+'/hr</span></div>'
     +'<div class="bc-summary-total"><span>Total</span><span>R'+(t.rate*2)+'</span></div></div>'
-    +'<button class="bc-confirm" id="bookBtn"'+(selDay&&selTime&&selMode?'':' disabled')+' onclick="confirmBooking()">Confirm Booking</button>';
+    +'<button class="bc-confirm" id="bookBtn"'+(selDay&&selTime&&selMode?'':' disabled')+' onclick="confirmBooking()">Request Session &rarr;</button>';
 }
 
 function pickMode(m) {
@@ -1081,41 +1081,48 @@ function confirmBooking() {
 
   UPCOMING_L.unshift({
     id: newId, tutor: t.name, subject: t.subjects[0],
-    date: selDay, time: selTime, mode: t.mode[0], rate: t.rate, status: 'confirmed'
+    date: selDay, time: t_time || selTime, mode: selMode || t.mode[0],
+    rate: t.rate * 2, status: 'pending_payment'
   });
   DUE_INV.unshift({
     id: invId, dueDate: selDay, tutor: t.name, subject: t.subjects[0], amount: t.rate
   });
 
+  var t_time = selTime; // capture before render
+  var t_rate = t.rate * 2; // 2-hour session total
+  var t_mode = selMode || t.mode[0];
+
   apiPost('/sessions', {
-    learnerName: LEARNER.name,
+    learnerName:  LEARNER.name,
     learnerEmail: LEARNER.email,
-    tutorName: t.name,
-    tutorEmail: t.email || '',
-    subject: t.subjects[0],
-    day: selDay,
-    time: selTime,
-    rate: t.rate * 2, // 2-hour session
-    mode: selMode || t.mode[0]
+    tutorName:    t.name,
+    tutorEmail:   t.email || '',
+    subject:      t.subjects[0],
+    day:          selDay,
+    time:         t_time,
+    rate:         t_rate,
+    mode:         t_mode,
+    status:       'pending_payment'
   }).then(function(r) {
     if (r && r.error) {
-      console.error('[booking] failed:', r.error);
-      // If double booking error, reset and show message
       if (r.error.includes('already been booked')) {
-        bookingDone = false;
-        selTime = null;
-        // Add the slot to local booked list immediately
-        BOOKED_SLOTS.push({ day: selDay, time: selTime });
+        bookingDone = false; selTime = null;
+        BOOKED_SLOTS.push({ day: selDay, time: t_time });
         epiphanyAlert('This time slot was just booked. Please choose another.', 'error');
         render();
+      } else {
+        epiphanyAlert(r.error, 'error');
       }
     } else {
-      console.log('[booking] saved ✓');
-      // Add to local booked slots so same user can't double book
-      BOOKED_SLOTS.push({ day: selDay, time: t_time });
+      console.log('[booking] pending_payment saved, id:', r && r.id);
+      // Store pending session id for pay now button
+      if (r && r.id) {
+        UPCOMING_L[0].id = r.id;
+        UPCOMING_L[0].status = 'pending_payment';
+        renderDashboard();
+      }
     }
   });
-  var t_time = selTime; // capture before render
 
   render();
 }
@@ -1252,8 +1259,12 @@ function lessonCard(l) {
   var dateStr = l.date && l.date.length===10
     ? new Date(l.date+'T12:00:00').toLocaleDateString('en-ZA',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
     : (l.date || '—');
+  if (st === 'pending_payment') {
+    act += '<button class="lc-join" onclick="doSessionPayment(this)" data-id="'+l.id+'" data-tutor="'+l.tutor+'" data-subject="'+l.subject+'" data-rate="'+l.rate+'" style="background:var(--amber);color:var(--black)">Pay Now R'+l.rate+' &rarr;</button>';
+    act += '<button class="lc-cancel" onclick="doCancelFromCard(this)" data-id="'+l.id+'" data-tutor="'+l.tutor+'" data-subject="'+l.subject+'">Cancel</button>';
+  }
   if (st === 'confirmed') {
-    act += '<button class="lc-join" onclick="alert(&quot;Session joining link coming soon!&quot;)">Join &rarr;</button>';
+    act += '<button class="lc-join" onclick="epiphanyAlert(&quot;Session joining link will appear here once confirmed.&quot;,&quot;info&quot;)">Join &rarr;</button>';
     act += '<button class="lc-cancel" onclick="doCancelFromCard(this)" data-id="'+l.id+'" data-tutor="'+l.tutor+'" data-subject="'+l.subject+'">Cancel</button>';
   }
   if (st === 'completed' && !l.rated) act += '<button class="lc-rate-btn">Rate &#9733;</button>';
@@ -1272,6 +1283,45 @@ function lessonCard(l) {
     +'</div>';
 }
 
+async function doSessionPayment(btn) {
+  var sessionId = btn.getAttribute('data-id');
+  var tutorName = btn.getAttribute('data-tutor');
+  var subject   = btn.getAttribute('data-subject');
+  var rate      = btn.getAttribute('data-rate');
+
+  // Check if tutor has saved payment details (returning payer)
+  btn.textContent = 'Redirecting...'; btn.disabled = true;
+
+  try {
+    var data = await apiPost('/subscribe', {
+      tutorId:    sessionId,   // use session id as payment reference
+      tutorEmail: LEARNER.email,
+      tutorName:  LEARNER.name,
+      sessionId:  sessionId,
+      amount:     rate,
+      itemName:   subject + ' session with ' + tutorName,
+      type:       'session'
+    });
+    if (data.error) {
+      epiphanyAlert(data.error, 'error');
+      btn.textContent = 'Pay Now R'+rate+' →'; btn.disabled = false;
+      return;
+    }
+    // Submit form to PayFast
+    var form = document.createElement('form');
+    form.method = 'POST'; form.action = data.payfastUrl;
+    Object.entries(data.formData).forEach(function(kv) {
+      var input = document.createElement('input');
+      input.type = 'hidden'; input.name = kv[0]; input.value = kv[1];
+      form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+  } catch(e) {
+    epiphanyAlert('Something went wrong. Please try again.', 'error');
+    btn.textContent = 'Pay Now R'+rate+' →'; btn.disabled = false;
+  }
+}
 function doCancelFromCard(btn) {
   var id      = btn.getAttribute('data-id');
   var tutor   = btn.getAttribute('data-tutor');
