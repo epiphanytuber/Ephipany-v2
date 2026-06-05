@@ -672,7 +672,8 @@ async function loadTutors() {
 }
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 const TIMES=["08:00–10:00","09:00–11:00","10:00–12:00","11:00–13:00","12:00–14:00","13:00–15:00","14:00–16:00","15:00–17:00","16:00–18:00","17:00–19:00"];
-const SUBJECTS=["All Subjects","Mathematics","English","Sciences","Commerce","Languages","Computer Science","History"];
+const SUBJECTS=["All Subjects","Accounting","Afrikaans","Biology","Business Studies","Chemistry","Computer Science","Consumer Studies","Economics","English","Geography","History","IsiZulu","IsiXhosa","Life Sciences","Life Orientation","Mathematics","Mathematical Literacy","Music","Physical Sciences","Physics","Sesotho","Setswana","Sepedi","Technology","Tourism","Visual Arts","Xitsonga","Zulu"];
+const TUTOR_SUBJECTS=["Accounting","Afrikaans","Biology","Business Studies","Chemistry","Computer Science","Consumer Studies","Economics","English","Geography","History","IsiZulu","IsiXhosa","Life Sciences","Life Orientation","Mathematics","Mathematical Literacy","Music","Physical Sciences","Physics","Sesotho","Setswana","Sepedi","Technology","Tourism","Visual Arts","Xitsonga","Zulu"];
 const LOCATIONS=["All Locations","Johannesburg","Cape Town","Pretoria","Durban","Stellenbosch"];
 const MODES=["All Modes","In-Person","Online"];
 
@@ -801,6 +802,60 @@ function updateMobTabActive() {
     if (btn) btn.style.color = dashTab===t ? 'var(--gold)' : 'var(--muted)';
   });
 }
+var _selectedSubjects = [];
+function buildSubjectOptions() {
+  return TUTOR_SUBJECTS.map(function(s) {
+    var key = s.replace(/ /g,'_');
+    return '<div onclick="toggleSubject(event,&quot;'+s+'&quot;)" style="padding:10px 14px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(201,168,76,.05)">'
+      +'<span class="subj-check-'+key+'" style="width:14px;height:14px;border:1px solid rgba(201,168,76,.4);display:inline-block;flex-shrink:0;border-radius:2px"></span>'
+      +s+'</div>';
+  }).join('');
+}
+function toggleSubjectDropdown() {
+  var d = document.getElementById('subjectDropdown');
+  if (d) d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+function toggleSubject(e, subj) {
+  e.stopPropagation();
+  var idx = _selectedSubjects.indexOf(subj);
+  var checkEl = document.querySelector('.subj-check-' + subj.replace(/ /g,'_'));
+  if (idx === -1) {
+    _selectedSubjects.push(subj);
+    if (checkEl) { checkEl.style.background='var(--gold)'; checkEl.style.borderColor='var(--gold)'; checkEl.innerHTML='<svg viewBox="0 0 10 8" width="10" height="8"><polyline points="1,4 4,7 9,1" fill="none" stroke="#000" stroke-width="2"/></svg>'; }
+  } else {
+    _selectedSubjects.splice(idx, 1);
+    if (checkEl) { checkEl.style.background=''; checkEl.style.borderColor='rgba(201,168,76,.4)'; checkEl.innerHTML=''; }
+  }
+  // Update hidden input and picklist display
+  var input = document.getElementById('rSubject');
+  if (input) input.value = _selectedSubjects.join(', ');
+  var pl = document.getElementById('subjectPicklist');
+  var placeholder = document.getElementById('subjectPlaceholder');
+  if (pl) {
+    // Remove old tags (keep placeholder)
+    Array.from(pl.querySelectorAll('.subj-tag')).forEach(function(t){t.remove()});
+    if (_selectedSubjects.length === 0) {
+      if (placeholder) placeholder.style.display = 'block';
+    } else {
+      if (placeholder) placeholder.style.display = 'none';
+      _selectedSubjects.forEach(function(s) {
+        var tag = document.createElement('span');
+        tag.className = 'subj-tag';
+        tag.style.cssText = 'padding:3px 10px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.35);font-size:10px;color:var(--gold);letter-spacing:1px;display:flex;align-items:center;gap:6px';
+        tag.innerHTML = s + '<span onclick="toggleSubject(event,&quot;'+s+'&quot;)" style="cursor:pointer;opacity:.6;font-size:12px">&times;</span>';
+        pl.appendChild(tag);
+      });
+    }
+  }
+}
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  var d = document.getElementById('subjectDropdown');
+  var p = document.getElementById('subjectPicklist');
+  if (d && p && !p.contains(e.target) && !d.contains(e.target)) {
+    d.style.display = 'none';
+  }
+});
 function goLogoClick() {
   // If in dashboard, exit to home but DON'T log out
   if (document.getElementById('dashNav').style.display === 'flex') {
@@ -1040,7 +1095,7 @@ function renderHome() {
     var el;
     el = document.getElementById('statStudents'); if (el) el.textContent = data.students || 0;
     el = document.getElementById('statTutors');   if (el) el.textContent = data.tutors   || TUTORS.length || 0;
-    el = document.getElementById('statSubjects'); if (el) el.textContent = data.subjects || 0;
+    el = document.getElementById('statSubjects'); if (el) el.textContent = data.subjects || TUTOR_SUBJECTS.length || 0;
   }).catch(function(){});
   const feat = TUTORS.slice(0, 4);
   return `<div class="page">
@@ -1313,8 +1368,8 @@ function renderRegister() {
 <div class="gold-rule"></div>
 <p class="reg-intro">${isTutor ? 'Share your expertise, inspire learners, and build a flexible career on your terms.' : "Connect with South Africa's finest educators and start your learning journey today."}</p>
 <div class="reg-tabs">
-  <button class="reg-tab${isTutor ? ' active' : ''}" onclick="regRole='tutor';render()">I&rsquo;m a Tutor</button>
-  <button class="reg-tab${!isTutor ? ' active' : ''}" onclick="regRole='learner';render()">I&rsquo;m a Learner</button>
+  <button class="reg-tab${isTutor ? ' active' : ''}" onclick="regRole='tutor';_selectedSubjects=[];render()">I&rsquo;m a Tutor</button>
+  <button class="reg-tab${!isTutor ? ' active' : ''}" onclick="regRole='learner';_selectedSubjects=[];render()">I&rsquo;m a Learner</button>
 </div>
 ${isTutor ? `<div class="photo-drop"><div class="photo-drop-icon">&#128247;</div><div class="photo-drop-text">Drop your profile photo here, or <span>browse to upload</span><br/>JPG or PNG &middot; Max 5MB</div></div>` : ''}
 <div class="reg-grid">
@@ -1325,7 +1380,15 @@ ${isTutor ? `<div class="photo-drop"><div class="photo-drop-icon">&#128247;</div
   ${isTutor ? `
   <div class="reg-group"><label class="reg-label">City / Location</label><select class="reg-select" id="rTCity"><option value="">Select city</option>${LOCATIONS.slice(1).map(l => `<option>${l}</option>`).join('')}</select></div>
   <div class="reg-group"><label class="reg-label">Teaching Mode</label><select class="reg-select" id="rTMode"><option value="">Select mode</option><option>In-Person</option><option>Online</option><option>Both</option></select></div>
-  <div class="reg-group"><label class="reg-label">Primary Subject</label><input class="reg-input" id="rSubject" placeholder="e.g. Mathematics"/></div>
+  <div class="reg-group reg-group-full"><label class="reg-label">Subjects You Teach <span style="color:var(--muted);font-size:9px">(select all that apply)</span></label>
+  <div id="subjectPicklist" style="display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:rgba(255,255,255,.04);border:1px solid rgba(250,249,246,.1);min-height:48px;cursor:pointer" onclick="toggleSubjectDropdown()">
+    <span id="subjectPlaceholder" style="color:var(--muted);font-size:12px;align-self:center">Click to select subjects&hellip;</span>
+  </div>
+  <div id="subjectDropdown" style="display:none;background:var(--black3);border:1px solid var(--border);max-height:220px;overflow-y:auto;margin-top:2px;z-index:100;position:relative">
+    ${buildSubjectOptions()}
+  </div>
+  <input type="hidden" id="rSubject" value=""/>
+  </div>
   <div class="reg-group"><label class="reg-label">Grade Level</label><input class="reg-input" id="rGradeLevel" placeholder="e.g. Grade 10&ndash;12"/></div>
   <div class="reg-group"><label class="reg-label">Hourly Rate (ZAR)</label><input class="reg-input" id="rRate" placeholder="e.g. 400" type="number"/></div>
   <div class="reg-group"><label class="reg-label">Highest Qualification</label><select class="reg-select" id="rQual"><option value="">Select&hellip;</option><option>Matric / Grade 12</option><option>Diploma</option><option>Bachelor&rsquo;s Degree</option><option>Honours Degree</option><option>Master&rsquo;s Degree</option><option>Doctorate (PhD)</option></select></div>
@@ -1805,12 +1868,23 @@ function loadSubState(){try{var s=localStorage.getItem(subKey());if(s)TUTOR_SUB=
 function isSubActive(){
   if(TUTOR_SUB.status==='active') return true;
   if(TUTOR_SUB.status==='trial') {
-    if(!TUTOR_SUB.trialEnd) return true; // no end date = still valid
-    return new Date() < new Date(TUTOR_SUB.trialEnd);
+    if(!TUTOR_SUB.trialEnd) return true;
+    try {
+      var end = new Date(TUTOR_SUB.trialEnd);
+      if (isNaN(end.getTime())) return true; // can't parse = assume valid
+      return new Date() < end;
+    } catch(e) { return true; }
   }
   return false;
 }
-function daysLeft(){if(!TUTOR_SUB.trialEnd)return 0;return Math.max(0,Math.ceil((new Date(TUTOR_SUB.trialEnd)-new Date())/86400000));}
+function daysLeft(){
+  if(!TUTOR_SUB.trialEnd) return 0;
+  try {
+    var end = new Date(TUTOR_SUB.trialEnd);
+    if (isNaN(end.getTime())) return 0;
+    return Math.max(0, Math.ceil((end - new Date()) / 86400000));
+  } catch(e) { return 0; }
+}
 function startTrial(){var s=new Date(),e=new Date(s);e.setDate(e.getDate()+TRIAL_DAYS);TUTOR_SUB={status:'trial',trialStart:s.toISOString(),trialEnd:e.toISOString(),subStart:null,nextBilling:e.toISOString()};saveSubState();if(TUTOR.airtableId)apiPost('/admin?action=subscription',{action:'start_trial',tutorId:TUTOR.airtableId});renderTutorDashboard();}
 function cancelSubscription(){TUTOR_SUB.status='cancelled';saveSubState();if(TUTOR.airtableId)apiPost('/admin?action=subscription',{action:'cancel',tutorId:TUTOR.airtableId});renderTutorDashboard();}
 function goToRequests(){dashTab='requests';renderTutorDashboard();}
