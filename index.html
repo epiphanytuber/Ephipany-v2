@@ -1888,6 +1888,17 @@ function daysLeft(){
 function startTrial(){var s=new Date(),e=new Date(s);e.setDate(e.getDate()+TRIAL_DAYS);TUTOR_SUB={status:'trial',trialStart:s.toISOString(),trialEnd:e.toISOString(),subStart:null,nextBilling:e.toISOString()};saveSubState();if(TUTOR.airtableId)apiPost('/admin?action=subscription',{action:'start_trial',tutorId:TUTOR.airtableId});renderTutorDashboard();}
 function cancelSubscription(){TUTOR_SUB.status='cancelled';saveSubState();if(TUTOR.airtableId)apiPost('/admin?action=subscription',{action:'cancel',tutorId:TUTOR.airtableId});renderTutorDashboard();}
 function goToRequests(){dashTab='requests';renderTutorDashboard();}
+async function acceptSession(sessionId){
+  var data = await apiPost('/cancel-session',{sessionId:sessionId,learnerEmail:'__tutor_action__',action:'accept'});
+  epiphanyAlert('Session accepted! The learner has been notified.','success');
+  loadTutorData().then(function(){renderTutorDashboard();});
+}
+async function declineSession(sessionId){
+  if(!confirm('Decline this session request?')) return;
+  var data = await apiPost('/cancel-session',{sessionId:sessionId,learnerEmail:'__tutor_action__',action:'decline'});
+  epiphanyAlert('Session declined.','info');
+  loadTutorData().then(function(){renderTutorDashboard();});
+}
 async function launchPayFast() {
   var btn = event && event.target ? event.target : null;
   if (btn) { btn.textContent = 'Redirecting to PayFast...'; btn.disabled = true; }
@@ -1928,30 +1939,233 @@ function renderSubExpired(){document.getElementById('app').innerHTML='<div style
 function renderTutorDashboard(){
   // Only load from localStorage if API hasn't set subscription yet
   if(TUTOR_SUB.status==='none' && !TUTOR_SUB.trialEnd) loadSubState();
-  // If still none after localStorage check, show trial gate
   if(TUTOR_SUB.status==='none'){renderSubGate();return;}
-  // Check if trial/subscription is actually active
-  if(!isSubActive()&&TUTOR_SUB.status!=='active'&&TUTOR_SUB.status!=='trial'){renderSubExpired();return;}
-  var totalEarned=tutorEarnings.reduce(function(s,e){return s+e.amount;},0);
-  var requests=tutorSessions.filter(function(s){return s.status==='pending';});
-  var confirmed=tutorSessions.filter(function(s){return s.status==='confirmed';});
-  var completedCt=tutorPastSessions.filter(function(s){return s.status==='completed';}).length;
-  var navItems=[{id:'overview',label:'Overview',icon:'&#9672;'},{id:'sessions',label:'My Sessions',icon:'&#9719;',badge:confirmed.length||null},{id:'requests',label:'Student Requests',icon:'&#9681;',badge:requests.length||null},{id:'earnings',label:'Earnings',icon:'&#9678;'},{id:'subscription',label:'Subscription',icon:'&#9670;'},{id:'tprofile',label:'Profile Settings',icon:'&#9673;'}];
-  function tc(s){var cls=s.status==='confirmed'?'lc-up':s.status==='pending'?'lc-pend':'lc-can';return '<div class="lc '+cls+'">'+avatarHTML(s.learner||'Student',44)+'<div class="lc-info"><div class="lc-tutor">'+(s.learner||'Student')+'</div><div class="lc-subj">'+s.subject+'</div><div class="lc-meta"><span class="lc-date">'+s.date+' &middot; '+s.time+'</span><span class="lc-mode">'+s.mode+'</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R'+s.rate+'</span>'+pill(s.status)+'</div></div>';}
-  var dl=daysLeft();
-  var trialBanner=TUTOR_SUB.status==='trial'?'<div style="background:rgba(201,168,76,.12);border:1px solid var(--gold);padding:14px 20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;color:var(--gold)">&#9670; Free trial &mdash; <strong>'+dl+' day'+(dl!==1?'s':'')+' remaining</strong></span><button onclick="dashTab=&quot;subscription&quot;;renderTutorDashboard()" style="font-size:10px;background:var(--gold);color:var(--black);border:none;padding:7px 16px;cursor:pointer;">Manage &rarr;</button></div>':'';
-  var signOutBtn='<div style="padding:20px 28px;border-top:1px solid rgba(201,168,76,.08);position:absolute;bottom:0;left:0;right:0"><button onclick="exitDashboard()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(250,249,246,.1);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">&#8592; Sign Out</button></div>';
-  var navHtml=navItems.map(function(n){var active=dashTab===n.id?' active':'';var badge=n.badge?'<span class="dash-nav-badge">'+n.badge+'</span>':'';return '<button class="dash-nav-item'+active+'" onclick="dashTab=&quot;'+n.id+'&quot;;renderTutorDashboard()"><span class="dash-nav-icon">'+n.icon+'</span>'+n.label+badge+'</button>';}).join('');
-  var sidebar='<aside class="dash-sidebar"><div class="dash-sb-profile"><div class="dash-sb-label">Tutor Account</div><div class="dash-sb-user">'+avatarHTML(TUTOR.name,40,'border:1px solid var(--gold)')+'<div><div class="dash-sb-uname">'+TUTOR.name+'</div><div class="dash-sb-role" style="color:var(--gold)">Tutor</div></div></div></div><div class="dash-nav-label">Navigation</div>'+navHtml+signOutBtn+'</aside>';
-  var mainPad = window.innerWidth<=768 ? 'padding-bottom:80px' : '';
-  var main='';
-  if(dashTab==='overview'){var nxt=confirmed[0]||tutorSessions[0];var m='<div class="dash-section">'+trialBanner+'<div class="dash-eyebrow">Tutor Dashboard</div><div class="dash-title">Welcome back, <em>'+(TUTOR.name.split(' ')[0]||'Tutor')+'</em></div><div class="ov-grid"><div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">'+confirmed.length+'</div><div class="ov-sub">'+(nxt?'Next: '+nxt.date:'None scheduled')+'</div></div><div class="ov-card"><div class="ov-label">Completed</div><div class="ov-value">'+completedCt+'</div></div><div class="ov-card"><div class="ov-label">Total Earned</div><div class="ov-value gld">R'+totalEarned.toLocaleString()+'</div></div><div class="ov-card"><div class="ov-label">Pending Requests</div><div class="ov-value'+(requests.length?' amb':'')+'">'+requests.length+'</div>'+(requests.length?'<div class="ov-sub clk" onclick="goToRequests()">Review now</div>':'')+'</div></div><div class="sub-hdg">Next Session</div>'+(nxt?'<div class="lesson-list">'+tc(nxt)+'</div>':'<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>')+'</div>';main=m;}
-  if(dashTab==='sessions'){var m='<div class="dash-section"><div class="dash-eyebrow">My Sessions</div><div class="dash-title"><em>Upcoming</em> Sessions</div>'+(confirmed.length>0?'<div class="lesson-list">'+confirmed.map(tc).join('')+'</div>':'<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>')+'<div class="sub-hdg" style="margin-top:16px">Past Sessions</div>'+(tutorPastSessions.length>0?'<div class="lesson-list">'+tutorPastSessions.map(tc).join('')+'</div>':'<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No past sessions yet.</div>')+'</div>';main=m;}
-  if(dashTab==='requests'){var m='<div class="dash-section"><div class="dash-eyebrow">Student Requests</div><div class="dash-title"><em>Pending</em> Requests</div>'+(requests.length>0?'<div class="lesson-list">'+requests.map(function(s){return '<div class="lc lc-pend">'+avatarHTML(s.learner||'Student',44)+'<div class="lc-info"><div class="lc-tutor">'+(s.learner||'Student')+'</div><div class="lc-subj">'+s.subject+'</div></div><div class="lc-right">'+pill(s.status)+'<button class="lc-join" onclick="alert(&quot;Accepted!&quot;)">Accept</button></div></div>';}).join('')+'</div>':'<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No pending requests.</div>')+'</div>';main=m;}
-  if(dashTab==='earnings'){var m='<div class="dash-section"><div class="dash-eyebrow">Finances</div><div class="dash-title">My <em>Earnings</em></div><div class="pay-top"><div class="pay-card"><div class="pay-card-label">Total Earned</div><div class="pay-card-value">R'+totalEarned.toLocaleString()+'</div></div><div class="pay-card"><div class="pay-card-label">Hourly Rate</div><div class="pay-card-value">R'+(TUTOR.rate||0)+'</div></div></div>'+(tutorEarnings.length>0?'<table class="inv-table"><thead><tr><th>Invoice</th><th>Date</th><th>Learner</th><th>Amount</th></tr></thead><tbody>'+tutorEarnings.map(function(e){return '<tr><td>'+e.id+'</td><td>'+e.date+'</td><td>'+e.learner+'</td><td style="color:var(--gold)">R'+e.amount+'</td></tr>';}).join('')+'</tbody></table>':'<div style="padding:32px 0;color:var(--muted);font-size:13px;text-align:center">No earnings yet.</div>')+'</div>';main=m;}
-  if(dashTab==='subscription'){function fmt(d){return d?new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'}):'—';}var sl=TUTOR_SUB.status==='trial'?'Free Trial — '+dl+' day'+(dl!==1?'s':'')+' remaining':TUTOR_SUB.status==='active'?'Active':'Inactive';var m='<div class="dash-section"><div class="dash-eyebrow">Billing</div><div class="dash-title">My <em>Subscription</em></div><div class="pay-top"><div class="pay-card"><div class="pay-card-label">Status</div><div class="pay-card-value" style="font-size:28px">'+(TUTOR_SUB.status==='trial'?'Free Trial':TUTOR_SUB.status==='active'?'Active':'Inactive')+'</div><div class="pay-card-sub">'+sl+'</div></div><div class="pay-card"><div class="pay-card-label">Monthly Fee</div><div class="pay-card-value">R'+SUB_PRICE+'</div><div class="pay-card-sub">after free trial</div></div></div>';if(TUTOR_SUB.status==='trial'){m+='<div style="background:var(--black3);padding:32px;margin-bottom:24px;border:1px solid var(--border)"><div style="font-family:Georgia,serif;font-size:22px;margin-bottom:8px">Trial ends <span style="color:var(--gold)">'+fmt(TUTOR_SUB.trialEnd)+'</span></div><div style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.8">Subscribe to keep your profile live. R'+SUB_PRICE+'/month. Cancel anytime.</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;margin-right:12px">Subscribe Now</button><button onclick="if(confirm(&quot;Cancel trial?&quot;))cancelSubscription()" style="padding:14px 20px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.15);cursor:pointer;">Cancel Trial</button></div>';}if(TUTOR_SUB.status==='cancelled'||TUTOR_SUB.status==='expired'){m+='<div style="background:var(--black3);padding:32px;border:1px solid rgba(224,92,92,.2)"><div style="font-family:Georgia,serif;font-size:22px;margin-bottom:8px;color:var(--red)">Subscription Ended</div><button onclick="launchPayFast()" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Reactivate</button></div>';}m+='</div>';main=m;}
-  if(dashTab==='tprofile'){var m='<div class="dash-section"><div class="dash-eyebrow">Account</div><div class="dash-title">Tutor <em>Profile</em></div><div class="gold-rule"></div><div class="settings-avatar-row">'+avatarHTML(TUTOR.name,72,'border:2px solid var(--gold)')+'<div><div style="font-size:16px;font-weight:600;margin-bottom:4px">'+TUTOR.name+'</div><div style="font-size:12px;color:var(--gold);margin-bottom:4px">'+(TUTOR.subject||'')+'</div></div></div><div class="settings-grid"><div class="setting-group"><label class="setting-label">Full Name</label><input class="setting-input" id="tpName" value="'+TUTOR.name+'"/></div><div class="setting-group"><label class="setting-label">Email</label><input class="setting-input" id="tpEmail" value="'+TUTOR.email+'"/></div><div class="setting-group"><label class="setting-label">Phone</label><input class="setting-input" id="tpPhone" value="'+(TUTOR.phone||'')+'"/></div><div class="setting-group"><label class="setting-label">City</label><input class="setting-input" id="tpCity" value="'+(TUTOR.city||'')+'"/></div></div><div style="display:flex;align-items:center"><button class="settings-save" onclick="saveTutorProfile()">Save Changes</button><span class="save-toast" id="saveToast" style="display:none">&#10003; Saved</span></div></div>';main=m;}
-  document.getElementById('app').innerHTML='<div class="dashboard-wrap">'+sidebar+'<main class="dash-main" style="'+mainPad+'">'+main+'</main></div>';
+  if(!isSubActive()&&TUTOR_SUB.status!=='active'){renderSubExpired();return;}
+
+  var totalEarned  = tutorEarnings.reduce(function(s,e){return s+e.amount;},0);
+  var requests     = tutorSessions.filter(function(s){return s.status==='pending';});
+  var confirmed    = tutorSessions.filter(function(s){return s.status==='confirmed';});
+  var completedCt  = tutorPastSessions.filter(function(s){return s.status==='completed';}).length;
+  var dl           = daysLeft();
+  var firstName    = TUTOR.name ? TUTOR.name.split(' ')[0] : 'Tutor';
+  var mobPad       = window.innerWidth<=768 ? 'padding-bottom:80px' : '';
+
+  // ── NAV ITEMS ──────────────────────────────────────────────────
+  var navItems = [
+    {id:'overview',   label:'Overview',          icon:'&#9672;'},
+    {id:'sessions',   label:'My Sessions',       icon:'&#9719;', badge: confirmed.length||null},
+    {id:'requests',   label:'Student Requests',  icon:'&#9681;', badge: requests.length||null},
+    {id:'earnings',   label:'Earnings',          icon:'&#9678;'},
+    {id:'subscription',label:'Subscription',     icon:'&#9670;'},
+    {id:'tprofile',   label:'Profile Settings',  icon:'&#9673;'},
+  ];
+
+  // ── TUTOR SESSION CARD ─────────────────────────────────────────
+  function tc(s){
+    var cls = s.status==='confirmed'?'lc-up':s.status==='pending'?'lc-pend':'lc-can';
+    var dateStr = s.date && s.date.length===10
+      ? new Date(s.date+'T12:00:00').toLocaleDateString('en-ZA',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
+      : (s.date||'—');
+    var actions = '';
+    if(s.status==='pending'){
+      actions += '<button class="lc-join" style="background:var(--green);color:#000" onclick="acceptSession(\''+s.id+'\')">Accept</button>';
+      actions += '<button class="lc-cancel" onclick="declineSession(\''+s.id+'\')">Decline</button>';
+    }
+    return '<div class="lc '+cls+'">'
+      +avatarHTML(s.learner||'Student',44)
+      +'<div class="lc-info">'
+      +'<div class="lc-tutor">'+(s.learner||'Student')+'</div>'
+      +'<div class="lc-subj">'+s.subject+'</div>'
+      +'<div class="lc-meta"><span class="lc-date">&#128197; '+dateStr+' &middot; '+s.time+'</span>'
+      +'<span class="lc-mode">'+(s.mode||'Online')+'</span>'
+      +'<span class="lc-mode">2hrs</span>'
+      +'</div></div>'
+      +'<div class="lc-right"><span class="lc-rate-lbl">R'+s.rate+'</span>'
+      +pill(s.status)+actions+'</div></div>';
+  }
+
+  // ── TRIAL BANNER ───────────────────────────────────────────────
+  var trialBanner = TUTOR_SUB.status==='trial'
+    ? '<div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.3);padding:12px 20px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">'
+      +'<div><span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#C9A84C;display:block;margin-bottom:2px">Free Trial</span>'
+      +'<span style="font-size:13px;color:var(--white)">&#9670; <strong>'+dl+' day'+(dl!==1?'s':'')+' remaining</strong> — Subscribe to keep your profile active after your trial ends.</span></div>'
+      +'<button onclick="dashTab=&quot;subscription&quot;;renderTutorDashboard()" style="background:var(--gold);color:var(--black);border:none;padding:9px 20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;cursor:pointer;white-space:nowrap">Manage Subscription →</button></div>'
+    : '';
+
+  // ── SIGN OUT ───────────────────────────────────────────────────
+  var signOutBtn = '<div style="padding:16px 20px;border-top:1px solid var(--border);margin-top:8px">'
+    +'<button onclick="exitDashboard()" style="width:100%;padding:9px;background:transparent;border:1px solid rgba(250,249,246,.12);color:rgba(250,249,246,.45);font-size:9px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:sans-serif;">← Sign Out</button></div>';
+
+  // ── TRIAL PILL IN SIDEBAR ──────────────────────────────────────
+  var trialPill = TUTOR_SUB.status==='trial'
+    ? '<div style="margin-top:10px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);padding:7px 10px">'
+      +'<div style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#C9A84C;margin-bottom:2px">Free Trial</div>'
+      +'<div style="font-size:11px;color:rgba(250,249,246,.6)">'+dl+' days remaining</div></div>'
+    : (TUTOR_SUB.status==='active'
+      ? '<div style="margin-top:10px;background:rgba(76,175,125,.08);border:1px solid rgba(76,175,125,.2);padding:7px 10px">'
+        +'<div style="font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#4caf7d;margin-bottom:2px">✓ Subscribed</div>'
+        +'<div style="font-size:11px;color:rgba(250,249,246,.6)">Active</div></div>'
+      : '');
+
+  var navHtml = navItems.map(function(n){
+    var active = dashTab===n.id?' active':'';
+    var badge  = n.badge ? '<span class="dash-nav-badge">'+n.badge+'</span>' : '';
+    return '<button class="dash-nav-item'+active+'" onclick="dashTab=&quot;'+n.id+'&quot;;renderTutorDashboard()">'
+      +'<span class="dash-nav-icon">'+n.icon+'</span>'+n.label+badge+'</button>';
+  }).join('');
+
+  var sidebar = '<aside class="dash-sidebar">'
+    +'<div class="dash-sb-profile">'
+    +'<div class="dash-sb-label">Tutor Account</div>'
+    +'<div class="dash-sb-user">'+avatarHTML(TUTOR.name,40,'border:1px solid var(--gold)')
+    +'<div><div class="dash-sb-uname">'+TUTOR.name+'</div>'
+    +'<div class="dash-sb-role" style="color:var(--gold);letter-spacing:1px">'+( TUTOR.subject||'Tutor')+'</div></div></div>'
+    +trialPill+'</div>'
+    +'<div class="dash-nav-label">Navigation</div>'
+    +navHtml+signOutBtn+'</aside>';
+
+  var main = '';
+
+  // ── OVERVIEW ───────────────────────────────────────────────────
+  if(dashTab==='overview'){
+    var nxt = confirmed[0]||null;
+    main = '<div class="dash-section">'
+      +trialBanner
+      +'<div class="dash-eyebrow">Tutor Dashboard</div>'
+      +'<div class="dash-title">Welcome back, <em>'+firstName+'</em></div>'
+      +'<div class="ov-grid">'
+      +'<div class="ov-card ov-hl"><div class="ov-label">Upcoming Sessions</div><div class="ov-value gld">'+confirmed.length+'</div><div class="ov-sub">'+(nxt?'Next: '+(nxt.date&&nxt.date.length===10?new Date(nxt.date+'T12:00:00').toLocaleDateString('en-ZA',{weekday:'short',day:'numeric',month:'short'}):nxt.date||'—'):'None scheduled')+'</div></div>'
+      +'<div class="ov-card"><div class="ov-label">Completed Sessions</div><div class="ov-value">'+completedCt+'</div><div class="ov-sub">Since '+(TUTOR.since||'registration')+'</div></div>'
+      +'<div class="ov-card"><div class="ov-label">Total Earned</div><div class="ov-value gld">R'+totalEarned.toLocaleString()+'</div><div class="ov-sub">'+tutorEarnings.length+' session'+(tutorEarnings.length!==1?'s':'')+' paid</div></div>'
+      +'<div class="ov-card"><div class="ov-label">Pending Requests</div><div class="ov-value'+(requests.length?' amb':'')+'">'+requests.length+'</div>'+(requests.length?'<div class="ov-sub clk" onclick="goToRequests()">Review now →</div>':'<div class="ov-sub">None pending</div>')+'</div>'
+      +'</div>'
+      +'<div class="sub-hdg">Next Session</div>'
+      +(nxt?'<div class="lesson-list">'+tc(nxt)+'</div>':'<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet. Your profile is live — learners can start booking!</div>')
+      +(requests.length?'<div class="sub-hdg" style="margin-top:8px">Pending Requests <span class="sub-hdg-link" onclick="dashTab=&quot;requests&quot;;renderTutorDashboard()">View all →</span></div><div class="lesson-list">'+tc(requests[0])+'</div>':'')
+      +'</div>';
+  }
+
+  // ── MY SESSIONS ────────────────────────────────────────────────
+  if(dashTab==='sessions'){
+    main = '<div class="dash-section"><div class="dash-eyebrow">My Sessions</div><div class="dash-title"><em>Upcoming</em> Sessions</div>'
+      +(confirmed.length>0?'<div class="lesson-list">'+confirmed.map(tc).join('')+'</div>':'<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No upcoming sessions yet.</div>')
+      +'<div class="sub-hdg" style="margin-top:16px">Past Sessions <span class="sub-hdg-count">'+tutorPastSessions.length+' sessions</span></div>'
+      +(tutorPastSessions.length>0?'<div class="lesson-list">'+tutorPastSessions.map(tc).join('')+'</div>':'<div style="padding:20px 0;color:var(--muted);font-size:13px;text-align:center">No past sessions yet.</div>')
+      +'</div>';
+  }
+
+  // ── STUDENT REQUESTS ───────────────────────────────────────────
+  if(dashTab==='requests'){
+    main = '<div class="dash-section"><div class="dash-eyebrow">Student Requests</div><div class="dash-title"><em>Pending</em> Requests</div>'
+      +(requests.length>0
+        ?'<div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.8">These learners have requested a session with you and are waiting for payment. Once they pay, the session will be automatically confirmed.</div>'
+          +'<div class="lesson-list">'+requests.map(tc).join('')+'</div>'
+        :'<div style="padding:40px 0;color:var(--muted);font-size:13px;text-align:center">No pending requests.</div>')
+      +'</div>';
+  }
+
+  // ── EARNINGS ───────────────────────────────────────────────────
+  if(dashTab==='earnings'){
+    var thisMonth = new Date().getMonth();
+    var thisYear  = new Date().getFullYear();
+    var monthEarnings = tutorEarnings.filter(function(e){
+      var d = new Date(e.date||e.paid_on||0);
+      return d.getMonth()===thisMonth && d.getFullYear()===thisYear;
+    }).reduce(function(s,e){return s+e.amount;},0);
+
+    main = '<div class="dash-section"><div class="dash-eyebrow">Finances</div><div class="dash-title">My <em>Earnings</em></div>'
+      +'<div class="pay-top">'
+      +'<div class="pay-card"><div class="pay-card-label">Total Earned (All Time)</div><div class="pay-card-value">R'+totalEarned.toLocaleString()+'</div><div class="pay-card-sub">'+tutorEarnings.length+' sessions paid</div></div>'
+      +'<div class="pay-card"><div class="pay-card-label">This Month</div><div class="pay-card-value grn">R'+monthEarnings.toLocaleString()+'</div><div class="pay-card-sub">'+new Date().toLocaleString('en-ZA',{month:'long',year:'numeric'})+'</div></div>'
+      +'</div>'
+      +'<div class="pay-top" style="margin-bottom:28px">'
+      +'<div class="pay-card"><div class="pay-card-label">Hourly Rate</div><div class="pay-card-value" style="font-size:36px">R'+(TUTOR.rate||0)+'</div><div class="pay-card-sub">R'+(TUTOR.rate*2||0)+' per 2hr session</div></div>'
+      +'<div class="pay-card"><div class="pay-card-label">Sessions Completed</div><div class="pay-card-value" style="font-size:36px">'+completedCt+'</div><div class="pay-card-sub">All time</div></div>'
+      +'</div>'
+      +(tutorEarnings.length>0
+        ?'<div class="sub-hdg">Payment History <span class="sub-hdg-count">'+tutorEarnings.length+' payments</span></div>'
+          +'<table class="inv-table"><thead><tr><th>Reference</th><th>Date</th><th>Learner</th><th>Subject</th><th>Amount</th></tr></thead><tbody>'
+          +tutorEarnings.map(function(e){
+            var d = e.date||e.paid_on||'';
+            var dateStr = d ? new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : '—';
+            return '<tr><td><span class="inv-id">'+(e.id||'—')+'</span></td><td style="color:var(--muted);font-size:12px">'+dateStr+'</td><td>'+(e.learner||'—')+'</td><td style="color:var(--muted)">'+(e.subject||'—')+'</td><td style="font-family:Georgia,serif;font-size:18px;color:var(--gold)">R'+e.amount+'</td></tr>';
+          }).join('')
+          +'</tbody></table>'
+        :'<div style="padding:32px 0;color:var(--muted);font-size:13px;text-align:center">No earnings yet. Once learners pay for sessions, they will appear here.</div>')
+      +'</div>';
+  }
+
+  // ── SUBSCRIPTION ───────────────────────────────────────────────
+  if(dashTab==='subscription'){
+    function fmt(d){ return d ? new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'long',year:'numeric'}) : '—'; }
+    var statusLabel = TUTOR_SUB.status==='trial' ? 'Free Trial' : TUTOR_SUB.status==='active' ? 'Active' : 'Inactive';
+    var statusColor = TUTOR_SUB.status==='trial' ? 'var(--gold)' : TUTOR_SUB.status==='active' ? 'var(--green)' : 'var(--red)';
+
+    main = '<div class="dash-section"><div class="dash-eyebrow">Billing</div><div class="dash-title">My <em>Subscription</em></div>'
+      +'<div class="pay-top">'
+      +'<div class="pay-card"><div class="pay-card-label">Current Status</div><div class="pay-card-value" style="font-size:28px;color:'+statusColor+'">'+statusLabel+'</div>'+(TUTOR_SUB.status==='trial'?'<div class="pay-card-sub">'+dl+' days remaining</div>':TUTOR_SUB.status==='active'?'<div class="pay-card-sub" style="color:var(--green)">✓ Your profile is active</div>':'')+'</div>'
+      +'<div class="pay-card"><div class="pay-card-label">Monthly Fee</div><div class="pay-card-value" style="font-size:36px">R'+SUB_PRICE+'</div><div class="pay-card-sub">After free trial ends</div></div>'
+      +'</div>';
+
+    if(TUTOR_SUB.status==='trial'){
+      main += '<div style="background:var(--black3);padding:28px;margin-bottom:20px;border:1px solid rgba(201,168,76,.2)">'
+        +'<div style="font-family:Georgia,serif;font-size:22px;margin-bottom:8px">Trial ends <span style="color:var(--gold)">'+fmt(TUTOR_SUB.trialEnd)+'</span></div>'
+        +'<div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.8">After your trial ends, subscribe for <strong style="color:var(--white)">R'+SUB_PRICE+'/month</strong> to keep your profile visible to learners. Cancel anytime.</div>'
+        +'<div style="display:flex;gap:10px;flex-wrap:wrap">'
+        +'<button onclick="launchPayFast(event)" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Subscribe Now — R'+SUB_PRICE+'/month</button>'
+        +'<button onclick="if(confirm(\'Cancel your free trial? Your profile will be hidden from learners.\'))cancelSubscription()" style="padding:14px 20px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.15);cursor:pointer;">Cancel Trial</button>'
+        +'</div></div>';
+    }
+    if(TUTOR_SUB.status==='active'){
+      main += '<div style="background:rgba(76,175,125,.06);padding:28px;margin-bottom:20px;border:1px solid rgba(76,175,125,.2)">'
+        +'<div style="font-family:Georgia,serif;font-size:22px;margin-bottom:8px;color:var(--green)">✓ Active Subscription</div>'
+        +'<div style="font-size:13px;color:var(--muted);margin-bottom:8px">Next billing date: <strong style="color:var(--white)">'+fmt(TUTOR_SUB.nextBilling)+'</strong></div>'
+        +'<div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.8">Your subscription renews automatically each month. You can cancel at any time.</div>'
+        +'<button onclick="if(confirm(\'Cancel subscription? Your profile will be hidden from learners at the end of the current period.\'))cancelSubscription()" style="padding:12px 24px;background:transparent;color:var(--red);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid var(--red);cursor:pointer;">Cancel Subscription</button>'
+        +'</div>';
+    }
+    if(TUTOR_SUB.status==='cancelled'||TUTOR_SUB.status==='expired'){
+      main += '<div style="background:rgba(224,92,92,.06);padding:28px;border:1px solid rgba(224,92,92,.2)">'
+        +'<div style="font-family:Georgia,serif;font-size:22px;margin-bottom:8px;color:var(--red)">Subscription '+(TUTOR_SUB.status==='cancelled'?'Cancelled':'Expired')+'</div>'
+        +'<div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.8">Your profile is currently hidden from learners. Reactivate to appear in the catalogue and accept bookings.</div>'
+        +'<button onclick="launchPayFast(event)" style="padding:14px 32px;background:var(--gold);color:var(--black);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Reactivate — R'+SUB_PRICE+'/month</button>'
+        +'</div>';
+    }
+
+    // Billing history if any
+    if(tutorEarnings.length>0){
+      main += '<div class="sub-hdg" style="margin-top:28px">Subscription History</div>'
+        +'<table class="inv-table"><thead><tr><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody>'
+        +tutorEarnings.filter(function(e){return e.type==='subscription';}).map(function(e){
+          return '<tr><td style="color:var(--muted);font-size:12px">'+new Date(e.date||0).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'})+'</td><td style="font-family:Georgia,serif;font-size:18px;color:var(--gold)">R'+e.amount+'</td><td><span class="inv-paid">Paid</span></td></tr>';
+        }).join('')
+        +'</tbody></table>';
+    }
+    main += '</div>';
+  }
+
+  // ── PROFILE SETTINGS ───────────────────────────────────────────
+  if(dashTab==='tprofile'){
+    main = '<div class="dash-section"><div class="dash-eyebrow">Account</div><div class="dash-title">Tutor <em>Profile</em></div><div class="gold-rule"></div>'
+      +'<div class="settings-avatar-row">'+avatarHTML(TUTOR.name,72,'border:2px solid var(--gold)')
+      +'<div><div style="font-size:16px;font-weight:600;margin-bottom:4px">'+TUTOR.name+'</div>'
+      +'<div style="font-size:12px;color:var(--gold);margin-bottom:4px">'+(TUTOR.subject||'')+'</div>'
+      +'<div style="font-size:12px;color:var(--muted)">'+( TUTOR.city||'')+'</div></div></div>'
+      +'<div class="settings-grid">'
+      +'<div class="setting-group"><label class="setting-label">Full Name</label><input class="setting-input" id="tpName" value="'+TUTOR.name+'"/></div>'
+      +'<div class="setting-group"><label class="setting-label">Email</label><input class="setting-input" id="tpEmail" value="'+TUTOR.email+'" type="email"/></div>'
+      +'<div class="setting-group"><label class="setting-label">Phone</label><input class="setting-input" id="tpPhone" value="'+(TUTOR.phone||'')+'"/></div>'
+      +'<div class="setting-group"><label class="setting-label">City</label><input class="setting-input" id="tpCity" value="'+(TUTOR.city||'')+'"/></div>'
+      +'<div class="setting-group full"><label class="setting-label">New Password</label>'
+      +'<div style="position:relative"><input class="setting-input" id="tpPass" type="password" placeholder="Leave blank to keep current" style="width:100%;padding-right:48px"/>'
+      +'<button onclick="togglePassVis(\'tpPass\',this)" type="button" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px">&#128065;</button></div></div>'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;margin-top:8px">'
+      +'<button class="settings-save" onclick="saveTutorProfile()">Save Changes</button>'
+      +'<span class="save-toast" id="saveToast" style="display:none">&#10003; Saved successfully</span></div></div>';
+  }
+
+  document.getElementById('app').innerHTML = '<div class="dashboard-wrap">'+sidebar+'<main class="dash-main" style="'+mobPad+'">'+main+'</main></div>';
 }
 
 loadTutors();
