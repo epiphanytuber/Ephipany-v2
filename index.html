@@ -1106,7 +1106,7 @@ function confirmBooking() {
         selTime = null;
         // Add the slot to local booked list immediately
         BOOKED_SLOTS.push({ day: selDay, time: selTime });
-        alert('Sorry! This time slot was just booked by someone else. Please choose another time.');
+        epiphanyAlert('This time slot was just booked. Please choose another.', 'error');
         render();
       }
     } else {
@@ -1324,7 +1324,7 @@ async function confirmCancelSession() {
     closeCancelModal();
     renderDashboard();
   } catch(e) {
-    alert('Something went wrong. Please try again.');
+    epiphanyAlert('Something went wrong. Please try again.', 'error');
     if(btn){btn.textContent='Confirm Cancellation';btn.disabled=false;}
   }
 }
@@ -1551,6 +1551,26 @@ function togglePassVis(inputId, btn) {
     btn.style.color = 'var(--muted)';
   }
 }
+function epiphanyAlert(msg, type) {
+  // type: 'error' | 'success' | 'info'
+  type = type || 'info';
+  var colors = {
+    error:   { bg:'rgba(224,92,92,.12)',   border:'rgba(224,92,92,.35)',   icon:'&#10005;', iconBg:'#e05c5c' },
+    success: { bg:'rgba(76,175,125,.10)',  border:'rgba(76,175,125,.35)',  icon:'&#10022;', iconBg:'#4caf7d' },
+    info:    { bg:'rgba(201,168,76,.08)',  border:'rgba(201,168,76,.25)',  icon:'&#9670;',  iconBg:'#C9A84C' }
+  };
+  var c = colors[type] || colors.info;
+  var existing = document.getElementById('epiphanyAlertEl');
+  if (existing) existing.remove();
+  var el = document.createElement('div');
+  el.id = 'epiphanyAlertEl';
+  el.style.cssText = 'position:fixed;top:24px;left:50%;transform:translateX(-50%);z-index:99999;min-width:320px;max-width:520px;background:var(--black3);border:1px solid '+c.border+';padding:16px 20px 16px 16px;display:flex;align-items:flex-start;gap:14px;animation:fadeUp .3s ease;box-shadow:0 8px 40px rgba(0,0,0,.6)';
+  el.innerHTML = '<div style="width:32px;height:32px;border-radius:50%;background:'+c.iconBg+';display:flex;align-items:center;justify-content:center;font-size:13px;color:#000;flex-shrink:0">'+c.icon+'</div>'
+    +'<div style="flex:1;padding-top:4px"><div style="font-size:13px;color:var(--white);line-height:1.6">'+msg+'</div></div>'
+    +'<button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0;line-height:1;flex-shrink:0;margin-top:2px">&#10005;</button>';
+  document.body.appendChild(el);
+  setTimeout(function(){ if(el.parentElement) el.remove(); }, 5000);
+}
 function showSaveToast() {
   const t = document.getElementById('saveToast');
   if (t) { t.style.display = 'inline-flex'; setTimeout(() => { t.style.display = 'none'; }, 2500); }
@@ -1596,7 +1616,7 @@ async function launchPayFast() {
     document.body.appendChild(form);
     form.submit();
   } catch(e) {
-    alert('Something went wrong. Please try again.');
+    epiphanyAlert('Something went wrong. Please try again.', 'error');
     if(btn){btn.textContent='Subscribe Now';btn.disabled=false;}
   }
 }
