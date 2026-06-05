@@ -482,7 +482,7 @@ async function restoreSession() {
   const token=getCookie('epiphany_token'), type=getCookie('epiphany_type');
   if (!token||!type) return;
   try {
-    const data=await apiPost('/session',{token});
+    const data=await apiPost('/auth?action=session',{token});
     if (data.error) { clearCookie('epiphany_token'); clearCookie('epiphany_type'); return; }
     if (data.type==='learner'&&data.user) {
       const u=data.user;
@@ -810,7 +810,7 @@ function renderAuthModal() {
 }
 
 function openForgotPassword(){var m=document.getElementById('authModalMount');if(!m)return;m.innerHTML='<div class="auth-overlay" id="authOverlay" onclick="if(event.target.id===&quot;authOverlay&quot;)closeAuthModal()"><div class="auth-box"><button class="auth-close" onclick="closeAuthModal()">&#10005;</button><div class="auth-logo">Epi<span>phany</span></div><div style="text-align:center;margin-bottom:20px"><div style="font-size:22px;font-weight:300;margin-bottom:4px">Reset Password</div><div style="font-size:12px;color:var(--muted)">Enter your email and a new password.</div></div><div id="fpError" class="auth-error" style="display:none"></div><div id="fpSuccess" style="display:none;background:rgba(76,175,125,.12);border:1px solid rgba(76,175,125,.3);color:var(--green);font-size:12px;padding:10px 14px;margin-bottom:4px"></div><label class="auth-label">Email</label><input class="auth-input" id="fpEmail" type="email" placeholder="your@email.com"/><label class="auth-label">New Password</label><input class="auth-input" id="fpPass" type="password" placeholder="Min. 6 characters"/><label class="auth-label">Confirm</label><input class="auth-input" id="fpPass2" type="password" placeholder="Repeat"/><button class="auth-submit" onclick="doResetPassword()">Reset Password</button><div class="auth-switch">Remember it? <span onclick="openAuthModal(&quot;signin&quot;)">Back to Sign In</span></div></div></div>';}
-async function doResetPassword(){var email=document.getElementById('fpEmail')?document.getElementById('fpEmail').value.trim():'';var pass=document.getElementById('fpPass')?document.getElementById('fpPass').value:'';var pass2=document.getElementById('fpPass2')?document.getElementById('fpPass2').value:'';var errEl=document.getElementById('fpError');var sucEl=document.getElementById('fpSuccess');if(!email){errEl.textContent='Enter your email.';errEl.style.display='block';return;}if(!pass||pass.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;}if(pass!==pass2){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}var btn=document.querySelector('.auth-submit');if(btn){btn.textContent='Resetting...';btn.disabled=true;}try{var data=await apiPost('/reset-password',{email:email,password:pass});if(data.error){errEl.textContent=data.error;errEl.style.display='block';if(btn){btn.textContent='Reset Password';btn.disabled=false;}return;}sucEl.textContent='Password reset! You can now sign in.';sucEl.style.display='block';if(btn)btn.textContent='Done!';setTimeout(function(){openAuthModal('signin');},2000);}catch(e){errEl.textContent='Something went wrong.';errEl.style.display='block';if(btn){btn.textContent='Reset Password';btn.disabled=false;}}}
+async function doResetPassword(){var email=document.getElementById('fpEmail')?document.getElementById('fpEmail').value.trim():'';var pass=document.getElementById('fpPass')?document.getElementById('fpPass').value:'';var pass2=document.getElementById('fpPass2')?document.getElementById('fpPass2').value:'';var errEl=document.getElementById('fpError');var sucEl=document.getElementById('fpSuccess');if(!email){errEl.textContent='Enter your email.';errEl.style.display='block';return;}if(!pass||pass.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;}if(pass!==pass2){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}var btn=document.querySelector('.auth-submit');if(btn){btn.textContent='Resetting...';btn.disabled=true;}try{var data=await apiPost('/auth?action=reset-password',{email:email,password:pass});if(data.error){errEl.textContent=data.error;errEl.style.display='block';if(btn){btn.textContent='Reset Password';btn.disabled=false;}return;}sucEl.textContent='Password reset! You can now sign in.';sucEl.style.display='block';if(btn)btn.textContent='Done!';setTimeout(function(){openAuthModal('signin');},2000);}catch(e){errEl.textContent='Something went wrong.';errEl.style.display='block';if(btn){btn.textContent='Reset Password';btn.disabled=false;}}}
 function goToRegisterFromModal() {
   closeAuthModal();
   regRole = 'learner';
@@ -826,7 +826,7 @@ async function doSignIn() {
   const btn = document.querySelector('.auth-submit');
   if (btn) { btn.textContent = 'Signing in...'; btn.disabled = true; }
   try {
-    const data = await apiPost('/login', { email, password: pass });
+    const data = await apiPost('/auth?action=login', { email, password: pass });
     if (data.error) { authError = data.error; renderAuthModal(); return; }
     if (data.type === 'learner') {
       const u = data.user;
@@ -863,7 +863,7 @@ function render() {
 function renderHome() {
   if (!TUTORS_LOADED) { loadTutors().then(() => render()); }
   // Load live stats from API
-  apiGet('/stats').then(function(data) {
+  apiGet('/admin?action=stats').then(function(data) {
     if (data.error) return;
     var el;
     el = document.getElementById('statStudents'); if (el) el.textContent = data.students || 0;
@@ -1168,9 +1168,9 @@ async function submitRegistration() {
     setCookie('epiphany_token', LEARNER._pendingToken, 30);
     setCookie('epiphany_type',  'learner', 30);
 
-    const regData = await apiPost('/register',{type:'learner',first,last,email,phone,password:pass,grade,location,subjects});
+    const regData = await apiPost('/auth?action=register',{type:'learner',first,last,email,phone,password:pass,grade,location,subjects});
     if (regData.error) { regError=regData.error; render(); return; }
-    const loginData = await apiPost('/login',{email,password:pass});
+    const loginData = await apiPost('/auth?action=login',{email,password:pass});
     if (loginData.token) { setCookie('epiphany_token',loginData.token,30); setCookie('epiphany_type','learner',30); }
 
     // Go straight to dashboard after registration
@@ -1202,7 +1202,7 @@ async function submitRegistration() {
     if (!tutorPass)  { regError = 'Please create a password.'; render(); return; }
     if (tutorPass.length < 6) { regError = 'Password must be at least 6 characters.'; render(); return; }
     if (tutorPass !== tutorPass2) { regError = 'Passwords do not match.'; render(); return; }
-    const tReg = await apiPost('/register',{type:'tutor',first,last,email,phone,password:tutorPass,
+    const tReg = await apiPost('/auth?action=register',{type:'tutor',first,last,email,phone,password:tutorPass,
       city,teachingMode:tMode||'Online',subject,gradeLevel,rate,qual,availability:availDays,bio});
     if (tReg.error) { regError=tReg.error; render(); return; }
 
@@ -1514,8 +1514,8 @@ function isSubActive(){
   return false;
 }
 function daysLeft(){if(!TUTOR_SUB.trialEnd)return 0;return Math.max(0,Math.ceil((new Date(TUTOR_SUB.trialEnd)-new Date())/86400000));}
-function startTrial(){var s=new Date(),e=new Date(s);e.setDate(e.getDate()+TRIAL_DAYS);TUTOR_SUB={status:'trial',trialStart:s.toISOString(),trialEnd:e.toISOString(),subStart:null,nextBilling:e.toISOString()};saveSubState();if(TUTOR.airtableId)apiPost('/subscription',{action:'start_trial',tutorId:TUTOR.airtableId});renderTutorDashboard();}
-function cancelSubscription(){TUTOR_SUB.status='cancelled';saveSubState();if(TUTOR.airtableId)apiPost('/subscription',{action:'cancel',tutorId:TUTOR.airtableId});renderTutorDashboard();}
+function startTrial(){var s=new Date(),e=new Date(s);e.setDate(e.getDate()+TRIAL_DAYS);TUTOR_SUB={status:'trial',trialStart:s.toISOString(),trialEnd:e.toISOString(),subStart:null,nextBilling:e.toISOString()};saveSubState();if(TUTOR.airtableId)apiPost('/admin?action=subscription',{action:'start_trial',tutorId:TUTOR.airtableId});renderTutorDashboard();}
+function cancelSubscription(){TUTOR_SUB.status='cancelled';saveSubState();if(TUTOR.airtableId)apiPost('/admin?action=subscription',{action:'cancel',tutorId:TUTOR.airtableId});renderTutorDashboard();}
 function goToRequests(){dashTab='requests';renderTutorDashboard();}
 async function launchPayFast() {
   var btn = event && event.target ? event.target : null;
