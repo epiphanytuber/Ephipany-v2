@@ -53,6 +53,7 @@ export default async function handler(req, res) {
 
     try {
       const id = 'BK-' + Date.now();
+      const sessionStatus = req.body.status || 'pending_payment';
 
       // ── SERVER-SIDE double booking check ──────────────────────────
       const conflict = await query(`
@@ -60,7 +61,7 @@ export default async function handler(req, res) {
         WHERE tutor_name = '${esc(tutorName)}'
           AND day = '${esc(day)}'
           AND time = '${esc(time)}'
-          AND status = 'confirmed'
+          AND status IN ('confirmed','pending_payment')
         LIMIT 1
       `);
       if (conflict.length > 0) {
@@ -86,7 +87,12 @@ export default async function handler(req, res) {
         )
       `);
 
-      console.log('[sessions] Saved booking:', id, learnerName, tutorName);
+      console.log('[sessions] Saved booking:', id, learnerName, tutorName, 'status:', sessionStatus);
+
+      // Only send confirmation emails when session is confirmed (payment received)
+      if (sessionStatus !== 'confirmed') {
+        return ok(res, { success: true, id });
+      }
 
       // Send confirmation email to learner
       try {
