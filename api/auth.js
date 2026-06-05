@@ -60,7 +60,11 @@ export default async function handler(req, res) {
         const status = t.status||t[8];
         if (status !== 'Comfirmed') return err(res,'Your tutor application is still pending approval.');
         await query(`UPDATE epiphany.main.tutors SET session_token='${esc(token)}',last_login='${now}' WHERE email='${esc(emailLower)}'`);
-        return ok(res,{type:'tutor',token,tutor:{id:t.id||t[0],name:t.full_name||t[1],email:t.email||t[2],phone:t.phone||t[3]||'',city:t.city||t[4]||'',subject:t.primary_subject||t[5]||'',rate:parseFloat(t.hourly_rate||t[6])||0,bio:t.bio||t[7]||'',since:t.applied_on||t[9]||''},subscription:{status:t.sub_status||t[10]||'none',trialStart:t.trial_start||t[11]||null,trialEnd:t.trial_end||t[12]||null,nextBilling:t.next_billing||t[13]||null}});
+        const ls = t.sub_status||t[10]||'none';
+        const lt = t.trial_start||t[11]||null;
+        const le = t.trial_end||t[12]||null;
+        const lb = t.next_billing||t[13]||null;
+        return ok(res,{type:'tutor',token,tutor:{id:t.id||t[0],name:t.full_name||t[1],email:t.email||t[2],phone:t.phone||t[3]||'',city:t.city||t[4]||'',subject:t.primary_subject||t[5]||'',rate:parseFloat(t.hourly_rate||t[6])||0,bio:t.bio||t[7]||'',since:t.applied_on||t[9]||''},subscription:{status:ls,trialStart:lt?new Date(lt).toISOString():null,trialEnd:le?new Date(le).toISOString():null,nextBilling:lb?new Date(lb).toISOString():null}});
       }
       return err(res,'Incorrect email or password');
     } catch(e) { console.error('[auth/login]',e.message); return err(res,'Login failed',500); }
@@ -79,10 +83,14 @@ export default async function handler(req, res) {
         return ok(res,{type:'learner',user:{id:u.id||u[0],name:u.full_name||u[1],email:u.email||u[2],phone:u.phone||u[3]||'',since:u.registered_on||u[4]||''}});
       }
       if (decoded.type === 'tutor') {
-        const tutors = await query(`SELECT t.id,t.full_name,t.email,t.phone,t.city,t.primary_subject,t.hourly_rate,t.bio,t.applied_on,s.status,s.trial_start,s.trial_end,s.next_billing FROM epiphany.main.tutors t LEFT JOIN epiphany.main.subscriptions s ON s.tutor_id=t.id WHERE t.id='${esc(decoded.id)}' AND t.status='Comfirmed'`);
+        const tutors = await query(`SELECT t.id,t.full_name,t.email,t.phone,t.city,t.primary_subject,t.hourly_rate,t.bio,t.applied_on,s.status as sub_status,s.trial_start,s.trial_end,s.next_billing FROM epiphany.main.tutors t LEFT JOIN epiphany.main.subscriptions s ON s.tutor_id=t.id WHERE t.id='${esc(decoded.id)}' AND t.status='Comfirmed'`);
         if (!tutors.length) return err(res,'Session expired');
         const t = tutors[0];
-        return ok(res,{type:'tutor',tutor:{id:t.id||t[0],name:t.full_name||t[1],email:t.email||t[2],phone:t.phone||t[3]||'',city:t.city||t[4]||'',subject:t.primary_subject||t[5]||'',rate:parseFloat(t.hourly_rate||t[6])||0,bio:t.bio||t[7]||'',since:t.applied_on||t[8]||''},subscription:{status:t.status||t[9]||'none',trialStart:t.trial_start||t[10]||null,trialEnd:t.trial_end||t[11]||null,nextBilling:t.next_billing||t[12]||null}});
+        const subStatus   = t.sub_status  || t[9]  || 'none';
+        const trialStart  = t.trial_start || t[10] || null;
+        const trialEnd    = t.trial_end   || t[11] || null;
+        const nextBilling = t.next_billing|| t[12] || null;
+        return ok(res,{type:'tutor',tutor:{id:t.id||t[0],name:t.full_name||t[1],email:t.email||t[2],phone:t.phone||t[3]||'',city:t.city||t[4]||'',subject:t.primary_subject||t[5]||'',rate:parseFloat(t.hourly_rate||t[6])||0,bio:t.bio||t[7]||'',since:t.applied_on||t[8]||''},subscription:{status:subStatus,trialStart:trialStart?new Date(trialStart).toISOString():null,trialEnd:trialEnd?new Date(trialEnd).toISOString():null,nextBilling:nextBilling?new Date(nextBilling).toISOString():null}});
       }
       return err(res,'Invalid token type');
     } catch(e) { return err(res,'Invalid or expired session'); }
