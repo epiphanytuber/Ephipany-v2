@@ -528,7 +528,7 @@ async function loadTutors() {
 const DAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 const TIMES=["08:00–10:00","09:00–11:00","10:00–12:00","11:00–13:00","12:00–14:00","13:00–15:00","14:00–16:00","15:00–17:00","16:00–18:00","17:00–19:00"];
 const SUBJECTS=["All Subjects","Mathematics","English","Sciences","Commerce","Languages","Computer Science","History"];
-const LOCATIONS=["All Locations","Johannesburg","Midrand","Pretoria","Centurion","Kempton Park"];
+const LOCATIONS=["All Locations","Johannesburg","Cape Town","Pretoria","Durban","Stellenbosch"];
 const MODES=["All Modes","In-Person","Online"];
 
 // Learner object — updated on registration
@@ -720,7 +720,20 @@ async function loadLearnerData() {
       });
     }
     var pData=await apiGet('/payments?email='+encodeURIComponent(LEARNER.email)+'&type=learner');
-    if(pData.payments)INVOICES=pData.payments.filter(function(p){return p.status==='paid';}).map(function(p){return{id:p.invoice_id||p.id,date:p.paid_on||'',tutor:p.tutor_name||'',subject:p.subject,amount:parseFloat(p.amount)||0};});
+    if(pData.payments) {
+      INVOICES = pData.payments.map(function(p) {
+        return {
+          id:          p.id || '',
+          invoice_id:  p.invoice_id || 'INV-'+Date.now(),
+          tutor_name:  p.tutor_name || '',
+          subject:     p.subject || '',
+          amount:      parseFloat(p.amount) || 0,
+          status:      p.status || 'confirmed',
+          paid_on:     p.paid_on || '',
+          day:         p.day || '',
+        };
+      });
+    }
   }catch(e){console.error('[loadLearnerData]',e);}
 }
 function enterDashboard() {
@@ -1211,7 +1224,57 @@ function lessonCard(l) {
   return `<div class="lc ${bcls}"><img src="${l.img}" class="lc-img" alt="${l.tutor}"/><div class="lc-info"><div class="lc-tutor">${l.tutor}</div><div class="lc-subj">${l.subject}</div><div class="lc-meta"><span class="lc-date">&#128197; ${l.date} &middot; ${l.time}</span><span class="lc-mode">${l.mode}</span></div></div><div class="lc-right"><span class="lc-rate-lbl">R${l.rate}</span>${pill(st)}${act}</div></div>`;
 }
 
-function cancelLesson(id) { cancelledIds.push(id); renderDashboard(); }
+function showCancelModal(sessionId, tutorName, subject) {
+  // Store for later use
+  window._cancelSessionId = sessionId;
+  var m = document.getElementById('authModalMount');
+  if (!m) return;
+  var html = '<div class="auth-overlay" id="authOverlay">';
+  html += '<div class="auth-box" style="max-width:420px">';
+  html += '<button class="auth-close" onclick="closeCancelModal()">&#10005;</button>';
+  html += '<div style="font-family:Georgia,serif;font-size:22px;font-weight:300;color:var(--red);margin-bottom:16px">Cancel Session</div>';
+  html += '<p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px">Are you sure you want to cancel your <strong style="color:var(--white)">'+subject+'</strong> session with <strong style="color:var(--gold)">'+tutorName+'</strong>? Both you and the tutor will be notified by email.</p>';
+  html += '<label class="auth-label">Reason (optional)</label>';
+  html += '<textarea class="auth-input" id="cancelReason" rows="3" placeholder="e.g. Schedule conflict, personal reasons..." style="resize:vertical;height:80px;padding:11px 14px"></textarea>';
+  html += '<button onclick="confirmCancelSession()" style="width:100%;margin-top:16px;padding:14px;background:var(--red);color:var(--white);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Confirm Cancellation</button>';
+  html += '<button onclick="closeCancelModal()" style="width:100%;margin-top:8px;padding:12px;background:transparent;color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(250,249,246,.1);cursor:pointer;">Keep Session</button>';
+  html += '</div></div>';
+  m.innerHTML = html;
+}
+function closeCancelModal() {
+  var m = document.getElementById('authModalMount');
+  if (m) m.innerHTML = '';
+}
+async function confirmCancelSession() {
+  var sessionId = window._cancelSessionId;
+  if (!sessionId) return;
+  var reason = document.getElementById('cancelReason') ? document.getElementById('cancelReason').value : '';
+  var btn = document.querySelector('#authModalMount button[style*="var(--red)"]');
+  if (btn) { btn.textContent = 'Cancelling...'; btn.disabled = true; }
+  try {
+    var data = await apiPost('/cancel-session', {
+      sessionId: sessionId || window._cancelSessionId,
+      learnerEmail: LEARNER.email,
+      reason: reason
+    });
+    if (data.error) { alert('Error: ' + data.error); if(btn){btn.textContent='Confirm Cancellation';btn.disabled=false;} return; }
+    // Update local state
+    cancelledIds.push(sessionId);
+    UPCOMING_L = UPCOMING_L.map(function(s){ return s.id===sessionId ? Object.assign({},s,{status:'cancelled'}) : s; });
+    // Move to past
+    var cancelled = UPCOMING_L.find(function(s){return s.id===sessionId;});
+    if (cancelled) {
+      PAST_L.unshift(Object.assign({},cancelled,{status:'cancelled'}));
+      UPCOMING_L = UPCOMING_L.filter(function(s){return s.id!==sessionId;});
+    }
+    closeCancelModal();
+    renderDashboard();
+  } catch(e) {
+    alert('Something went wrong. Please try again.');
+    if(btn){btn.textContent='Confirm Cancellation';btn.disabled=false;}
+  }
+}
+function cancelLesson(id) { showCancelModal(id,'','Session'); }
 
 // ── DASHBOARD RENDER ──────────────────────────────────────────────
 function buildDueTile(due) {
@@ -1220,7 +1283,8 @@ function buildDueTile(due) {
   return '<div class="ov-card"><div class="ov-label">Amount Due</div><div class="ov-value'+cls+'">R'+due+'</div>'+sub+'</div>';
 }
 function renderDashboard() {
-  const totalSpent  = INVOICES.reduce((s, i) => s + i.amount, 0);
+  var signOutBtnL = '<div style="padding:20px 28px;border-top:1px solid var(--border);margin-top:16px"><button onclick="exitDashboard()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(250,249,246,.12);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:sans-serif;">Sign Out</button></div>';
+  const totalSpent = INVOICES.filter(function(i){return i.status!=='cancelled';}).reduce(function(s,i){return s+i.amount;},0);
   const outstanding = DUE_INV.filter(i => !paidIds.includes(i.id));
   const dueTotal    = outstanding.reduce((s, i) => s + i.amount, 0);
   const completedCt = PAST_L.filter(l => l.status === 'completed').length;
@@ -1233,7 +1297,6 @@ function renderDashboard() {
     { id: 'profile',  label: 'Profile Settings',  icon: '&#9673;' },
   ];
 
-  const signOutBtnL = '<div style="padding:20px 28px;border-top:1px solid rgba(201,168,76,.08);position:absolute;bottom:0;left:0;right:0"><button onclick="exitDashboard()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(250,249,246,.1);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">&#8592; Sign Out</button></div>';
   const sidebar = `<aside class="dash-sidebar">
 <div class="dash-sb-profile">
   <div class="dash-sb-label">My Account</div>
@@ -1241,6 +1304,7 @@ function renderDashboard() {
 </div>
 <div class="dash-nav-label">Navigation</div>
 ${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' : ''}" onclick="switchTab('${n.id}')"><span class="dash-nav-icon">${n.icon}</span>${n.label}${n.badge ? `<span class="dash-nav-badge">${n.badge}</span>` : ''}</button>`).join('')}
+${signOutBtnL}
 </aside>`;
 
   let main = '';
@@ -1302,20 +1366,32 @@ ${navItems.map(n => `<button class="dash-nav-item${dashTab === n.id ? ' active' 
   }
 
   if (dashTab === 'payments') {
-    const modal = payInvoice ? renderPayModal() : '';
-    main = `<div class="dash-section">
-<div class="dash-eyebrow">Finances</div><div class="dash-title">Payments &amp; <em>Invoices</em></div>
-<div class="pay-top">
-  <div class="pay-card"><div class="pay-card-label">Total Spent (All Time)</div><div class="pay-card-value">R${totalSpent.toLocaleString()}</div><div class="pay-card-sub">${INVOICES.length} sessions paid</div></div>
-  <div class="pay-card"><div class="pay-card-label">Currently Due</div><div class="pay-card-value ${dueTotal > 0 ? 'amb' : 'grn'}">R${dueTotal}</div><div class="pay-card-sub">${outstanding.length === 0 ? 'All paid &#10003;' : `${outstanding.length} invoice${outstanding.length !== 1 ? 's' : ''} outstanding`}</div></div>
-</div>
-${outstanding.length > 0 ? `<div style="margin-bottom:28px"><div class="due-hdr"><span class="due-dot"></span>Outstanding Invoices</div>${outstanding.map(inv => `<div class="due-card"><div class="due-info"><div class="due-inv-id">${inv.id}</div><div class="due-desc">${inv.tutor} &mdash; ${inv.subject}</div><div class="due-date">Due: ${inv.dueDate}</div></div><span class="due-amount">R${inv.amount}</span><button class="pay-now-btn" onclick="openPayModal('${inv.id}')">Pay Now</button></div>`).join('')}</div>` : ''}
-<div class="sub-hdg">Invoice History <span class="sub-hdg-count">${INVOICES.length} invoices</span></div>
-<table class="inv-table">
-<thead><tr><th>Invoice</th><th>Date</th><th>Tutor</th><th>Subject</th><th>Amount</th><th>Status</th><th></th></tr></thead>
-<tbody>${INVOICES.map(inv => `<tr><td><span class="inv-id">${inv.id}</span></td><td style="color:var(--muted);font-size:12px">${inv.date}</td><td>${inv.tutor}</td><td style="color:var(--muted)">${inv.subject}</td><td style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold)">R${inv.amount}</td><td><span class="inv-paid">Paid</span></td><td><button class="inv-dl">&#8595; Receipt</button></td></tr>`).join('')}</tbody>
-</table>${modal}
-</div>`;
+    var modal = payInvoice ? renderPayModal() : '';
+    var invoiceRows = INVOICES.length > 0
+      ? INVOICES.map(function(inv) {
+          var statusBadge = inv.status === 'cancelled'
+            ? '<span style="color:var(--red);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;background:rgba(224,92,92,.1);border:1px solid rgba(224,92,92,.2)">Cancelled</span>'
+            : '<span class="inv-paid">Confirmed</span>';
+          var dateStr = inv.paid_on ? new Date(inv.paid_on).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : inv.day || '—';
+          return '<tr><td><span class="inv-id">'+(inv.invoice_id||inv.id)+'</span></td>'
+            +'<td style="color:var(--muted);font-size:12px">'+dateStr+'</td>'
+            +'<td>'+inv.tutor_name+'</td>'
+            +'<td style="color:var(--muted)">'+inv.subject+'</td>'
+            +'<td style="font-family:Georgia,serif;font-size:18px;color:var(--gold)">R'+inv.amount+'</td>'
+            +'<td>'+statusBadge+'</td></tr>';
+        }).join('')
+      : '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted);font-style:italic">No payment history yet.</td></tr>';
+
+    main = '<div class="dash-section">'
+      +'<div class="dash-eyebrow">Finances</div><div class="dash-title">Payments &amp; <em>Invoices</em></div>'
+      +'<div class="pay-top">'
+      +'<div class="pay-card"><div class="pay-card-label">Total Sessions</div><div class="pay-card-value" style="font-size:36px">'+INVOICES.length+'</div><div class="pay-card-sub">All time bookings</div></div>'
+      +'<div class="pay-card"><div class="pay-card-label">Total Value</div><div class="pay-card-value">R'+totalSpent.toLocaleString()+'</div><div class="pay-card-sub">Session bookings</div></div>'
+      +'</div>'
+      +'<div class="sub-hdg">Session History <span class="sub-hdg-count">'+INVOICES.length+' sessions</span></div>'
+      +'<table class="inv-table"><thead><tr><th>Reference</th><th>Date</th><th>Tutor</th><th>Subject</th><th>Amount</th><th>Status</th></tr></thead>'
+      +'<tbody>'+invoiceRows+'</tbody></table>'
+      +modal+'</div>';
   }
 
   if (dashTab === 'profile') {
