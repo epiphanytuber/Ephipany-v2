@@ -52,7 +52,9 @@ export default async function handler(req, res) {
       if (learners.length > 0) {
         const u = learners[0];
         await query(`UPDATE epiphany.main.users SET session_token='${esc(token)}',last_login='${now}' WHERE email='${esc(emailLower)}'`);
-        return ok(res,{type:'learner',token,user:{id:u.id||u[0],name:u.full_name||u[1],email:u.email||u[2],phone:u.phone||u[3]||'',since:u.registered_on||(u[5])||''}});
+        const rawSince = u.registered_on||u[5]||null;
+        const sinceFmt = rawSince ? new Date(rawSince).toLocaleString('en-ZA',{month:'long',year:'numeric'}) : '';
+        return ok(res,{type:'learner',token,user:{id:u.id||u[0],name:u.full_name||u[1],email:u.email||u[2],phone:u.phone||u[3]||'',since:sinceFmt}});
       }
       const tutors = await query(`SELECT t.id,t.full_name,t.email,t.phone,t.city,t.primary_subject,t.hourly_rate,t.bio,t.status,t.applied_on,s.status as sub_status,s.trial_start,s.trial_end,s.next_billing FROM epiphany.main.tutors t LEFT JOIN epiphany.main.subscriptions s ON s.tutor_id=t.id WHERE t.email='${esc(emailLower)}' AND t.password_hash='${esc(passwordHash)}'`);
       if (tutors.length > 0) {
@@ -80,7 +82,9 @@ export default async function handler(req, res) {
         const users = await query(`SELECT id,full_name,email,phone,registered_on FROM epiphany.main.users WHERE id='${esc(decoded.id)}' AND status='active'`);
         if (!users.length) return err(res,'Session expired');
         const u = users[0];
-        return ok(res,{type:'learner',user:{id:u.id||u[0],name:u.full_name||u[1],email:u.email||u[2],phone:u.phone||u[3]||'',since:u.registered_on||u[4]||''}});
+        const rawS2 = u.registered_on||u[4]||null;
+        const sinceF2 = rawS2 ? new Date(rawS2).toLocaleString('en-ZA',{month:'long',year:'numeric'}) : '';
+        return ok(res,{type:'learner',user:{id:u.id||u[0],name:u.full_name||u[1],email:u.email||u[2],phone:u.phone||u[3]||'',since:sinceF2}});
       }
       if (decoded.type === 'tutor') {
         const tutors = await query(`SELECT t.id,t.full_name,t.email,t.phone,t.city,t.primary_subject,t.hourly_rate,t.bio,t.applied_on,s.status as sub_status,s.trial_start,s.trial_end,s.next_billing FROM epiphany.main.tutors t LEFT JOIN epiphany.main.subscriptions s ON s.tutor_id=t.id WHERE t.id='${esc(decoded.id)}' AND t.status='Comfirmed'`);
