@@ -1543,8 +1543,15 @@ function lessonCard(l) {
     ? new Date(l.date+'T12:00:00').toLocaleDateString('en-ZA',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
     : (l.date || '—');
   if (st === 'pending_payment') {
-    act += '<button onclick="doSessionPayment(this)" data-id="'+l.id+'" data-tutor="'+l.tutor+'" data-subject="'+l.subject+'" data-rate="'+l.rate+'" style="padding:7px 16px;background:var(--red);color:var(--white);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Pay R'+l.rate+' →</button>';
-    act += '<button class="lc-cancel" onclick="doCancelFromCard(this)" data-id="'+l.id+'" data-tutor="'+l.tutor+'" data-subject="'+l.subject+'">Cancel</button>';
+    // Only show Pay button — no duplicate pill
+    act = '<button onclick="doSessionPayment(this)" data-id="'+l.id+'" data-tutor="'+l.tutor+'" data-subject="'+l.subject+'" data-rate="'+l.rate+'" style="padding:7px 16px;background:var(--red);color:var(--white);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Pay R'+l.rate+' →</button>'
+    +'<button class="lc-cancel" onclick="doCancelFromCard(this)" data-id="'+l.id+'" data-tutor="'+l.tutor+'" data-subject="'+l.subject+'">Cancel</button>';
+    return '<div class="lc lc-pend">'+avatarHTML(l.tutor,44)
+      +'<div class="lc-info"><div class="lc-tutor">'+l.tutor+'</div>'
+      +'<div class="lc-subj">'+l.subject+'</div>'
+      +'<div class="lc-meta"><span class="lc-date">&#128197; '+dateStr+' &middot; '+l.time+'</span>'
+      +'<span class="lc-mode">'+(l.mode||'Online')+'</span><span class="lc-mode">2hrs</span></div></div>'
+      +'<div class="lc-right"><span class="lc-rate-lbl">R'+l.rate+'</span>'+act+'</div></div>';
   }
   if (st === 'confirmed') {
     act += '<button class="lc-join" onclick="epiphanyAlert(&quot;Session joining link will appear here once confirmed.&quot;,&quot;info&quot;)">Join &rarr;</button>';
@@ -1673,7 +1680,10 @@ function renderDashboard() {
   var signOutBtnL = '<div style="padding:20px 28px;border-top:1px solid var(--border);margin-top:16px"><button onclick="exitDashboard()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(250,249,246,.12);color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:sans-serif;">Sign Out</button></div>';
   const totalSpent = INVOICES.filter(function(i){return i.status!=='cancelled';}).reduce(function(s,i){return s+i.amount;},0);
   const outstanding = DUE_INV.filter(i => !paidIds.includes(i.id));
-  const dueTotal    = outstanding.reduce((s, i) => s + i.amount, 0);
+  // Also count pending_payment sessions as due
+  const pendingDue = UPCOMING_L.filter(function(s){ return s.status==='pending_payment' && !paidIds.includes(s.id); })
+    .reduce(function(sum,s){ return sum + (parseFloat(s.rate)||0); }, 0);
+  const dueTotal = outstanding.reduce(function(s,i){ return s + i.amount; }, 0) + pendingDue;
   const completedCt = PAST_L.filter(l => l.status === 'completed').length;
 
   const navItems = [
