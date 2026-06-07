@@ -753,7 +753,11 @@ function today() { return new Date().toISOString().split('T')[0]; }
 function monthYear() { return new Date().toLocaleString('en-ZA', { month: 'long', year: 'numeric' }); }
 const S = n => `<span class="stars-gold">${'&#9733;'.repeat(Math.floor(n))}${'&#9734;'.repeat(5 - Math.floor(n))}</span>`;
 const PILL_MAP = { confirmed: 'pill-confirmed', pending: 'pill-pending', pending_payment: 'pill-pending', completed: 'pill-completed', cancelled: 'pill-cancelled' };
-function pill(s) { return `<span class="lc-pill ${PILL_MAP[s] || ''}">${s}</span>`; }
+function pill(s) {
+  var labels = { confirmed:'Confirmed', pending:'Pending', pending_payment:'Awaiting Payment', completed:'Completed', cancelled:'Cancelled' };
+  var label = labels[s] || s;
+  return '<span class="lc-pill '+(PILL_MAP[s]||'')+'">'+label+'</span>';
+}
 
 // ── ACCOUNT CLICK HANDLER (bulletproof) ──────────────────────────
 function handleAccountClick() {
@@ -992,16 +996,19 @@ async function loadLearnerData() {
       INVOICES = pData.payments.map(function(p) {
         return {
           id:          p.id || '',
-          invoice_id:  p.invoice_id || 'INV-'+Date.now(),
-          tutor_name:  p.tutor_name || '',
-          subject:     p.subject || '',
-          amount:      parseFloat(p.amount) || 0,
-          status:      p.status || 'confirmed',
-          paid_on:     p.paid_on || '',
-          day:         p.day || '',
+          invoice_id:  'INV-'+(p.id||Date.now()).toString().slice(-8),
+          tutor_name:  p.tutor_name || p[1] || '',
+          subject:     p.subject    || p[2] || '',
+          amount:      parseFloat(p.amount||p[3]) || 0,
+          status:      p.status     || p[4] || 'confirmed',
+          paid_on:     p.paid_on    || p[5] || '',
+          day:         p.day        || '',
         };
       });
     }
+    // Also update DUE_INV from pending_payment sessions
+    DUE_INV = INVOICES.filter(function(i){ return i.status==='pending_payment'; })
+      .map(function(i){ return {id:i.id,dueDate:i.day||i.paid_on,tutor:i.tutor_name,subject:i.subject,amount:i.amount}; });
   }catch(e){console.error('[loadLearnerData]',e);}
 }
 function enterDashboard() {
@@ -1353,7 +1360,7 @@ function confirmBooking() {
     rate: t.rate * 2, status: 'pending_payment'
   });
   DUE_INV.unshift({
-    id: invId, dueDate: selDay, tutor: t.name, subject: t.subjects[0], amount: t.rate
+    id: invId, dueDate: selDay, tutor: t.name, subject: t.subjects[0], amount: t.rate * 2
   });
 
   var t_time = selTime; // capture before render
