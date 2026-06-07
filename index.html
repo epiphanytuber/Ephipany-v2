@@ -1543,7 +1543,7 @@ function lessonCard(l) {
     ? new Date(l.date+'T12:00:00').toLocaleDateString('en-ZA',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
     : (l.date || '—');
   if (st === 'pending_payment') {
-    act += '<button class="lc-join" onclick="doSessionPayment(this)" data-id="'+l.id+'" data-tutor="'+l.tutor+'" data-subject="'+l.subject+'" data-rate="'+l.rate+'" style="background:var(--amber);color:var(--black)">Pay Now R'+l.rate+' &rarr;</button>';
+    act += '<button onclick="doSessionPayment(this)" data-id="'+l.id+'" data-tutor="'+l.tutor+'" data-subject="'+l.subject+'" data-rate="'+l.rate+'" style="padding:7px 16px;background:var(--red);color:var(--white);font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;">Pay R'+l.rate+' →</button>';
     act += '<button class="lc-cancel" onclick="doCancelFromCard(this)" data-id="'+l.id+'" data-tutor="'+l.tutor+'" data-subject="'+l.subject+'">Cancel</button>';
   }
   if (st === 'confirmed') {
