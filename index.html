@@ -1006,7 +1006,23 @@ async function loadLearnerData() {
         };
       });
     }
-    // Also update DUE_INV from pending_payment sessions
+    // Merge pending_payment sessions into INVOICES if not already there
+    UPCOMING_L.filter(function(s){ return s.status==='pending_payment'; }).forEach(function(s) {
+      var already = INVOICES.some(function(i){ return i.id === s.id; });
+      if (!already) {
+        INVOICES.unshift({
+          id: s.id,
+          invoice_id: 'INV-'+s.id.toString().slice(-8),
+          tutor_name: s.tutor,
+          subject: s.subject,
+          amount: parseFloat(s.rate)||0,
+          status: 'pending_payment',
+          paid_on: '',
+          day: s.date,
+        });
+      }
+    });
+    // Update DUE_INV
     DUE_INV = INVOICES.filter(function(i){ return i.status==='pending_payment'; })
       .map(function(i){ return {id:i.id,dueDate:i.day||i.paid_on,tutor:i.tutor_name,subject:i.subject,amount:i.amount}; });
   }catch(e){console.error('[loadLearnerData]',e);}
@@ -1612,6 +1628,26 @@ async function doSessionPayment(btn) {
     btn.textContent = 'Pay Now R'+rate+' →'; btn.disabled = false;
   }
 }
+function payFromPaymentsTabGlobal() {
+  var d = window._payNow;
+  if (!d) return;
+  payFromPaymentsTab(d.id, d.tutor, d.subject, d.rate);
+}
+function payFromPaymentsTab(sessionId, tutorName, subject, amount) {
+  // Create a fake button element with the right data attributes
+  var fakeBtn = {
+    getAttribute: function(attr) {
+      if (attr === 'data-id') return sessionId;
+      if (attr === 'data-tutor') return tutorName;
+      if (attr === 'data-subject') return subject;
+      if (attr === 'data-rate') return amount;
+      return '';
+    },
+    textContent: '',
+    disabled: false
+  };
+  doSessionPayment(fakeBtn);
+}
 function doCancelFromCard(btn) {
   var id      = btn.getAttribute('data-id');
   var tutor   = btn.getAttribute('data-tutor');
@@ -1765,30 +1801,65 @@ ${signOutBtnL}
 
   if (dashTab === 'payments') {
     var modal = payInvoice ? renderPayModal() : '';
-    var invoiceRows = INVOICES.length > 0
-      ? INVOICES.map(function(inv) {
-          var statusBadge = inv.status === 'cancelled'
-            ? '<span style="color:var(--red);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;background:rgba(224,92,92,.1);border:1px solid rgba(224,92,92,.2)">Cancelled</span>'
-            : '<span class="inv-paid">Confirmed</span>';
-          var dateStr = inv.paid_on ? new Date(inv.paid_on).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : inv.day || '—';
-          return '<tr><td><span class="inv-id">'+(inv.invoice_id||inv.id)+'</span></td>'
+
+    // Split sessions into pending (awaiting payment) and paid
+    var pendingSessions = INVOICES.filter(function(inv){ return inv.status === 'pending_payment'; });
+    var paidSessions    = INVOICES.filter(function(inv){ return inv.status !== 'pending_payment' && inv.status !== 'cancelled'; });
+    var cancelledSess   = INVOICES.filter(function(inv){ return inv.status === 'cancelled'; });
+
+    var totalDue  = pendingSessions.reduce(function(s,i){ return s+i.amount; }, 0);
+    var totalPaid = paidSessions.reduce(function(s,i){ return s+i.amount; }, 0);
+
+    // Pending payment rows with Pay Now button
+    var pendingRows = pendingSessions.length > 0
+      ? pendingSessions.map(function(inv) {
+          var dateStr = inv.day ? new Date(inv.day+'T12:00:00').toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : '—';
+          return '<tr style="border-left:3px solid var(--red)">'
+            +'<td><span class="inv-id">'+(inv.invoice_id||inv.id)+'</span></td>'
+            +'<td style="color:var(--muted);font-size:12px">'+dateStr+'</td>'
+            +'<td>'+inv.tutor_name+'</td>'
+            +'<td style="color:var(--muted)">'+inv.subject+'</td>'
+            +'<td style="font-family:Georgia,serif;font-size:18px;color:var(--red)">R'+inv.amount+'</td>'
+            +'<td><span style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;background:rgba(224,92,92,.1);color:var(--red);border:1px solid rgba(224,92,92,.3)">Awaiting Payment</span></td>'
+            +'<td><button onclick="window._payNow={id:&quot;'+inv.id+'&quot;,tutor:&quot;'+inv.tutor_name+'&quot;,subject:&quot;'+inv.subject+'&quot;,rate:'+inv.amount+'};payFromPaymentsTabGlobal()" style="padding:6px 14px;background:var(--red);color:var(--white);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;border:none;cursor:pointer;white-space:nowrap">Pay Now</button></td>'
+            +'</tr>';
+        }).join('')
+      : '';
+
+    // Paid rows
+    var paidRows = paidSessions.length > 0
+      ? paidSessions.map(function(inv) {
+          var dateStr = inv.paid_on ? new Date(inv.paid_on).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : (inv.day ? new Date(inv.day+'T12:00:00').toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : '—');
+          return '<tr>'
+            +'<td><span class="inv-id">'+(inv.invoice_id||inv.id)+'</span></td>'
             +'<td style="color:var(--muted);font-size:12px">'+dateStr+'</td>'
             +'<td>'+inv.tutor_name+'</td>'
             +'<td style="color:var(--muted)">'+inv.subject+'</td>'
             +'<td style="font-family:Georgia,serif;font-size:18px;color:var(--gold)">R'+inv.amount+'</td>'
-            +'<td>'+statusBadge+'</td></tr>';
+            +'<td><span class="inv-paid">Confirmed</span></td>'
+            +'<td></td>'
+            +'</tr>';
         }).join('')
-      : '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted);font-style:italic">No payment history yet.</td></tr>';
+      : '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);font-style:italic">No confirmed sessions yet.</td></tr>';
 
     main = '<div class="dash-section">'
       +'<div class="dash-eyebrow">Finances</div><div class="dash-title">Payments &amp; <em>Invoices</em></div>'
       +'<div class="pay-top">'
-      +'<div class="pay-card"><div class="pay-card-label">Total Sessions</div><div class="pay-card-value" style="font-size:36px">'+INVOICES.length+'</div><div class="pay-card-sub">All time bookings</div></div>'
-      +'<div class="pay-card"><div class="pay-card-label">Total Value</div><div class="pay-card-value">R'+totalSpent.toLocaleString()+'</div><div class="pay-card-sub">Session bookings</div></div>'
+      +'<div class="pay-card"><div class="pay-card-label">Amount Due</div>'
+      +'<div class="pay-card-value '+(totalDue>0?'amb':'grn')+'">R'+totalDue+'</div>'
+      +'<div class="pay-card-sub">'+(pendingSessions.length>0?pendingSessions.length+' session'+(pendingSessions.length!==1?'s':'')+' awaiting payment':'All clear ✓')+'</div></div>'
+      +'<div class="pay-card"><div class="pay-card-label">Total Paid</div>'
+      +'<div class="pay-card-value">R'+totalPaid.toLocaleString()+'</div>'
+      +'<div class="pay-card-sub">'+paidSessions.length+' session'+(paidSessions.length!==1?'s':'')+' confirmed</div></div>'
       +'</div>'
-      +'<div class="sub-hdg">Session History <span class="sub-hdg-count">'+INVOICES.length+' sessions</span></div>'
-      +'<table class="inv-table"><thead><tr><th>Reference</th><th>Date</th><th>Tutor</th><th>Subject</th><th>Amount</th><th>Status</th></tr></thead>'
-      +'<tbody>'+invoiceRows+'</tbody></table>'
+      +(pendingSessions.length > 0
+        ? '<div style="margin-bottom:28px"><div class="due-hdr"><span class="due-dot"></span>Sessions Awaiting Payment</div>'
+          +'<table class="inv-table"><thead><tr><th>Reference</th><th>Date</th><th>Tutor</th><th>Subject</th><th>Amount</th><th>Status</th><th></th></tr></thead>'
+          +'<tbody>'+pendingRows+'</tbody></table></div>'
+        : '')
+      +'<div class="sub-hdg">All Sessions <span class="sub-hdg-count">'+(INVOICES.length)+' total</span></div>'
+      +'<table class="inv-table"><thead><tr><th>Reference</th><th>Date</th><th>Tutor</th><th>Subject</th><th>Amount</th><th>Status</th><th></th></tr></thead>'
+      +'<tbody>'+pendingRows+paidRows+'</tbody></table>'
       +modal+'</div>';
   }
 
