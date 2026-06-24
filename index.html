@@ -449,6 +449,7 @@ body{background:var(--black);color:var(--white);font-family:'Nunito Sans',sans-s
 
   /* ── HERO ── */
   .hero{min-height:auto;padding:48px 20px 40px}
+  .hero-book-wrap{display:none}
   .hero-bg-text{display:none}
   .hero-title{font-size:38px;line-height:1.1;margin-bottom:20px}
   .hero-sub{font-size:13px;margin-bottom:28px}
@@ -1163,10 +1164,86 @@ function renderHome() {
   }).catch(function(){});
   const feat = TUTORS.slice(0, 4);
   return `<div class="page">
-<section class="hero"><div class="hero-bg"></div><div class="hero-bg-text">EPIPHANY</div>
+<section class="hero"><div class="hero-bg"></div><div class="hero-line"></div>
+
+<!-- SVG Book illustration - sits right side like Montfort's mountain -->
+<div class="hero-book-wrap">
+<svg class="hero-book-svg" viewBox="0 0 520 580" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="pageGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#E8E4DC"/>
+      <stop offset="100%" stop-color="#F5F3EE"/>
+    </linearGradient>
+    <linearGradient id="spineGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0a0a0a"/>
+      <stop offset="100%" stop-color="#1a1a1a"/>
+    </linearGradient>
+    <linearGradient id="coverGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#111"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </linearGradient>
+    <linearGradient id="shadowGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="rgba(28,28,30,0.15)"/>
+      <stop offset="100%" stop-color="rgba(28,28,30,0)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Drop shadow -->
+  <ellipse cx="270" cy="545" rx="180" ry="18" fill="rgba(28,28,30,0.08)"/>
+
+  <!-- Book body - main cover -->
+  <rect x="80" y="60" width="320" height="450" rx="2" fill="url(#coverGrad)"/>
+
+  <!-- Book spine -->
+  <rect x="80" y="60" width="44" height="450" rx="2" fill="url(#spineGrad)"/>
+  <line x1="96" y1="80" x2="96" y2="490" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+
+  <!-- Page stack (right edge) - gives depth -->
+  <rect x="392" y="65" width="12" height="440" fill="#E8E4DC" rx="1"/>
+  <rect x="395" y="65" width="8" height="440" fill="#EDE9E1" rx="1"/>
+  <rect x="398" y="65" width="5" height="440" fill="#F2EFE8" rx="1"/>
+
+  <!-- Cover texture lines -->
+  <line x1="140" y1="60" x2="140" y2="510" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+
+  <!-- Cover design - horizontal rule -->
+  <line x1="110" y1="140" x2="380" y2="140" stroke="rgba(255,255,255,0.2)" stroke-width="0.75"/>
+  <line x1="110" y1="145" x2="380" y2="145" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
+
+  <!-- Cover title block -->
+  <rect x="110" y="165" width="200" height="4" fill="rgba(255,255,255,0.5)" rx="1"/>
+  <rect x="110" y="177" width="160" height="3" fill="rgba(255,255,255,0.3)" rx="1"/>
+  <rect x="110" y="188" width="180" height="3" fill="rgba(255,255,255,0.3)" rx="1"/>
+
+  <!-- Cover emblem - abstract E initial -->
+  <rect x="110" y="230" width="50" height="4" fill="rgba(255,255,255,0.6)" rx="0"/>
+  <rect x="110" y="244" width="36" height="4" fill="rgba(255,255,255,0.4)" rx="0"/>
+  <rect x="110" y="258" width="50" height="4" fill="rgba(255,255,255,0.6)" rx="0"/>
+  <rect x="110" y="230" width="4" height="32" fill="rgba(255,255,255,0.6)" rx="0"/>
+
+  <!-- Author line at bottom -->
+  <line x1="110" y1="430" x2="380" y2="430" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+  <rect x="110" y="445" width="120" height="2.5" fill="rgba(255,255,255,0.25)" rx="1"/>
+  <rect x="110" y="454" width="90" height="2.5" fill="rgba(255,255,255,0.18)" rx="1"/>
+
+  <!-- Open pages fanning - subtle page fan at top -->
+  <path d="M 124 62 Q 260 45 396 62" stroke="rgba(232,228,220,0.6)" stroke-width="1" fill="none"/>
+  <path d="M 124 62 Q 260 50 396 62" stroke="rgba(232,228,220,0.4)" stroke-width="0.75" fill="none"/>
+  <path d="M 124 62 Q 260 54 396 62" stroke="rgba(232,228,220,0.25)" stroke-width="0.5" fill="none"/>
+
+  <!-- Bookmark ribbon -->
+  <rect x="330" y="58" width="8" height="72" fill="#C9A84C"/>
+  <polygon points="330,130 338,130 334,142" fill="#A8842E"/>
+
+  <!-- Spine title text placeholder lines -->
+  <rect x="90" y="200" width="3" height="80" fill="rgba(255,255,255,0.2)" rx="1"/>
+  <rect x="90" y="290" width="3" height="40" fill="rgba(255,255,255,0.12)" rx="1"/>
+</svg>
+</div>
+
 <div class="hero-content">
-  <div class="eyebrow">Premier Tutoring Marketplace</div>
-  <h1 class="hero-title">Unlock your child's<br><em>true potential</em></h1>
+  <div class="hero-eyebrow">Premier Tutoring Marketplace · South Africa</div>
+  <h1 class="hero-title">Education that<br><em>transforms lives</em></h1>
   <p class="hero-sub">Connect with South Africa's finest educators. Expert tutors, flexible scheduling, and transformative results &mdash; all in one place.</p>
   <div class="hero-actions"><button class="btn-gold" onclick="navigate('catalogue')">Browse Tutors</button><button class="btn-ghost" onclick="navigate('register')">Become a Tutor</button></div>
   <div class="hero-stats" id="heroStats">
